@@ -1,0 +1,46 @@
+{% extends 'base.html' %} 
+{% block content %}
+
+
+{% block title %}Dashboard{% endblock %}
+
+<h1>{{greeting}} {{username}}</h1>
+
+<p>Welcome to your dashboard!</p>
+
+
+{% if role in ['Hiring Manager', 'HR Executive' ,'HR Manager'] %}
+<div class="dashboard-cards">
+    <div class="card">
+        <h2>Jobs Posted</h2>
+        <p>{{ job_count }}</p>
+        <h3>Total Openings</h3>
+        <p>{{ openings }}</p>
+
+        <a href="{{ url_for('jobs_list') }}">View Jobs</a>
+    </div>
+    <div class="card">
+        <h2>Candidates </h2>
+        <p>{{ candidates_managed_count }}</p>
+        <a href="{{ url_for('manage_candidates') }}">View Candidates</a>
+    </div>
+    <div class="card">
+        <h2>Onboarding Processes</h2>
+        <p>{{ onboarding_count }}</p>
+        <a href="{{ url_for('manage_onboarding') }}">View Onboarding</a>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+
+

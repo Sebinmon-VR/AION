@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="auth-layout">
+        <div class="auth-container">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/ODF.png') }}" alt="AION Logo">
+            </div>
+            <h2>Welcome back</h2>
+            <p class="subtitle">Sign in to your account to continue exploring and utilizing all the resources.</p>
+            
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+                
+                <button type="submit" class="btn-primary">Sign in</button>
+            </form>
+            
+            <div class="auth-link">
+                Don't have an account? <a href="/signup">Sign up</a>
+            </div>
+            
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="auth-image">
+            <div class="image-content">
+                <div class="tips-container">
+                    <div class="tips-card">
+                        <div class="tips-header">
+                            <div class="tips-tags">
+                                <span class="tag">Community of designers</span>
+                                <span class="tag">Creative resources</span>
+                            </div>
+                        </div>
+                        <div class="tips-text">
+                            I was able to reduce the time taken to present high-level designs by 35% using the platform.
+                        </div>
+                        <div class="tips-author">
+                            <div class="name">Sara Bright</div>
+                            <div class="role">Freelance Designer</div>
+                        </div>
+                        
+                        <div class="navigation-arrows">
+                            <button class="arrow-btn" onclick="previousTip()">
+                                <span>←</span>
+                            </button>
+                            <button class="arrow-btn" onclick="nextTip()">
+                                <span>→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tips navigation functionality
+        const tips = [
+            {
+                text: "I was able to reduce the time taken to present high-level designs by 35% using the platform.",
+                author: "Sara Bright",
+                role: "Freelance Designer",
+                tags: ["Community of designers", "Creative resources"]
+            },
+            {
+                text: "The platform has revolutionized how I approach design projects and collaborate with clients.",
+                author: "Mike Johnson",
+                role: "UX Designer",
+                tags: ["Design tools", "Collaboration"]
+            },
+            {
+                text: "Amazing resource library and community support. Highly recommended for all designers.",
+                author: "Emily Chen",
+                role: "Product Designer",
+                tags: ["Resource library", "Community support"]
+            }
+        ];
+        
+        let currentTip = 0;
+        
+        function updateTip() {
+            const tip = tips[currentTip];
+            const tipText = document.querySelector('.tips-text');
+            const tipName = document.querySelector('.tips-author .name');
+            const tipRole = document.querySelector('.tips-author .role');
+            const tipTags = document.querySelector('.tips-tags');
+            
+            tipText.textContent = tip.text;
+            tipName.textContent = tip.author;
+            tipRole.textContent = tip.role;
+            
+            tipTags.innerHTML = '';
+            tip.tags.forEach(tag => {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'tag';
+                tagSpan.textContent = tag;
+                tipTags.appendChild(tagSpan);
+            });
+        }
+        
+        function nextTip() {
+            currentTip = (currentTip + 1) % tips.length;
+            updateTip();
+        }
+        
+        function previousTip() {
+            currentTip = (currentTip - 1 + tips.length) % tips.length;
+            updateTip();
+        }
+    </script>
+</body>
+</html>
+

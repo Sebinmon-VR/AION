@@ -1,0 +1,6 @@
+openai
+python-dotenv
+pytz
+pywin32
+requests
+msal

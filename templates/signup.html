@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="auth-layout">
+        <div class="auth-container">
+            <div class="logo"></div>
+            <h2>Create an account</h2>
+            <p class="subtitle">Start exploring and utilizing all the resources that will help you elevate every design you make.</p>
+            
+            <form action="/signup" method="post">
+                <div class="form-group">
+                    <label for="username">Name</label>
+                    <input type="text" id="username" name="username" required placeholder="Your name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="Your email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="Your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Create a password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" required>
+                        <option value="" disabled selected>Select your department</option>
+                        <option value="Administration">Administration</option>
+                        <option value="IT">IT</option>
+                        <option value="Support">Support</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Research">Research</option>
+                        <option value="Development">Development</option>
+                        <option value="HR">HR</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="other-department-group" style="display:none;">
+                    <label for="other-department">Please specify department</label>
+                    <input type="text" id="other-department" name="other_department" placeholder="Enter department">
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">Position</label>
+                    <input type="text" id="role" name="role" required placeholder="Your position">
+                </div>
+                
+                <button type="submit" class="btn-primary">Create account</button>
+            </form>
+            
+            <div class="auth-link">
+                Already have an account? <a href="/login">Log in</a>
+            </div>
+            
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="auth-image">
+            <div class="image-content">
+                <div class="tips-container">
+                    <div class="tips-card">
+                        <div class="tips-header">
+                            <div class="tips-tags">
+                                <span class="tag">Community of designers</span>
+                                <span class="tag">Creative resources</span>
+                            </div>
+                        </div>
+                        <div class="tips-text">
+                            I was able to reduce the time taken to present high-level designs by 35% using the platform.
+                        </div>
+                        <div class="tips-author">
+                            <div class="name">Sara Bright</div>
+                            <div class="role">Freelance Designer</div>
+                        </div>
+                        
+                        <div class="navigation-arrows">
+                            <button class="arrow-btn" onclick="previousTip()">
+                                <span>←</span>
+                            </button>
+                            <button class="arrow-btn" onclick="nextTip()">
+                                <span>→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('department').addEventListener('change', function() {
+            var otherGroup = document.getElementById('other-department-group');
+            if (this.value === 'Other') {
+                otherGroup.style.display = 'block';
+                document.getElementById('other-department').required = true;
+            } else {
+                otherGroup.style.display = 'none';
+                document.getElementById('other-department').required = false;
+            }
+        });
+        
+        // Tips navigation functionality
+        const tips = [
+            {
+                text: "I was able to reduce the time taken to present high-level designs by 35% using the platform.",
+                author: "Sara Bright",
+                role: "Freelance Designer",
+                tags: ["Community of designers", "Creative resources"]
+            },
+            {
+                text: "The platform has revolutionized how I approach design projects and collaborate with clients.",
+                author: "Mike Johnson",
+                role: "UX Designer",
+                tags: ["Design tools", "Collaboration"]
+            },
+            {
+                text: "Amazing resource library and community support. Highly recommended for all designers.",
+                author: "Emily Chen",
+                role: "Product Designer",
+                tags: ["Resource library", "Community support"]
+            }
+        ];
+        
+        let currentTip = 0;
+        
+        function updateTip() {
+            const tip = tips[currentTip];
+            const tipText = document.querySelector('.tips-text');
+            const tipName = document.querySelector('.tips-author .name');
+            const tipRole = document.querySelector('.tips-author .role');
+            const tipTags = document.querySelector('.tips-tags');
+            
+            tipText.textContent = tip.text;
+            tipName.textContent = tip.author;
+            tipRole.textContent = tip.role;
+            
+            tipTags.innerHTML = '';
+            tip.tags.forEach(tag => {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'tag';
+                tagSpan.textContent = tag;
+                tipTags.appendChild(tagSpan);
+            });
+        }
+        
+        function nextTip() {
+            currentTip = (currentTip + 1) % tips.length;
+            updateTip();
+        }
+        
+        function previousTip() {
+            currentTip = (currentTip - 1 + tips.length) % tips.length;
+            updateTip();
+        }
+    </script>
+</body>
+</html>
+

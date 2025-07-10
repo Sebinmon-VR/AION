@@ -1,0 +1,87 @@
+[
+    {
+        "username": "jane",
+        "password": "HrJane@123",
+        "department": "HR",
+        "role": "HR Executive",
+        "email": "jane.hr@company.com",
+        "phone": "+1234567891",
+        "access_control": [
+            "post_jobs",
+            "manage_candidates",
+            "manage_onboarding"
+        ]
+    },
+    {
+        "username": "susan",
+        "password": "HrManagerSusan@123",
+        "department": "HR",
+        "role": "HR Manager",
+        "email": "susan.hrmanager@company.com",
+        "phone": "+1234567892",
+        "access_control": [
+            "post_jobs",
+            "manage_candidates",
+            "manage_onboarding",
+            "manage_hr_team"
+        ]
+    },
+    {
+        "username": "mike",
+        "password": "Mike@123",
+        "department": "HR",
+        "role": "Hiring Manager",
+        "email": "mike.manager@company.com",
+        "phone": "+1234567893",
+        "access_control": [
+            "post_jobs",
+            "manage_candidates",
+            "view_candidates",
+            "interview_candidates",
+            "manage_onboarding",
+            "manage_hr_team",
+            "approve_hiring"
+        ]
+    },
+    {
+        "username": "emma",
+        "password": "DirectorEmma@123",
+        "department": "HR",
+        "role": "HR Director",
+        "email": "emma.director@company.com",
+        "phone": "+1234567894",
+        "access_control": [
+            "manage_hr_team",
+            "approve_hiring",
+            "manage_onboarding",
+            "view_all_hr"
+        ]
+    },
+    {
+        "username": "oliver",
+        "password": "AdminOliver@123",
+        "department": "HR",
+        "role": "HR Admin",
+        "email": "oliver.admin@company.com",
+        "phone": "+1234567895",
+        "access_control": [
+            "manage_users",
+            "manage_hr_team",
+            "view_all_hr"
+        ]
+    },
+    {
+        "username": "lucas",
+        "password": "CeoLucas@123",
+        "department": "HR",
+        "role": "CEO",
+        "email": "lucas.ceo@company.com",
+        "phone": "+1234567896",
+        "access_control": [
+            "view_all_hr",
+            "approve_hiring",
+            "manage_admins",
+            "manage_hr_team"
+        ]
+    }
+]

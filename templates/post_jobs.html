@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="url_for('static', filename='css/styles.css')">
+</head>
+<body>
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="tracking-heading mb-4"><i class="bi bi-plus-circle"></i> Create Job Opening</h2>
+    <form method="post" action="/post_jobs" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        <div class="mb-3">
+            <label class="form-label">Job Title:</label>
+            <input type="text" class="form-control" name="job_title" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Job Description:</label>
+            <select name="jd_option" id="jd_option" class="form-select" onchange="toggleJDFields()">
+                <option value="upload">Upload JD</option>
+                <option value="create">Create JD</option>
+            </select>
+        </div>
+        <div class="mb-3" id="jd_upload">
+            <input type="file" class="form-control" name="jd_file" accept=".txt,.pdf,.doc,.docx">
+        </div>
+        <div class="mb-3" id="jd_create" style="display:none;">
+            <textarea class="form-control" name="job_description" rows="6" placeholder="Enter job description here"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Department:</label>
+            <input type="text" class="form-control" name="department" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Seniority Level:</label>
+            <select class="form-select" name="seniority_level" required>
+                <option value="">Select...</option>
+                <option value="Intern">Intern</option>
+                <option value="Junior">Junior</option>
+                <option value="Mid">Mid</option>
+                <option value="Senior">Senior</option>
+                <option value="Lead">Lead</option>
+                <option value="Manager">Manager</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Number of Openings:</label>
+            <input type="number" class="form-control" name="num_openings" min="1" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Location:</label>
+            <input type="text" class="form-control" name="job_location">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Salary Range:</label>
+            <input type="text" class="form-control" name="salary_range">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Employment Type:</label>
+            <select class="form-select" name="job_type">
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Required Skills (comma separated):</label>
+            <input type="text" class="form-control" name="job_requirements">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Lead Time (days):</label>
+            <input type="number" class="form-control" name="lead_time" min="0">
+        </div>
+        <button type="submit" class="btn"><i class="bi bi-save"></i> Create Job Opening</button>
+    </form>
+</div>
+<script>
+function toggleJDFields() {
+    var option = document.getElementById('jd_option').value;
+    document.getElementById('jd_upload').style.display = option === 'upload' ? 'block' : 'none';
+    document.getElementById('jd_create').style.display = option === 'create' ? 'block' : 'none';
+}
+window.onload = toggleJDFields;
+</script>
+{% endblock %}
+
+</body>
+</html>

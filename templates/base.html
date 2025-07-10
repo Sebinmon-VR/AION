@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <div class="sidebar">
+            <h2>HR Dashboard</h2>
+            <ul>
+                {% if role == 'HR Executive' %}
+                    <li><a href="/post_jobs">Post Jobs</a></li>
+                    <li><a href="/manage_candidates">Manage Candidates</a></li>
+                    <li><a href="/manage_onboarding">Manage Onboarding</a></li>
+                {% elif role == 'HR Manager' %}
+                    <li><a href="/post_jobs">Post Jobs</a></li>
+                    <li><a href="/manage_candidates">Manage Candidates</a></li>
+                    <li><a href="/manage_onboarding">Manage Onboarding</a></li>
+                    <li><a href="/manage_hr_team">Manage HR Team</a></li>
+                {% elif role == 'Hiring Manager' %}
+                    <li><a href="/post_jobs">Post Jobs</a></li>
+                    <li><a href="/manage_candidates">Manage Candidates</a></li>
+                    <li><a href="/manage_onboarding">Manage Onboarding</a></li>
+                    <li><a href="/manage_hr_team">Manage HR Team</a></li>
+                    <li><a href="/approve_hiring">Approve Hiring</a></li>
+                {% elif role == 'HR Admin' %}
+                    <li><a href="/manage_users">Manage Users</a></li>
+                    <li><a href="/manage_hr_team">Manage HR Team</a></li>
+                    <li><a href="/view_all_hr">View All HR</a></li>
+                {% elif role == 'CEO' %}
+                    <li><a href="/view_all_hr">Manage Users</a></li>
+                    <li><a href="/approve_hiring">Approve Hiring</a></li>
+                    <li><a href="/manage_admins">Manage Admins</a></li>
+                    <li><a href="/manage_hr_team">Manage HR Team</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="main-content">
+            {% block content %}
+            <!-- Page-specific content will be injected here -->
+            {% endblock %}
+        </div>
+    </div>
+    <script>
+    // Sidebar AJAX navigation for dashboard only
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+        sidebar.addEventListener('click', function(e) {
+            const target = e.target.closest('a');
+            if (target && target.getAttribute('href').startsWith('/')) {
+                e.preventDefault();
+                fetch(target.getAttribute('href'), {
+                    headers: {'X-Requested-With': 'XMLHttpRequest'},
+                    credentials: 'same-origin'
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    // Only replace main-content, do NOT touch sidebar
+                    let newContent = doc.querySelector('.main-content');
+                    if (newContent) {
+                        document.querySelector('.main-content').innerHTML = newContent.innerHTML;
+                    } else {
+                        // fallback: replace with whole response
+                        document.querySelector('.main-content').innerHTML = html;
+                    }
+                });
+            }
+        });
+    });
+    </script>
+</body>
+</html>
