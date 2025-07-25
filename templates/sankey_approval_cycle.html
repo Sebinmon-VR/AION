@@ -1,0 +1,84 @@
+<!-- Sankey Chart for Approval Cycle -->
+<div class="approval-cycle-section" style="margin:30px 0;">
+  <h2>Approval Cycle Sankey Chart</h2>
+  <div style="width:100%;max-width:700px;">
+    <canvas id="sankeyChart" style="width:100%;height:350px;"></canvas>
+  </div>
+</div>
+
+<!-- Chart.js v3.9.1 & Chartjs-chart-sankey CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.0/dist/chartjs-chart-sankey.min.js"></script>
+<script>
+alert('Sankey chart script loaded');
+function renderSankeyChart() {
+  console.log('renderSankeyChart called');
+  const canvas = document.getElementById('sankeyChart');
+  if (!canvas) {
+    console.error('Sankey canvas not found');
+    return;
+  }
+  const ctxSankey = canvas.getContext('2d');
+  if (!ctxSankey) {
+    console.error('Could not get 2D context for Sankey canvas');
+    return;
+  }
+  // Remove previous chart instance if exists
+  if (window.sankeyChartInstance) {
+    window.sankeyChartInstance.destroy();
+    console.log('Destroyed previous Sankey chart instance');
+  }
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js is not loaded');
+    return;
+  }
+  if (!Chart.registry.getPlugin('sankey')) {
+    console.error('Sankey plugin is not loaded');
+    return;
+  }
+  const sankeyData = {
+    nodes: [
+      { name: 'HR' },
+      { name: 'HR Manager' },
+      { name: 'Manager' },
+      { name: 'Approved' }
+    ],
+    links: [
+      { source: 0, target: 1, value: 5 },
+      { source: 1, target: 2, value: 4 },
+      { source: 2, target: 3, value: 3 }
+    ]
+  };
+  try {
+    window.sankeyChartInstance = new Chart(ctxSankey, {
+      type: 'sankey',
+      data: {
+        datasets: [{
+          label: 'Approval Cycle',
+          data: sankeyData.links,
+          nodes: sankeyData.nodes,
+          colorFrom: 'rgba(220,53,69,0.7)',
+          colorTo: 'rgba(40,167,69,0.7)',
+          borderWidth: 1,
+          borderColor: '#333',
+          nodeWidth: 30,
+          nodePadding: 20
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          title: { display: false }
+        }
+      }
+    });
+    console.log('Sankey chart rendered');
+  } catch (e) {
+    console.error('Error rendering Sankey chart:', e);
+  }
+}
+// Initial render
+document.addEventListener('DOMContentLoaded', renderSankeyChart);
+// Re-render after AJAX navigation
+document.addEventListener('main-content-updated', renderSankeyChart);
+</script>

@@ -9,10 +9,13 @@
 <body>
     <div class="auth-layout">
         <div class="auth-container">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='images/ODF.png') }}" alt="AION Logo">
+            <div class="logo" style="display: flex; align-items: center; gap: 10px; color: #1f2937;">
+                <img src="{{ url_for('static', filename='images/rj.png') }}" alt="Logo" style="height: 30px; width: auto;">
             </div>
-            <h2>Welcome back</h2>
+
+            <br>
+
+            <h2>Centrifuge Hire</h2>
             <p class="subtitle">Sign in to your account to continue exploring and utilizing all the resources.</p>
             
             <form action="/login" method="post">
@@ -43,20 +46,14 @@
                 <div class="tips-container">
                     <div class="tips-card">
                         <div class="tips-header">
-                            <div class="tips-tags">
-                                <span class="tag">Community of designers</span>
-                                <span class="tag">Creative resources</span>
-                            </div>
+                            <strong style="font-size: 0.9rem; color: #4f46e5;">💡 HR AI Tip</strong>
+                            <div class="tips-tags"></div>
                         </div>
-                        <div class="tips-text">
-                            I was able to reduce the time taken to present high-level designs by 35% using the platform.
+                        <div class="tips-text" style="margin-top: 10px;">
+                            <!-- Tip content will go here -->
                         </div>
-                        <div class="tips-author">
-                            <div class="name">Sara Bright</div>
-                            <div class="role">Freelance Designer</div>
-                        </div>
-                        
-                        <div class="navigation-arrows">
+
+                        <div class="navigation-arrows" style="margin-top: 1rem;">
                             <button class="arrow-btn" onclick="previousTip()">
                                 <span>←</span>
                             </button>
@@ -69,43 +66,41 @@
             </div>
         </div>
     </div>
-    
+
     <script>
-        // Tips navigation functionality
+        // Rotating HR AI tips
         const tips = [
             {
-                text: "I was able to reduce the time taken to present high-level designs by 35% using the platform.",
-                author: "Sara Bright",
-                role: "Freelance Designer",
-                tags: ["Community of designers", "Creative resources"]
+                text: "Automate resume screening and shortlist candidates in seconds using AI.",
+                tags: ["AI screening", "Faster hiring"]
             },
             {
-                text: "The platform has revolutionized how I approach design projects and collaborate with clients.",
-                author: "Mike Johnson",
-                role: "UX Designer",
-                tags: ["Design tools", "Collaboration"]
+                text: "Easily schedule interviews and send calendar invites directly from the platform.",
+                tags: ["Interview automation", "Calendar integration"]
             },
             {
-                text: "Amazing resource library and community support. Highly recommended for all designers.",
-                author: "Emily Chen",
-                role: "Product Designer",
-                tags: ["Resource library", "Community support"]
+                text: "Track applicant progress in real-time and generate performance reports instantly.",
+                tags: ["ATS", "Real-time tracking"]
+            },
+            {
+                text: "Use chat-based commands to fetch employee data, update roles, or export reports.",
+                tags: ["Chat commands", "Instant actions"]
+            },
+            {
+                text: "Set up automated onboarding workflows for new hires — from welcome email to policy signing.",
+                tags: ["Workflow automation", "New hires"]
             }
         ];
-        
+
         let currentTip = 0;
-        
+
         function updateTip() {
             const tip = tips[currentTip];
             const tipText = document.querySelector('.tips-text');
-            const tipName = document.querySelector('.tips-author .name');
-            const tipRole = document.querySelector('.tips-author .role');
             const tipTags = document.querySelector('.tips-tags');
-            
+
             tipText.textContent = tip.text;
-            tipName.textContent = tip.author;
-            tipRole.textContent = tip.role;
-            
+
             tipTags.innerHTML = '';
             tip.tags.forEach(tag => {
                 const tagSpan = document.createElement('span');
@@ -114,17 +109,19 @@
                 tipTags.appendChild(tagSpan);
             });
         }
-        
+
         function nextTip() {
             currentTip = (currentTip + 1) % tips.length;
             updateTip();
         }
-        
+
         function previousTip() {
             currentTip = (currentTip - 1 + tips.length) % tips.length;
             updateTip();
         }
+
+        // Initialize with first tip
+        window.onload = updateTip;
     </script>
 </body>
 </html>
-

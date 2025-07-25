@@ -1,0 +1,173 @@
+{% block content %}
+<div style="max-width:900px;margin:40px auto;padding:32px 24px;background:#fff;border-radius:10px;box-shadow:0 2px 12px #0001;">
+  <h2 style="color:#1976d2;">Milestone: {{ label|capitalize }}</h2>
+  {% if label|lower == 'hired' %}
+  <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start;">
+    <div style="flex:1;min-width:320px;max-width:420px;text-align:center;">
+      <h3 style="color:#1976d2;font-size:1.05rem;margin-bottom:8px;">Hiring Milestone Analytics</h3>
+      <canvas id="triangleChart" width="320" height="320"></canvas>
+      <div style="margin-top:12px;">
+        <span style="font-size:1.1rem;">Total Applicants: <b id="totalApplicantsVal">{{ total_applicants }}</b></span><br>
+        <span style="font-size:1.1rem;">Total Hired: <b id="totalHiredVal">{{ total_hired }}</b></span><br>
+        <span style="font-size:1.1rem;">Success Rate: <b id="successRateVal">{{ success_rate }}%</b></span>
+      </div>
+    </div>
+    <div style="flex:1;min-width:320px;max-width:420px;text-align:center;">
+      <h3 style="color:#1976d2;font-size:1.05rem;margin-bottom:8px;">Department-wise Applicants</h3>
+      <canvas id="deptRadarChart" width="340" height="320"></canvas>
+      <div id="deptClickHint" style="color:#888;font-size:0.98rem;margin-top:8px;">Click a department label to view applicants</div>
+    </div>
+  </div>
+  {% else %}
+  <div style="margin:32px auto 0 auto; max-width:500px; text-align:center;">
+    <canvas id="deptRadarChart" width="340" height="320"></canvas>
+    <div id="deptClickHint" style="color:#888;font-size:0.98rem;margin-top:8px;">Click a department label to view applicants</div>
+  </div>
+  {% endif %}
+  <div id="deptApplicantsTableWrapper" style="margin:28px auto 0 auto; max-width:700px; display:none;">
+    <h4 id="deptApplicantsTitle" style="color:#1976d2;margin-bottom:10px;"></h4>
+    <table id="deptApplicantsTable" style="width:100%;border-collapse:collapse;background:#f9f9fc;">
+      <thead>
+        <tr style="background:#e3eaf7;color:#1976d2;">
+          <th style="padding:8px 6px;">Name</th>
+          <th style="padding:8px 6px;">Job Title</th>
+          <th style="padding:8px 6px;">Status</th>
+          <th style="padding:8px 6px;">Applied Date</th>
+          <th style="padding:8px 6px;">Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Polar area chart for Hiring Milestone Analytics (only for hired)
+    {% if label|lower == 'hired' %}
+    window.addEventListener('DOMContentLoaded', function() {
+      const polarData = [
+        Number({{ total_applicants|default(0) }}),
+        Number({{ total_hired|default(0) }}),
+        Number({{ success_rate|replace('%','')|default(0) }})
+      ];
+      const polarLabels = ['Total Applicants', 'Total Hired', 'Success Rate'];
+      const polarColors = [
+        'rgba(25, 118, 210, 0.7)',
+        'rgba(0, 200, 83, 0.7)',
+        'rgba(255, 193, 7, 0.7)'
+      ];
+      const polarBorderColors = [
+        '#1976d2',
+        '#00c853',
+        '#ffc107'
+      ];
+      const triangleCanvas = document.getElementById('triangleChart');
+      if (triangleCanvas) {
+        const triangleCtx = triangleCanvas.getContext('2d');
+        new Chart(triangleCtx, {
+          type: 'polarArea',
+          data: {
+            labels: polarLabels,
+            datasets: [{
+              data: polarData,
+              backgroundColor: polarColors,
+              borderColor: polarBorderColors,
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                  color: '#222',
+                  font: { size: 16, weight: 'bold' }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ': ' + context.formattedValue;
+                  }
+                }
+              }
+            },
+            scales: {
+              r: {
+                angleLines: { display: false },
+                grid: { color: '#eee' },
+                pointLabels: { font: { size: 16, weight: 'bold' }, color: '#222' },
+                ticks: { color: '#222', font: { size: 14 } }
+              }
+            }
+          }
+        });
+      }
+    });
+    {% endif %}
+    // Department Radar Chart
+    const deptLabels = {{ dept_labels_json|safe }};
+    const deptCounts = {{ dept_counts_json|safe }};
+    const allCandidates = {{ candidates_json|safe }};
+    const radarCanvas = document.getElementById('deptRadarChart');
+    let radarChart = null;
+    if (radarCanvas && deptLabels.length && deptCounts.length) {
+      radarChart = new Chart(radarCanvas.getContext('2d'), {
+        type: 'radar',
+        data: {
+          labels: deptLabels,
+          datasets: [{
+            label: 'Applicants',
+            data: deptCounts,
+            fill: true,
+            backgroundColor: 'rgba(25, 118, 210, 0.15)',
+            borderColor: '#1976d2',
+            pointBackgroundColor: '#1976d2',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#1976d2'
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false }, title: { display: false } },
+          scales: {
+            r: {
+              angleLines: { display: true },
+              suggestedMin: 0,
+              suggestedMax: Math.max(...deptCounts, 5),
+              pointLabels: { font: { size: 13, weight: '600' } }
+            }
+          },
+          onClick: (e) => {
+            const points = radarChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+            if (points.length) {
+              const idx = points[0].index;
+              showDeptApplicants(deptLabels[idx]);
+            }
+          }
+        }
+      });
+    }
+    function showDeptApplicants(dept) {
+      const wrapper = document.getElementById('deptApplicantsTableWrapper');
+      const title = document.getElementById('deptApplicantsTitle');
+      const tbody = document.getElementById('deptApplicantsTable').querySelector('tbody');
+      title.textContent = `Applicants in "${dept}"`;
+      tbody.innerHTML = '';
+      const filtered = allCandidates.filter(c => (c.department || 'Unknown') === dept);
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No applicants in this department.</td></tr>';
+      } else {
+        for (const cand of filtered) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td style='padding:6px 4px;'>${cand.name}</td><td style='padding:6px 4px;'>${cand.job_title}</td><td style='padding:6px 4px;'>${cand.status}</td><td style='padding:6px 4px;'>${cand.applied_date}</td><td style='padding:6px 4px;'><a class='btn btn-primary' style='padding:4px 12px;' href='/candidate/${cand.id}'>View Profile</a></td>`;
+          tbody.appendChild(tr);
+        }
+      }
+      wrapper.style.display = 'block';
+      window.scrollTo({ top: wrapper.offsetTop - 80, behavior: 'smooth' });
+    }
+  </script>
+</div>
+{% endblock %}

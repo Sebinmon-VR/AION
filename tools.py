@@ -1,3 +1,24 @@
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+def delete_candidates_without_name(db_folder: str = "./db") -> str:
+    """Deletes all candidates from candidates.json who do not have a name (empty or missing)."""
+    import os, json
+    file_path = os.path.join(db_folder, "candidates.json")
+    if not os.path.exists(file_path):
+        return f"⚠️ File {file_path} does not exist."
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            candidates = json.load(f)
+        original_count = len(candidates)
+        filtered = [c for c in candidates if c.get("name", "").strip()]
+        removed_count = original_count - len(filtered)
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(filtered, f, ensure_ascii=False, indent=2)
+        if removed_count == 0:
+            return "No candidates without a name were found."
+        return f"✅ Deleted {removed_count} candidate(s) without a name."
+    except Exception as e:
+        return f"⚠️ Error deleting candidates: {e}"
 import os
 import json
 import pytz
@@ -6,6 +27,74 @@ import urllib.parse
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+def add_or_update_job_opening(
+    job_title: str,
+    job_posted_by: str,
+    department: str = "",
+    job_openings: int = 1,
+    status: str = "open",
+    job_location: str = "",
+    job_type: str = "Full-time",
+    job_requirements: str = "",
+    job_description: str = "",
+    job_lead_time: str = "",
+    seniority_level: str = "",
+    salary_range: str = "",
+    jd_file_path: str = ""
+) -> str:
+    """Adds or updates a job opening in jobs.json."""
+    import os, json, datetime
+    file_path = os.path.join(os.path.dirname(__file__), "db", "jobs.json")
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            try:
+                jobs = json.load(f)
+            except json.JSONDecodeError:
+                jobs = []
+    else:
+        jobs = []
+    # Check if job already exists
+    for job in jobs:
+        if job.get("job_title", "").lower() == job_title.lower() and job.get("department", "").lower() == department.lower():
+            job["job_openings"] = str(job_openings)
+            job["status"] = status
+            job["job_location"] = job_location
+            job["job_type"] = job_type
+            job["job_requirements"] = job_requirements
+            job["job_description"] = job_description
+            job["job_posted_by"] = job_posted_by
+            job["job_lead_time"] = job_lead_time
+            job["seniority_level"] = seniority_level
+            job["salary_range"] = salary_range
+            job["jd_file_path"] = jd_file_path
+            job["posted_at"] = job.get("posted_at", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(jobs, f, indent=4)
+            return f"✅ Updated job opening for {job_title} in {department} to {job_openings} positions."
+    # If not found, add new
+    job_id = str(len(jobs) + 1)
+    new_job = {
+        "job_id": job_id,
+        "job_title": job_title,
+        "job_description": job_description,
+        "job_location": job_location,
+        "job_type": job_type,
+        "job_requirements": job_requirements,
+        "job_openings": str(job_openings),
+        "job_posted_by": job_posted_by,
+        "job_lead_time": job_lead_time,
+        "department": department,
+        "seniority_level": seniority_level,
+        "salary_range": salary_range,
+        "jd_file_path": jd_file_path,
+        "posted_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "status": status
+    }
+    jobs.append(new_job)
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(jobs, f, indent=4)
+    return f"✅ Added new job opening for {job_title} in {department} with {job_openings} positions."
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def get_time(city: str) -> str:

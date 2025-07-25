@@ -1,0 +1,23 @@
+[
+    {
+        "candidate_id": 8,
+        "candidate_name": "Yousef Al Nuaimi",
+        "candidate_email": "yousef.nuaimi@example.com",
+        "cv_link": "resumes/Manager_Resume.pdf",
+        "status": "Shortlisted"
+    },
+    {
+        "candidate_id": 9,
+        "candidate_name": "Priya Singh",
+        "candidate_email": "priya.singh@example.com",
+        "cv_link": "resumes/Fresher_Resume.pdf",
+        "status": "Hired"
+    },
+    {
+        "candidate_id": 17,
+        "candidate_name": "Mohamed Saleh",
+        "candidate_email": "mohamed.saleh@example.com",
+        "cv_link": "resumes/Senior_Process_Designer_Resume.pdf",
+        "status": "Hired"
+    }
+]

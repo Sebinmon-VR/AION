@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Probation Assessment{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fff;
+    color: #222;
+  }
+  h2 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #111;
+  }
+  .candidate-info {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
+    margin-bottom: 30px;
+  }
+  .candidate-info p {
+    margin: 6px 0;
+    font-size: 1rem;
+  }
+  .assessment-month {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
+  }
+  .assessment-month h4 {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #222;
+  }
+  .assessment-submitted {
+    background: #f0f9ff;
+    border: 1px solid #90caf9;
+    border-radius: 6px;
+    padding: 15px 20px;
+    color: #0d47a1;
+    font-size: 0.95rem;
+  }
+  .assessment-submitted b {
+    color: #0b3d91;
+  }
+  form label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #333;
+  }
+  form input[type="text"],
+  form textarea {
+    width: 100%;
+    padding: 8px 12px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease-in-out;
+  }
+  form input[type="text"]:focus,
+  form textarea:focus {
+    border-color: #1976d2;
+    outline: none;
+  }
+  form textarea {
+    resize: vertical;
+  }
+  button[type="submit"] {
+    margin-top: 18px;
+    padding: 10px 18px;
+    background-color: #1976d2;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 1rem;
+  }
+  button[type="submit"]:hover {
+    background-color: #1565c0;
+  }
+  .pending-text {
+    font-style: italic;
+    color: #888;
+    padding: 15px 10px;
+  }
+</style>
+
+<div class="candidate-info">
+  <h2>Probation Assessment for {{ candidate.name }}</h2>
+  <p><b>Candidate ID:</b> {{ candidate.id }}</p>
+  <p><b>Status:</b> {{ candidate.status }}</p>
+  <p><b>Position:</b> {{ candidate.position }}</p>
+  <p><b>Applied Date:</b> {{ candidate.applied_date }}</p>
+</div>
+
+{% set pa = candidate.probation_assessment or {} %}
+{% for month in range(1,7) %}
+  <div class="assessment-month">
+    <h4>Month {{ month }}</h4>
+    {% if pa[month|string] %}
+      <div class="assessment-submitted">
+        <b>Assessment Submitted:</b><br>
+        {% for key, value in pa[month|string].items() %}
+          <b>{{ key|replace('_', ' ')|capitalize }}:</b> {{ value }}<br>
+        {% endfor %}
+      </div>
+    {% elif role in ['Discipline Manager', 'Department Manager (MOE)', 'Department Manager (MOP)', 'Operation Manager', 'CEO'] %}
+      <form action="/submit_probation_assessment/{{ candidate.id }}/{{ month }}" method="post" autocomplete="off">
+        {% if month == 1 %}
+          <label for="cultural_acceptance_{{ month }}">Cultural Acceptance:</label>
+          <input id="cultural_acceptance_{{ month }}" type="text" name="cultural_acceptance" required>
+
+          <label for="loyalty_{{ month }}">Loyalty:</label>
+          <input id="loyalty_{{ month }}" type="text" name="loyalty" required>
+
+          <label for="teamwork_{{ month }}">Teamwork:</label>
+          <input id="teamwork_{{ month }}" type="text" name="teamwork" required>
+
+          <label for="adaptability_{{ month }}">Adaptability:</label>
+          <input id="adaptability_{{ month }}" type="text" name="adaptability" required>
+
+          <label for="comments_{{ month }}">Comments:</label>
+          <textarea id="comments_{{ month }}" name="comments" rows="3"></textarea>
+        {% else %}
+          <label for="performance_{{ month }}">Performance:</label>
+          <input id="performance_{{ month }}" type="text" name="performance" required>
+
+          <label for="attendance_{{ month }}">Attendance:</label>
+          <input id="attendance_{{ month }}" type="text" name="attendance" required>
+
+          <label for="initiative_{{ month }}">Initiative:</label>
+          <input id="initiative_{{ month }}" type="text" name="initiative" required>
+
+          <label for="communication_{{ month }}">Communication:</label>
+          <input id="communication_{{ month }}" type="text" name="communication" required>
+
+          <label for="comments_{{ month }}">Comments:</label>
+          <textarea id="comments_{{ month }}" name="comments" rows="3"></textarea>
+        {% endif %}
+        <button type="submit">Submit Assessment</button>
+      </form>
+    {% else %}
+      <div class="pending-text">Assessment pending (HR/Manager access only)</div>
+    {% endif %}
+  </div>
+{% endfor %}
+{% endblock %}

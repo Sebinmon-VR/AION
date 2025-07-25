@@ -1,6 +1,139 @@
 {% extends 'base.html' %}
-{% block title %}Manage HR Team{% endblock %}
+{% block title %}Manage Team{% endblock %}
+
 {% block content %}
-<h2>Manage HR Team</h2>
-<p>This is the Manage HR Team page.</p>
+<style>
+  body {
+    background-color: #fafafa;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  h2 {
+    font-size: 20px;
+    color: #222;
+    margin: 20px 0 10px;
+  }
+
+  .hr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .hr-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+  }
+
+  .hr-card h3 {
+    font-size: 15px;
+    color: #007bff;
+    margin-bottom: 8px;
+  }
+
+  .hr-card p {
+    margin: 3px 0;
+    color: #555;
+  }
+
+  .approval-flow-section {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 40px;
+  }
+
+  .job-title {
+    font-weight: 600;
+    font-size: 14.5px;
+    margin-top: 20px;
+    margin-bottom: 6px;
+    color: #333;
+    border-left: 3px solid #007bff;
+    padding-left: 8px;
+  }
+
+  .profile-list {
+    padding-left: 12px;
+    margin-bottom: 14px;
+  }
+
+  .profile-item {
+    margin-bottom: 10px;
+  }
+
+  .profile-name {
+    font-weight: 500;
+    color: #007bff;
+    font-size: 13px;
+  }
+
+  .profile-status {
+    font-size: 12px;
+    color: #666;
+    margin-left: 6px;
+  }
+
+  .profile-states {
+    margin-left: 14px;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #555;
+  }
+
+  .profile-state {
+    margin-bottom: 2px;
+  }
+
+  .no-candidates {
+    font-style: italic;
+    font-size: 12.5px;
+    color: #999;
+    margin-left: 6px;
+  }
+</style>
+
+<div class="hr-grid">
+  {% for hrs in hr_team %}
+  <h2>Team</h2>
+
+  <div class="hr-card">
+    <h3>{{ hrs.name }}</h3>
+    <p>Email: {{ hrs.email }}</p>
+    <p>Phone: {{ hrs.phone }}</p>
+    <p>Dept: {{ hrs.department }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="approval-flow-section">
+  <h2>Approval Cycle</h2>
+
+  {% for job in jobs_with_candidates %}
+    <div class="job-title">{{ job.job_title }}</div>
+    {% if job.approval_flows %}
+      <div class="profile-list">
+        {% for flow in job.approval_flows %}
+          <div class="profile-item">
+            <span class="profile-name">{{ flow.candidate_name }} (ID: {{ flow.candidate_id }})</span>
+            <span class="profile-status">— {{ flow.steps[-1].action }}</span>
+            <div class="profile-states">
+              {% for step in flow.steps %}
+                <div class="profile-state">↳ <b>{{ step.role }}</b>: {{ step.action }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-candidates">No candidates for this job.</div>
+    {% endif %}
+  {% endfor %}
+</div>
+
 {% endblock %}

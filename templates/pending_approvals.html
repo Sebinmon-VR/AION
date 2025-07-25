@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Pending Approvals</h2>
+{% if pending_approvals %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Position</th>
+                <th>Match Score</th>
+                <th>Performance Score</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for candidate in pending_approvals %}
+            <tr>
+                <td>{{ candidate.name }}</td>
+                <td>{{ candidate.email }}</td>
+                <td>{{ candidate.position }}</td>
+                <td>{{ candidate.match_score or 'N/A' }}</td>
+                <td>{{ candidate.interview_score or 'N/A' }}</td>
+                <td>
+                    <a href="{{ url_for('candidate_profile', candidate_id=candidate.id) }}" class="btn btn-info">View Candidate</a>
+                    <form action="{{ url_for('approve_candidate') }}" method="post" style="display:inline;">
+                        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No pending approvals found.</p>
+{% endif %}
+{% endblock %}

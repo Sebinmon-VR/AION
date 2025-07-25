@@ -1,0 +1,148 @@
+
+
+{% block content %}
+<div style="max-width:900px;margin:40px auto;padding:32px 24px;background:#fff;border-radius:10px;box-shadow:0 2px 12px #0001;">
+  <h2 style="color:#1976d2;">{{ label|capitalize }}</h2>
+  <!-- <div style="color:#d32f2f; font-size:1.1rem; margin-bottom:10px;">
+    <b>Debug:</b> {{ display_candidates|length }} candidates received for status '<b>{{ label }}</b>'
+  </div> -->
+  <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start;">
+    <div style="flex:1;min-width:320px;max-width:420px;text-align:center;">
+      <h3 style="color:#1976d2;font-size:1.05rem;margin-bottom:8px;">
+        {% if label|lower == 'hired' %}Department-wise Hired Analytics{% else %}Department Distribution{% endif %}
+      </h3>
+      <canvas id="deptChart" width="320" height="320"></canvas>
+      {% if not dept_labels %}
+        <div style="margin:40px 0;color:#888;">No department data available.</div>
+      {% endif %}
+    </div>
+    <div style="flex:1;min-width:180px;max-width:220px;text-align:center;align-self:center;">
+      <div style="font-size:2.2rem;font-weight:700;color:#1976d2;">{{ total_candidates }}</div>
+      <div style="font-size:1.05rem;color:#444;">Total Candidates</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Always show all departments (even with zero count) for both hired and other statuses, always as radar chart
+    const deptLabels = {{ dept_labels|tojson|safe }};
+    const deptCounts = {{ dept_counts|tojson|safe }};
+    const ctx = document.getElementById('deptChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: deptLabels,
+        datasets: [{
+          label: '{% if label|lower == 'hired' %}Hired by Department{% else %}Department Distribution{% endif %}',
+          data: deptCounts,
+          backgroundColor: 'rgba(25, 118, 210, 0.2)',
+          borderColor: '#1976d2',
+          pointBackgroundColor: '#1976d2',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: '#1976d2',
+        }]
+      },
+      options: {
+        responsive: false,
+        plugins: { legend: { display: false } },
+        scales: { r: { min: 0, max: Math.max(...deptCounts, 1) } }
+      }
+    });
+  </script>
+  {% if label|lower == 'hired' %}
+    {% set triangle_data = [total_applicants|default(0), total_hired|default(0), success_rate|default(0)] %}
+    {% set dept_hired_labels_safe = dept_hired_labels|default([]) %}
+    {% set dept_hired_counts_safe = dept_hired_counts|default([]) %}
+    {% if triangle_data and dept_hired_labels_safe and dept_hired_counts_safe and triangle_data|length == 3 and dept_hired_labels_safe|length > 0 and dept_hired_counts_safe|length > 0 %}
+    <script>
+      const triangleData = {{ triangle_data|tojson|safe }};
+      const triangleMax = Math.max.apply(null, triangleData);
+      const deptHiredLabels = {{ dept_hired_labels_safe|tojson|safe }};
+      const deptHiredCounts = {{ dept_hired_counts_safe|tojson|safe }};
+
+      // Triangle chart for Total Applicants, Total Hired, Success Rate
+      const triangleCtx = document.getElementById('triangleChart').getContext('2d');
+      new Chart(triangleCtx, {
+        type: 'radar',
+        data: {
+          labels: ['Total Applicants', 'Total Hired', 'Success Rate'],
+          datasets: [{
+            label: 'Hiring Analytics',
+            data: triangleData,
+            backgroundColor: 'rgba(25, 118, 210, 0.2)',
+            borderColor: '#1976d2',
+            pointBackgroundColor: '#1976d2',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#1976d2',
+          }]
+        },
+        options: {
+          responsive: false,
+          plugins: { legend: { display: false } },
+          scales: { r: { min: 0, max: triangleMax } }
+        }
+      });
+
+      // Department-wise hired analytics (Polar Area Chart)
+      const deptPolarCtx = document.getElementById('deptPolarChart').getContext('2d');
+      new Chart(deptPolarCtx, {
+        type: 'polarArea',
+        data: {
+          labels: deptHiredLabels,
+          datasets: [{
+            label: 'Hired by Department',
+            data: deptHiredCounts,
+            backgroundColor: [
+              'rgba(25, 118, 210, 0.5)',
+              'rgba(56, 142, 60, 0.5)',
+              'rgba(251, 192, 45, 0.5)',
+              'rgba(211, 47, 47, 0.5)',
+              'rgba(123, 31, 162, 0.5)',
+              'rgba(2, 136, 209, 0.5)',
+              'rgba(255, 87, 34, 0.5)',
+              'rgba(0, 172, 193, 0.5)'
+            ]
+          }]
+        },
+        options: {
+          responsive: false,
+          plugins: { legend: { position: 'right' } }
+        }
+      });
+    </script>
+    {% else %}
+      <div style="width:100%;text-align:center;color:#d32f2f;font-weight:bold;margin-top:24px;">No analytics data available for charts.</div>
+    {% endif %}
+  {% endif %}
+  
+  {% if display_candidates and display_candidates|length > 0 %}
+    <div style="margin:40px 0 0 0;">
+      <table style="width:100%;border-collapse:collapse;margin-top:32px;">
+        <thead>
+          <tr style="background:#f5f5f5;">
+            <th>Name</th>
+            <th>Date Applied</th>
+            <th>Job Title</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in display_candidates %}
+            <tr style="border-bottom:1px solid #eee;">
+                <td>{{ c.name }}</td>
+                <td>{{ c.applied_date }}</td>
+                <td>{{ c.job_title }}</td>
+                <td><span class="badge" style="background:#e3eafc;color:#1976d2;padding:2px 10px;border-radius:8px;">{{ c.status }}</span></td>
+                <td><a class="btn btn-primary" style="padding:4px 12px;" href="/candidate/{{ c.id }}">View Profile</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="color:#d32f2f;font-weight:bold;">No active applicants found. (Debug: {{ display_candidates|length }} received)</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Customization{% endblock %}
+{% block content %}
+<div class="customize-container">
+  <h2 style="margin-bottom: 8px; font-size: 2rem; font-weight: 700; color: #222; letter-spacing: 0.5px;">Customize Main Menu</h2>
+  <p style="color: #555; margin-bottom: 24px; font-size: 1.08rem;">Set the order of your main menu options by entering numbers. Click <b>Save Order</b> to update your sidebar.</p>
+  <form method="post" action="/customization" id="customize-form">
+    <ul id="menu-list">
+      {% for item in menu_options %}
+        <li class="menu-item-row">
+          <input type="number" min="1" max="{{ menu_options|length }}" value="{{ loop.index }}" class="order-input">
+          <span class="menu-label">{{ item }}</span>
+          <input type="hidden" name="menu_order[]" value="{{ item }}">
+        </li>
+      {% endfor %}
+    </ul>
+    <button type="submit" class="btn">Save Order</button>
+  </form>
+</div>
+<style>
+.customize-container {
+  max-width: 480px;
+  margin: 40px auto 0 auto;
+  padding: 36px 32px 32px 32px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px 0 rgba(60,72,88,0.13);
+  border: 1.5px solid #f1f1f1;
+}
+#menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px 0;
+}
+.menu-item-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 12px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: #f7fafd;
+  border: 1.2px solid #e6eaf0;
+  transition: box-shadow 0.18s, border 0.18s, background 0.18s;
+}
+.menu-item-row:hover, .menu-item-row:focus-within {
+  background: #f0f6ff;
+  border-color: #b6d0fa;
+  box-shadow: 0 2px 8px 0 rgba(60,72,88,0.08);
+}
+.order-input {
+  width: 48px;
+  padding: 6px 10px;
+  font-size: 1.08rem;
+  border: 1.2px solid #d0d7e2;
+  border-radius: 6px;
+  background: #fff;
+  color: #222;
+  font-weight: 500;
+  outline: none;
+  transition: border 0.18s, box-shadow 0.18s;
+}
+.order-input:focus {
+  border: 1.5px solid #1976d2;
+  box-shadow: 0 2px 8px 0 #1976d21a;
+}
+.menu-label {
+  font-size: 1.08rem;
+  color: #222;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+.btn {
+  background: linear-gradient(90deg, #1976d2 60%, #4f8cff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 28px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 18px;
+  box-shadow: 0 2px 8px 0 rgba(60,72,88,0.08);
+  transition: background 0.18s, color 0.18s;
+}
+.btn:hover {
+  background: linear-gradient(90deg, #125ea2 60%, #1976d2 100%);
+}
+</style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const list = document.getElementById('menu-list');
+      const form = document.getElementById('customize-form');
+      form.addEventListener('submit', function(e) {
+        // Before submit, sort the items by the order input
+        const items = Array.from(list.querySelectorAll('li'));
+        items.sort((a, b) => {
+          const aVal = parseInt(a.querySelector('.order-input').value, 10);
+          const bVal = parseInt(b.querySelector('.order-input').value, 10);
+          return aVal - bVal;
+        });
+        // Re-append in sorted order
+        items.forEach(li => list.appendChild(li));
+        // Update hidden inputs to match new order
+        items.forEach(li => {
+          const label = li.querySelector('.menu-label');
+          const input = li.querySelector('input[type="hidden"]');
+          if (input && label) input.value = label.textContent.trim();
+        });
+      });
+    });
+    </script>
+{% endblock %}

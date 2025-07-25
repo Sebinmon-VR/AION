@@ -1,0 +1,58 @@
+[
+    {
+        "candidate_id": 5,
+        "type": "approval",
+        "status": "Approved",
+        "comment": "",
+        "timestamp": "2025-07-21T11:57:28.028800",
+        "for_role": "HR"
+    },
+    {
+        "candidate_id": 5,
+        "type": "approval",
+        "status": "Approved",
+        "comment": "",
+        "timestamp": "2025-07-21T11:58:06.049692",
+        "for_role": "HR"
+    },
+    {
+        "candidate_id": 5,
+        "type": "approval",
+        "status": "Approved",
+        "comment": "",
+        "timestamp": "2025-07-21T11:58:35.544210",
+        "for_role": "HR"
+    },
+    {
+        "candidate_id": 5,
+        "type": "approval",
+        "status": "Approved",
+        "comment": "",
+        "timestamp": "2025-07-21T11:59:18.919367",
+        "for_role": "HR"
+    },
+    {
+        "candidate_id": 5,
+        "type": "approval",
+        "status": "Hired",
+        "comment": "",
+        "timestamp": "2025-07-21T12:15:23.742024",
+        "for_role": "HR"
+    },
+    {
+        "candidate_id": 5,
+        "type": "approval",
+        "status": "Hired",
+        "comment": "",
+        "timestamp": "2025-07-21T12:18:28.969171",
+        "for_role": "HR"
+    },
+    {
+        "candidate_id": 4,
+        "type": "approval",
+        "status": "Hired",
+        "comment": "",
+        "timestamp": "2025-07-21T12:20:37.239689",
+        "for_role": "HR"
+    }
+]

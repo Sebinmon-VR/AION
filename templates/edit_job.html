@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Edit Job{% endblock %}
+{% block content %}
+<div class="container" style="max-width:600px;margin:auto;padding:32px;">
+    <h2>Edit Job</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="job_title">Title</label>
+            <input type="text" class="form-control" id="job_title" name="job_title" value="{{ job['job_title'] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="job_description">Description</label>
+            <textarea class="form-control" id="job_description" name="job_description" rows="3" required>{{ job['job_description'] }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="job_location">Location</label>
+            <input type="text" class="form-control" id="job_location" name="job_location" value="{{ job['job_location'] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="job_type">Type</label>
+            <input type="text" class="form-control" id="job_type" name="job_type" value="{{ job['job_type'] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="job_requirements">Requirements</label>
+            <textarea class="form-control" id="job_requirements" name="job_requirements" rows="2" required>{{ job['job_requirements'] }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{{ url_for('jobs_list') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

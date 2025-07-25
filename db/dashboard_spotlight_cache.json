@@ -1,0 +1,53 @@
+{
+  "top_hired": {
+    "id": 3,
+    "name": "Fatima Noor",
+    "email": "fatima.noor@example.com",
+    "phone": "+971-52-1122334",
+    "position": "Full Stack Senior Developer",
+    "status": "Hired",
+    "applied_date": "2025-07-19",
+    "skills": [
+      "Python",
+      "Flask",
+      "React",
+      "SCSS",
+      "Microservices",
+      "CI/CD",
+      "PostgreSQL"
+    ],
+    "experience": [
+      {
+        "job_title": "Senior Full Stack Developer",
+        "company": "Innovatech LLC",
+        "location": "Abu Dhabi, UAE",
+        "dates": "Jan 2020 - Present",
+        "responsibilities": [
+          "Led a team of 5 developers to deliver scalable SaaS products.",
+          "Architected microservices and implemented CI/CD pipelines."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "MSc Software Engineering",
+        "institution": "Khalifa University",
+        "year": "2019"
+      }
+    ],
+    "certifications": [
+      "Certified Kubernetes Administrator"
+    ],
+    "projects": [
+      "HR Management System (Flask, React)",
+      "Real-time analytics dashboard"
+    ],
+    "linkedin": "linkedin.com/in/fatimanoor",
+    "github": "",
+    "match_score": 22,
+    "job_id": "3"
+  },
+  "top_hired_ai_insight": "Fatima Noor is highlighted as the top hired candidate due to her excellent match score of 22, indicating her significant experience and leadership in Full Stack Development, particularly in managing development teams and implementing scalable SaaS solutions.",
+  "top_new": null,
+  "top_new_ai_insight": null
+}

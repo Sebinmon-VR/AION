@@ -1,0 +1,16 @@
+[
+    {
+        "candidate_id": 3,
+        "candidate_name": "Fatima Noor",
+        "candidate_email": "fatima.noor@example.com",
+        "cv_link": "resumes/Senior_Process_Designer_Resume.pdf",
+        "status": "Shortlisted"
+    },
+    {
+        "candidate_id": 19,
+        "candidate_name": "Rashid Al Amiri",
+        "candidate_email": "rashid.amiri@example.com",
+        "cv_link": "resumes/Manager_Resume.pdf",
+        "status": "Rejected"
+    }
+]

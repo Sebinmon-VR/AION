@@ -1,0 +1,16 @@
+[
+    {
+        "candidate_id": 2,
+        "candidate_name": "Omar Al Farsi",
+        "candidate_email": "omar.alfarsi@example.com",
+        "cv_link": "resumes/Manager_Resume.pdf",
+        "status": "Shortlisted"
+    },
+    {
+        "candidate_id": 18,
+        "candidate_name": "Layla Hassan",
+        "candidate_email": "layla.hassan@example.com",
+        "cv_link": "resumes/Fresher_Resume.pdf",
+        "status": "Interview Scheduled"
+    }
+]

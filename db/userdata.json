@@ -1,87 +1,16 @@
 [
-    {
-        "username": "jane",
-        "password": "HrJane@123",
-        "department": "HR",
-        "role": "HR Executive",
-        "email": "jane.hr@company.com",
-        "phone": "+1234567891",
-        "access_control": [
-            "post_jobs",
-            "manage_candidates",
-            "manage_onboarding"
-        ]
-    },
-    {
-        "username": "susan",
-        "password": "HrManagerSusan@123",
-        "department": "HR",
-        "role": "HR Manager",
-        "email": "susan.hrmanager@company.com",
-        "phone": "+1234567892",
-        "access_control": [
-            "post_jobs",
-            "manage_candidates",
-            "manage_onboarding",
-            "manage_hr_team"
-        ]
-    },
-    {
-        "username": "mike",
-        "password": "Mike@123",
-        "department": "HR",
-        "role": "Hiring Manager",
-        "email": "mike.manager@company.com",
-        "phone": "+1234567893",
-        "access_control": [
-            "post_jobs",
-            "manage_candidates",
-            "view_candidates",
-            "interview_candidates",
-            "manage_onboarding",
-            "manage_hr_team",
-            "approve_hiring"
-        ]
-    },
-    {
-        "username": "emma",
-        "password": "DirectorEmma@123",
-        "department": "HR",
-        "role": "HR Director",
-        "email": "emma.director@company.com",
-        "phone": "+1234567894",
-        "access_control": [
-            "manage_hr_team",
-            "approve_hiring",
-            "manage_onboarding",
-            "view_all_hr"
-        ]
-    },
-    {
-        "username": "oliver",
-        "password": "AdminOliver@123",
-        "department": "HR",
-        "role": "HR Admin",
-        "email": "oliver.admin@company.com",
-        "phone": "+1234567895",
-        "access_control": [
-            "manage_users",
-            "manage_hr_team",
-            "view_all_hr"
-        ]
-    },
-    {
-        "username": "lucas",
-        "password": "CeoLucas@123",
-        "department": "HR",
-        "role": "CEO",
-        "email": "lucas.ceo@company.com",
-        "phone": "+1234567896",
-        "access_control": [
-            "view_all_hr",
-            "approve_hiring",
-            "manage_admins",
-            "manage_hr_team"
-        ]
-    }
+    {"username": "mike", "password": "pass123", "department": "Process and HSE", "role": "Discipline Manager", "email": "dm.proc_hse@company.com", "phone": "+1111111111", "access_control": ["approve_candidates"]},
+    {"username": "kevin", "password": "pass123", "department": "Piping & Mechanical", "role": "Discipline Manager", "email": "dm.piping@company.com", "phone": "+1111111112", "access_control": ["approve_candidates"]},
+    {"username": "jhon", "password": "pass123", "department": "Civil & Structural", "role": "Discipline Manager", "email": "dm.civil@company.com", "phone": "+1111111113", "access_control": ["approve_candidates"]},
+    {"username": "discipline_mgr_elec", "password": "pass123", "department": "Electrical", "role": "Discipline Manager", "email": "dm.elec@company.com", "phone": "+1111111114", "access_control": ["approve_candidates"]},
+    {"username": "discipline_mgr_inst", "password": "pass123", "department": "Instrumentation and Control", "role": "Discipline Manager", "email": "dm.inst@company.com", "phone": "+1111111115", "access_control": ["approve_candidates"]},
+    {"username": "discipline_mgr_digi", "password": "pass123", "department": "Digitization", "role": "Discipline Manager", "email": "dm.digi@company.com", "phone": "+1111111116", "access_control": ["approve_candidates"]},
+    {"username": "discipline_mgr_ai", "password": "pass123", "department": "AI Development", "role": "Discipline Manager", "email": "dm.ai@company.com", "phone": "+1111111117", "access_control": ["approve_candidates"]},
+
+    {"username": "sara", "password": "pass123", "department": "Process and HSE", "role": "Department Manager (MOE)", "email": "moe@company.com", "phone": "+1222222221", "access_control": ["approve_candidates"]},
+    {"username": "dept_mgr_mop", "password": "pass123", "department": "Piping & Mechanical", "role": "Department Manager (MOP)", "email": "mop@company.com", "phone": "+1222222222", "access_control": ["approve_candidates"]},
+
+    {"username": "op_mgr", "password": "pass123", "department": "Operations", "role": "Operation Manager", "email": "opmgr@company.com", "phone": "+1333333333", "access_control": ["approve_candidates"]},
+
+    {"username": "ceo", "password": "pass123", "department": "Management", "role": "CEO", "email": "ceo@company.com", "phone": "+1444444444", "access_control": ["approve_candidates"]}
 ]

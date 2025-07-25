@@ -1,0 +1,75 @@
+<!-- Add this to your dashboard.html where the Overall AI System Insight card is rendered -->
+<div id="system-insight-card" class="card" style="position: relative;">
+    <div class="card-body">
+        <h5 class="card-title">Overall AI System Insight</h5>
+        <hr>
+        <div id="system-ai-summary">
+            <!-- Short summary will be injected here -->
+        </div>
+        <div id="system-ai-details" style="display: none;">
+            <!-- Full details will be injected here -->
+        </div>
+        <!-- Regenerate Icon -->
+        <button id="regenerate-insight-btn" title="Regenerate Insights" style="position: absolute; bottom: 16px; right: 16px; background: none; border: none; cursor: pointer;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-7.94"></path></svg>
+        </button>
+        <button id="toggle-details-btn" style="position: absolute; bottom: 16px; left: 16px; background: none; border: none; cursor: pointer; color: #007bff; font-size: 14px;">Show Details</button>
+    </div>
+</div>
+<script>
+function summarizeInsight(html) {
+    // Extract first bullet or key points for summary
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    const bullets = temp.querySelectorAll('li');
+    let summary = '';
+    if (bullets.length > 0) {
+        summary = `<ul><li>${bullets[0].innerText}</li></ul>`;
+    } else {
+        summary = temp.innerText.split('\n')[0];
+    }
+    return summary;
+}
+function fetchAndUpdateInsight() {
+    fetch('/regenerate_system_insights', {method: 'POST'})
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('system-ai-details').innerHTML = data.system_ai_insight;
+                document.getElementById('system-ai-summary').innerHTML = summarizeInsight(data.system_ai_insight);
+            } else {
+                document.getElementById('system-ai-summary').innerHTML = '<span style="color:red">Failed to load insights.</span>';
+            }
+        });
+}
+document.getElementById('regenerate-insight-btn').onclick = fetchAndUpdateInsight;
+document.getElementById('toggle-details-btn').onclick = function() {
+    const details = document.getElementById('system-ai-details');
+    const summary = document.getElementById('system-ai-summary');
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        summary.style.display = 'none';
+        this.innerText = 'Show Summary';
+    } else {
+        details.style.display = 'none';
+        summary.style.display = 'block';
+        this.innerText = 'Show Details';
+    }
+};
+// Initial load
+fetch('/regenerate_system_insights', {method: 'POST'})
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('system-ai-details').innerHTML = data.system_ai_insight;
+            document.getElementById('system-ai-summary').innerHTML = summarizeInsight(data.system_ai_insight);
+        } else {
+            document.getElementById('system-ai-summary').innerHTML = '<span style="color:red">Failed to load insights.</span>';
+        }
+    });
+</script>
+<style>
+#system-insight-card .card-body { position: relative; }
+#regenerate-insight-btn svg { transition: transform 0.2s; }
+#regenerate-insight-btn:active svg { transform: rotate(90deg); }
+</style>

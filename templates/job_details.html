@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% block title %}Job Details{% endblock %}
+{% block content %}
+<style>
+  .job-card {
+    width: 100%;
+    margin: 24px 0 0 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px 0 rgba(60,72,88,0.08);
+    padding: 28px 3vw 22px 3vw;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    border: 1.2px solid #e0e0e0;
+    box-sizing: border-box;
+  }
+  .job-title {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #232323;
+    margin-bottom: 4px;
+    letter-spacing: 0.05px;
+    text-align: left;
+  }
+  .job-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: none;
+  }
+  .job-table th, .job-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: left;
+    font-size: 1.01rem;
+  }
+  .job-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: #232323;
+    border-top: 1px solid #f0f0f0;
+    width: 180px;
+  }
+  .job-table tr:last-child td {
+    border-bottom: none;
+  }
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1976d2;
+    margin-top: 24px;
+    margin-bottom: 10px;
+  }
+  .form-section {
+    background: #f8f9fa;
+    border-radius: 7px;
+    padding: 16px 18px 12px 18px;
+    margin-bottom: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px 0 rgba(60,72,88,0.03);
+  }
+  label {
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 4px;
+    display: block;
+    font-size: 0.98rem;
+  }
+  input[type="file"], select {
+    margin-bottom: 10px;
+    padding: 6px 8px;
+    border: 1px solid #cfd8dc;
+    border-radius: 4px;
+    font-size: 0.98rem;
+    background: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border 0.2s;
+  }
+  input[type="file"]:focus, select:focus {
+    border: 1.5px solid #1976d2;
+    outline: none;
+  }
+  .btn {
+    background: #f5f5f5;
+    color: #222;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 7px 18px;
+    font-size: 0.98rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 5px;
+    box-shadow: 0 1px 2px 0 rgba(60,72,88,0.06);
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn:hover {
+    background: #e0e0e0;
+    color: #111;
+  }
+  .candidates-list {
+    background: #f8f9fa;
+    border-radius: 7px;
+    padding: 14px 18px 10px 18px;
+    border: 1px solid #e5e7eb;
+    margin-top: 18px;
+    box-shadow: 0 1px 2px 0 rgba(60,72,88,0.03);
+  }
+  .candidates-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .candidates-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 1.01rem;
+    color: #222;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .candidates-list li:last-child {
+    border-bottom: none;
+  }
+</style>
+<div class="job-card">
+  <div class="job-title">Job Details</div>
+
+  <table class="job-table">
+    <tbody>
+      {% set field_map = {
+        'job_id': 'Job ID',
+        'job_title': 'Job Title',
+        'job_description': 'Job Description',
+        'job_location': 'Job Location',
+        'job_type': 'Job Type',
+        'job_requirements': 'Job Requirements',
+        'job_openings': 'Job Openings',
+        'job_posted_by': 'Job Posted By',
+        'job_lead_time': 'Job Lead Time',
+        'department': 'Department',
+        'seniority_level': 'Seniority Level',
+        'salary_range': 'Salary Range',
+        'jd_file_path': 'JD File',
+        'posted_at': 'Posted At',
+        'status': 'Status'
+      } %}
+      {% for key, label in field_map.items() %}
+        <tr>
+          <th>{{ label }}</th>
+          {% set value = job.get(key, '') %}
+          <td>
+            {{ value }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# Always display JD file preview if a path exists #}
+  {% set jdfile = job.get('jd_file_path', '') %}
+  {% if jdfile and jdfile|length > 0 and jdfile != 'Unknown' %}
+    <div class="form-section">
+      <div class="section-title">Job Description File Preview</div>
+      {% if jdfile.lower().endswith('.pdf') %}
+        {# Always use the uploaded_file route for JD files in db/uploads/jd_files #}
+        <embed src="{{ url_for('uploaded_file', filename=jdfile) }}" type="application/pdf" width="100%" height="320px" style="border:1px solid #ccc; border-radius:6px;" />
+        <div style="margin-top:8px;"><a href="{{ url_for('uploaded_file', filename=jdfile) }}" target="_blank" class="btn">Download JD PDF</a></div>
+      {% else %}
+        <a href="{{ url_for('uploaded_file', filename=jdfile) }}" target="_blank" class="btn">Download JD File</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <div>No JD file uploaded.</div>
+  {% endif %}
+
+  {% if role in ['Discipline Manager', 'Department Manager (MOE)', 'Department Manager (MOP)', 'Operation Manager', 'CEO'] %}
+    <div class="form-section">
+      <div class="section-title">Update Job Status</div>
+      <form action="{{ url_for('update_job_status', job_id=job['job_id'] if job['job_id'] is defined else job['id']) }}" method="post">
+        <label for="status">Status:</label>
+        <select name="status" id="status">
+          <option value="active" {% if job['status'] == 'active' %}selected{% endif %}>Active</option>
+          <option value="closed" {% if job['status'] == 'closed' %}selected{% endif %}>Closed</option>
+        </select>
+        <button type="submit" class="btn">Update Status</button>
+      </form>
+    </div>
+    <div class="form-section">
+      <div class="section-title">Upload Candidate CV for this Job</div>
+      <form action="{{ url_for('upload_cv') }}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="job_id" value="{{ job['job_id'] if job['job_id'] is defined else job['id'] }}">
+        <label for="resume">Upload CV:</label>
+        <input type="file" name="resume" id="resume" accept=".pdf,.doc,.docx" required>
+        <button type="submit" class="btn">Upload CV</button>
+      </form>
+    </div>
+  {% endif %}
+
+  {% if uploaded_cvs %}
+    <div class="candidates-list">
+      <div class="section-title">Candidates Applied for this Job</div>
+      <ul>
+        {% for cv in uploaded_cvs %}
+          <li>
+            <span style="font-size:1.1em;">👤</span> <b>{{ cv.candidate_name }}</b> ({{ cv.candidate_email }})
+            {% if cv.candidate_id is defined %}
+              - <a href="{{ url_for('candidate_profile', candidate_id=cv.candidate_id) }}">View Profile</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

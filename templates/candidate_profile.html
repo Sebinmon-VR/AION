@@ -1,0 +1,557 @@
+
+{% block title %}Candidate Profile{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="/static/css/candidate_profile.css">
+
+
+<style>
+  .profile_container, .update_profile_right {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+  }
+  .candidate_profile_info, .info {
+    border-radius: 8px;
+    border: 1px solid #f0f0f0;
+    box-shadow: none;
+    margin-bottom: 18px;
+  }
+  .candidate_profile_info h2 {
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: #1976d2;
+    margin-bottom: 8px;
+  }
+  .candidate_profile_info p, .info p {
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+  .profile_container form, .update_profile_right form {
+    margin-top: 8px;
+    background: #fafbfc;
+    padding: 14px 14px 8px 14px;
+    border-radius: 7px;
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+  }
+  .profile_container label, .update_profile_right label {
+    font-weight: 500;
+    margin-bottom: 3px;
+    display: block;
+    color: #222;
+    font-size: 0.98rem;
+  }
+  .profile_container input[type="text"],
+  .profile_container input[type="date"],
+  .profile_container input[type="time"],
+  .profile_container input[type="file"],
+  .profile_container textarea,
+  .update_profile_right input[type="text"],
+  .update_profile_right input[type="date"],
+  .update_profile_right input[type="time"],
+  .update_profile_right input[type="file"],
+  .update_profile_right textarea,
+  .update_profile_right select {
+    width: 100%;
+    padding: 7px 9px;
+    margin-bottom: 10px;
+    border: 1px solid #cfd8dc;
+    border-radius: 5px;
+    font-size: 0.98rem;
+    background: #fff;
+    box-sizing: border-box;
+    transition: border 0.2s;
+  }
+  .profile_container input[type="text"]:focus,
+  .profile_container input[type="date"]:focus,
+  .profile_container input[type="time"]:focus,
+  .profile_container textarea:focus,
+  .update_profile_right input[type="text"]:focus,
+  .update_profile_right input[type="date"]:focus,
+  .update_profile_right input[type="time"]:focus,
+  .update_profile_right textarea:focus,
+  .update_profile_right select:focus {
+    border: 1.5px solid #1976d2;
+    outline: none;
+  }
+  .profile_container button, .update_profile_right button, .btn, .btn-warning {
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 18px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 6px;
+    box-shadow: none;
+    transition: background 0.2s;
+  }
+  .profile_container button:hover, .update_profile_right button:hover, .btn:hover, .btn-warning:hover {
+    background: #333;
+    color: #fff;
+  }
+  .profile_container table, .update_profile_right table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 8px;
+    background: #fafbfc;
+    border-radius: 7px;
+    overflow: hidden;
+    box-shadow: none;
+  }
+  .profile_container th, .profile_container td, .update_profile_right th, .update_profile_right td {
+    padding: 8px 7px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+    font-size: 0.98rem;
+  }
+  .profile_container th, .update_profile_right th {
+    background: #e3f2fd;
+    font-weight: 600;
+    color: #1976d2;
+  }
+  .profile_container tr:last-child td, .update_profile_right tr:last-child td {
+    border-bottom: none;
+  }
+  .profile_container input[type="checkbox"], .update_profile_right input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #1976d2;
+    margin: 0 auto;
+    display: block;
+  }
+  .profile_container .updation, .update_profile_right .updation {
+    margin-top: 14px;
+  }
+  @media (max-width: 900px) {
+    .container { flex-direction: column; }
+    .profile_container, .update_profile_right { width: 100% !important; height: auto !important; }
+  }
+</style>
+
+<div class="container" style="width: 100%; height: 100vh; display: flex; background: #f5f7fa; padding: 18px 0; gap: 18px;">
+
+  <!-- LEFT COLUMN -->
+  <div class="profile_container" style="width: 70%; height: 100vh; overflow-y: auto; padding: 30px; box-sizing: border-box; min-width: 340px;">
+
+
+
+
+
+    <div class="candidate_profile_info" style="background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 20px;">
+      <h2 style="margin-bottom: 10px;">{{ candidate.name }}</h2>
+      <p><b>Email:</b> {{ candidate.email }}</p>
+      <p><b>Phone:</b> {{ candidate.phone }}</p>
+      <p><b>Position:</b> {{ candidate.position }}</p>
+      <p><b>Status:</b> {{ candidate.status }}</p>
+      <p><b>Applied Date:</b> {{ candidate.applied_date }}</p>
+      <p><b>Notes:</b> {{ candidate.notes }}</p>
+
+{% if candidate.status == 'Selected' and role == 'Operation Manager' %}
+  <div style="margin-top: 20px; border:2px solid #1976d2; background:#e3f2fd; padding:18px; border-radius:10px;">
+    <h3 style="color:#1976d2;">Operation Manager: Issue Offer Letter</h3>
+    <form action="/issue_offer_letter" method="post">
+      <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+      <label for="offer_details">Offer Letter Details:</label>
+      <textarea id="offer_details" name="offer_details" rows="10" required placeholder="Enter offer letter content here...">
+Dear {{ candidate.name }},
+
+We are pleased to offer you the position of {{ candidate.position }} at our company. Your skills and experience will be an ideal fit for our team.
+
+Position: {{ candidate.position }}
+Start Date: [Enter Start Date]
+Salary: [Enter Salary Details]
+Reporting Manager: {{ request.cookies.get('username', '') }}
+
+Please review the terms and let us know if you have any questions. We look forward to having you on board.
+
+Best regards,
+{{ request.cookies.get('username', '') }}
+Operation Manager
+</textarea>
+      <button type="submit" style="background:#1976d2; color:#fff;">Issue Offer Letter</button>
+    </form>
+  </div>
+{% endif %}
+      <div style="margin-top: 20px;">
+        <h4>Resume Preview</h4>
+        {% if candidate.cv_path %}
+          {% if candidate.cv_path.lower().endswith('.pdf') %}
+            <embed src="{{ url_for('uploaded_file', filename=candidate.cv_path) }}" type="application/pdf" width="100%" height="500px" style="border:1px solid #ccc; border-radius:8px;" />
+            <div><a href="{{ url_for('uploaded_file', filename=candidate.cv_path) }}" target="_blank">Download PDF</a></div>
+          {% else %}
+            <a href="{{ url_for('uploaded_file', filename=candidate.cv_path) }}" target="_blank">Download Resume</a>
+          {% endif %}
+        {% else %}
+          <div>No resume uploaded.</div>
+        {% endif %}
+      </div>
+
+      {% if candidate.interview_video %}
+      <div style="margin-top: 20px;">
+        <h4>Interview Video</h4>
+        <video controls width="100%" style="max-width:600px; border-radius:8px;">
+          <source src="{{ url_for('uploaded_file', filename=candidate.interview_video) }}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <div><a href="{{ url_for('uploaded_file', filename=candidate.interview_video) }}" target="_blank">Download Video</a></div>
+      </div>
+      {% endif %}
+
+      <p style="margin-top: 15px;"><b>Applied Job ID:</b> {{ candidate.job_id }}</p>
+    </div>
+
+
+    <div class="info" style="background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 20px;">
+      <p><b>Match Score:</b> {{ candidate.match_score if candidate.match_score is defined else 0 }}</p>
+      <p><b>Interview Performance Score:</b> {{ candidate.interview_score if candidate.interview_score is defined else 'N/A' }}</p>
+      <details>
+        <summary style="font-weight:500; cursor:pointer;">Show Details (Skills, Experience, Education, etc.)</summary>
+        <div style="margin-top:10px;">
+        {% if candidate.skills %}
+          <b>Skills:</b>
+          <ul>
+          {% for skill in candidate.skills %}
+            <li>{{ skill }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+        {% if candidate.experience %}
+          <b>Experience:</b>
+          <ul>
+          {% for exp in candidate.experience %}
+            <li>
+              {% if exp is string %}{{ exp }}{% else %}
+                {% if exp.job_title %}<b>{{ exp.job_title }}</b>{% endif %}
+                {% if exp.company %} at {{ exp.company }}{% endif %}
+                {% if exp.location %} ({{ exp.location }}){% endif %}
+                {% if exp.dates %} - {{ exp.dates }}{% endif %}
+                {% if exp.responsibilities %}
+                  <ul>
+                    {% for resp in exp.responsibilities %}
+                      <li>{{ resp }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              {% endif %}
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+        {% if candidate.education %}
+          <b>Education:</b>
+          <ul>
+          {% for edu in candidate.education %}
+            <li>{% if edu is string %}{{ edu }}{% else %}
+              {% if edu.degree %}{{ edu.degree }}{% endif %}
+              {% if edu.institution %} at {{ edu.institution }}{% endif %}
+              {% if edu.year %} ({{ edu.year }}){% endif %}
+            {% endif %}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+        {% if candidate.certifications %}
+          <b>Certifications:</b>
+          <ul>
+          {% for cert in candidate.certifications %}
+            <li>{{ cert }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+        {% if candidate.projects %}
+          <b>Projects:</b>
+          <ul>
+          {% for proj in candidate.projects %}
+            <li>{{ proj }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+        </div>
+      </details>
+      <p><b>LinkedIn:</b> <a href="{{ candidate.linkedin }}" target="_blank">{{ candidate.linkedin }}</a></p>
+      <p><b>GitHub:</b> <a href="{{ candidate.github }}" target="_blank">{{ candidate.github }}</a></p>
+    </div>
+  {% if candidate.status == 'Hired' and candidate.offer_letter_details %}
+    <div style="margin-bottom: 20px; border:1.5px solid #fefefe; background:#e3f2fd; padding:16px; border-radius:10px;">
+      <h3 style="color:#3e4953;">Offer Letter Issued</h3>
+      <b>Candidate Name:</b> {{ candidate.name }}<br>
+      <b>Candidate Email:</b> {{ candidate.email }}<br>
+      <b>Position:</b> {{ candidate.position }}<br>
+      <b>Issued By:</b> {{ candidate.offer_issued_by }} ({{ candidate.offer_issued_by_email }})<br>
+      <b>Status:</b> Hired<br>
+      <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #bbb; border-radius:7px;">
+        <b>Offer Letter Content:</b><br>
+        <pre style="white-space:pre-wrap; font-size:1.05em;">{{ candidate.offer_letter_details }}</pre>
+      </div>
+    </div>
+  {% endif %}
+{% if candidate.status == 'Interview Scheduled' and role in ['HR', 'HR Manager', 'Manager', 'Department Manager (MOE)', 'Department Manager (MOP)', 'Operation Manager', 'CEO', 'Discipline Manager'] %}
+    <div style="margin-top: 20px;">
+      <h3>Interview Video Analysis</h3>
+      <form id="interviewForm" action="/interview_analysis" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+        <label for="video_file">Interview Video File:</label>
+        <input type="file" id="video_file" name="video_file" accept="video/*" required>
+        <button type="submit">Upload & Analyze</button>
+      </form>
+      <div id="result" style="margin-top: 15px;"></div>
+    </div>
+    {% endif %}
+
+    {% if candidate.status == 'Interviewed' and role == 'HR' %}
+    <div style="margin-top: 20px;">
+      <h3>Select Candidate & Send for Approval</h3>
+      <form action="/send_for_approval" method="post">
+        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+        <input type="hidden" name="interviewer" value="{{ request.cookies.get('username', '') }}">
+        <label for="approval_message">Approval Message:</label>
+        <textarea id="approval_message" name="approval_message" rows="4" required></textarea>
+        <button type="submit">Send for Approval</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if candidate.approval_comment %}
+    <div style="margin-top:20px; border:1px solid #4caf50; background:#e8f5e9; padding:10px;">
+      <b>HR Manager Approval Comment:</b> {{ candidate.approval_comment }}
+    </div>
+    {% endif %}
+
+{% if show_offer_letter %}
+    <div style="margin-top: 20px; border:2px solid #ffffff; background:#e3f2fd; padding:18px; border-radius:10px;">
+      <h3 style="color:#262b30;">Operation Manager: Issue Offer Letter</h3>
+      <div style="margin-bottom:10px;">
+        <b>Candidate Name:</b> {{ candidate.name }}<br>
+        <b>Candidate Email:</b> {{ candidate.email }}<br>
+        <b>Position:</b> {{ candidate.position }}<br>
+        <b>Manager Name:</b> {{ request.cookies.get('username', '') }}<br>
+        <b>Manager Email:</b> {{ request.cookies.get('email', '') }}
+      </div>
+      <form action="/issue_offer_letter" method="post">
+        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+        <label for="offer_details">Offer Letter Details:</label>
+        <textarea id="offer_details" name="offer_details" rows="6" required placeholder="Enter offer letter content here..."></textarea>
+        <button type="submit" style="background:#1976d2; color:#fff; margin-top:10px;">Issue Offer Letter</button>
+      </form>
+    </div>
+{% endif %}
+
+<script>
+// Dynamically update offer letter template fields as candidate or manager data changes
+document.addEventListener('DOMContentLoaded', function() {
+  var offerDetails = document.getElementById('offer_details');
+  if (offerDetails) {
+    // Save the original template
+    var template = offerDetails.value;
+    // Optionally, you can add listeners to update fields if you add input fields for Start Date/Salary
+    // For now, this just keeps the template in the textarea for editing
+  }
+});
+</script>
+
+    {% if candidate.interview_score or candidate.ai_interview_report or candidate.interview_transcript %}
+    <div style="margin-top:30px; border:1px solid #ccc; padding:15px; background:#f9f9f9;">
+      <h4>Latest Interview Analysis Result</h4>
+      {% if candidate.interview_score %}
+      <b>Score:</b> {{ candidate.interview_score }}<br>
+      {% endif %}
+      <details style="margin-top:10px;">
+        <summary style="cursor:pointer; font-weight:bold;">Show AI Report & Transcript</summary>
+        {% if candidate.ai_interview_report %}
+        <b>AI Report:</b>
+        <div style="background:#fff; border:1px solid #eee; border-radius:7px; padding:14px 16px; margin-bottom:10px; font-size:1.05em; line-height:1.6; color:#222;">
+          {{ candidate.ai_interview_report | replace('*', '') | replace('#', '') | replace('\n', '<br>') | safe }}
+        </div>
+        {% endif %}
+        {% if candidate.interview_transcript %}
+        <b>Transcript:</b>
+        <pre style="white-space:pre-wrap;">{{ candidate.interview_transcript }}</pre>
+        {% endif %}
+      </details>
+    </div>
+    {% endif %}
+
+    <script>
+      document.getElementById('interviewForm').onsubmit = async function(e) {
+          e.preventDefault();
+          const form = e.target;
+          const formData = new FormData(form);
+          document.getElementById('result').innerHTML = 'Uploading and analyzing... Please wait.';
+          try {
+              const response = await fetch('/interview_analysis', {
+                  method: 'POST',
+                  body: formData
+              });
+              const data = await response.json();
+              if (data.success) {
+                  location.reload();
+              } else {
+                  document.getElementById('result').innerHTML = `<b>Error:</b> ${data.message}`;
+              }
+          } catch (err) {
+              document.getElementById('result').innerHTML = `<b>Request failed:</b> ${err}`;
+          }
+      };
+    </script>
+{% if candidate.status == 'Hired' %}
+  {% set months_with_insight = [] %}
+  {% for month in range(1,7) %}
+    {% set insight = candidate.probation_assessment_insights[month|string] if candidate.probation_assessment_insights and candidate.probation_assessment_insights[month|string] is defined else None %}
+    {% set assessment = candidate.probation_assessment[month|string] if candidate.probation_assessment and candidate.probation_assessment[month|string] is defined else None %}
+    {% if insight or assessment %}
+      {% set _ = months_with_insight.append(month) %}
+    {% endif %}
+  {% endfor %}
+  {% if months_with_insight|length > 0 %}
+    <div class="desktop-card" style="margin-bottom:0; padding: 28px 32px; max-width: 600px; margin-left:auto; margin-right:auto;">
+      <h3 style="font-size:1.2rem; margin-bottom:18px; color:#222; text-align:center;">Probation Assessment Insights</h3>
+      {# Analytical overall summary #}
+      {% set positive = 0 %}
+      {% set negative = 0 %}
+      {% for month in months_with_insight %}
+        {% set insight = candidate.probation_assessment_insights[month|string] if candidate.probation_assessment_insights and candidate.probation_assessment_insights[month|string] is defined else None %}
+        {% if insight %}
+          {% if 'good' in insight.lower() or 'excellent' in insight.lower() or 'positive' in insight.lower() or 'improved' in insight.lower() %}
+            {% set positive = positive + 1 %}
+          {% endif %}
+          {% if 'not good' in insight.lower() or 'poor' in insight.lower() or 'negative' in insight.lower() or 'needs improvement' in insight.lower() %}
+            {% set negative = negative + 1 %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      <div style="margin-bottom:18px; text-align:center; font-size:1.08rem; color:#444;">
+        {% if positive > negative %}
+          <b>Overall Insight:</b> The candidate's probation performance is trending <span style="color:#222; font-weight:600;">positive</span> based on available assessments.
+        {% elif negative > positive %}
+          <b>Overall Insight:</b> The candidate's probation performance shows <span style="color:#222; font-weight:600;">areas of concern</span> and may need improvement.
+        {% else %}
+          <b>Overall Insight:</b> The candidate's probation performance is <span style="color:#222; font-weight:600;">mixed or inconclusive</span> so far.
+        {% endif %}
+      </div>
+      <div style="margin-top:10px;">
+        {% for month in months_with_insight %}
+          {% set insight = candidate.probation_assessment_insights[month|string] if candidate.probation_assessment_insights and candidate.probation_assessment_insights[month|string] is defined else None %}
+          {% set assessment = candidate.probation_assessment[month|string] if candidate.probation_assessment and candidate.probation_assessment[month|string] is defined else None %}
+          <div style="margin-bottom: 18px; padding-bottom:10px; border-bottom:1px solid #f0f0f0;">
+            <b style="color:#222;">Month {{ month }}:</b><br>
+            {% if insight %}
+              <span style="color:#222;">{{ insight|safe }}</span>
+            {% elif assessment %}
+              <span class="probation-summary-processing"><span class="spinner"></span> Generating summary for Month {{ month }}...</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="update_profile_right" style="width: 38%; max-width: 440px; min-width: 340px; height: 100vh; overflow-y: auto; padding: 36px 28px 28px 28px; box-sizing: border-box; background: #fff; border-left: 1px solid #eee; display: flex; flex-direction: column; gap: 22px;">
+
+
+    {% if schedule_interview or (candidate.status == 'Shortlisted' and role in ['HR', 'HR Manager', 'Manager']) %}
+    <h3>Schedule Interview</h3>
+    <form action="/schedule_interview" method="post">
+      <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+      <input type="hidden" name="intervier" value="{{ request.cookies.get('username', '')}}">
+      <label for="interview_date">Date:</label>
+      <input type="date" id="interview_date" name="interview_date" required>
+      <label for="interview_time">Time:</label>
+      <input type="time" id="interview_time" name="interview_time" required>
+      <button type="submit">Schedule</button>
+    </form>
+    {% endif %}
+
+    <div class="updation" style="margin-top: 20px;">
+      <form action="/update_candidate_status" method="post">
+        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+        <label for="new_status">Update Status:</label>
+        <select id="new_status" name="new_status" required>
+          <option value="Selected" {% if candidate.status == 'Selected' %}selected{% endif %}>Selected</option>
+          <option value="Shortlisted" {% if candidate.status == 'Shortlisted' %}selected{% endif %}>Shortlisted</option>
+          <option value="Interview Scheduled" {% if candidate.status == 'Interview Scheduled' %}selected{% endif %}>Interview Scheduled</option>
+          <option value="Interviewed" {% if candidate.status == 'Interviewed' %}selected{% endif %}>Interviewed</option>
+          <option value="Hired" {% if candidate.status == 'Hired' %}selected{% endif %}>Hired</option>
+          <option value="Resigned" {% if candidate.status == 'Resigned' %}selected{% endif %}>Resigned</option>
+          <option value="Fired" {% if candidate.status == 'Fired' %}selected{% endif %}>Fired</option>
+          <option value="Rejected" {% if candidate.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+          <option value="On Hold" {% if candidate.status == 'On Hold' %}selected{% endif %}>On Hold</option>
+          <option value="Onboarding" {% if candidate.status == 'Onboarding' %}selected{% endif %}>Onboarding</option>
+        </select>
+        <button type="submit">Update Status</button>
+      </form>
+    </div>
+
+    {% if role in ['Department Manager (MOE)', 'Department Manager (MOP)', 'Operation Manager', 'CEO'] and candidate.status == 'Pending Approval' %}
+    <form action="/approve_candidate" method="post" style="margin-top:20px;">
+      <h4>Pending Approval {{ interviewer }}</h4>
+      <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+      <button type="submit">Approve Candidate</button>
+    </form>
+    {% endif %}
+
+
+    {% if candidate.status == 'Pending Approval' and role in ['Department Manager (MOE)', 'Department Manager (MOP)'] %}
+    <div style="margin-top: 20px; background: #fff; border: 1px solid #e0e0e0; padding: 12px 10px; border-radius: 7px;">
+      <h3 style="margin-top:0;">Approval Section</h3>
+      <form action="/send_negotiation_mail" method="post">
+        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+        <label for="negotiation_message">Negotiation Mail:</label>
+        <textarea id="negotiation_message" name="negotiation_message" rows="4"></textarea>
+        <button type="submit">Send Mail</button>
+      </form>
+
+      <form action="/approve_candidate" method="post">
+        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+        <label for="approval_comment">Approval Comment:</label>
+        <textarea id="approval_comment" name="approval_comment" rows="3" required></textarea>
+        <button type="submit" name="action" value="approve">Approve</button>
+        <button type="submit" name="action" value="hold">Hold</button>
+        <button type="submit" name="action" value="reject">Reject</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if candidate.status == 'Hired' and candidate.onboarding %}
+    <div style="margin-top:30px; border:1px solid #e0e0e0; background:#fff; padding:15px;">
+      <h3>Onboarding Progress</h3>
+      <form action="/update_onboarding" method="post">
+        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+        <table class="table table-bordered" style="width:100%;">
+          <thead>
+            <tr><th>Step</th><th>Status</th><th>Completed</th></tr>
+          </thead>
+          <tbody>
+            {% set main_steps = ['Joining Formalities', 'HR Introduction', 'Document Verification', 'System Allocation'] %}
+            {% for step in main_steps %}
+            <tr>
+              <td>{{ step }}</td>
+              <td>{{ candidate.onboarding.get(step, 'Pending') }}</td>
+              <td>
+                <input type="checkbox" name="{{ step.replace(' ', '_').lower() }}" value="1" {% if candidate.onboarding.get(step) == 'Completed' %}checked{% endif %}>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <button type="submit">Update Onboarding</button>
+      </form>
+      <p style="margin-top:10px; color:#444;">Check the box to mark a step as completed.</p>
+    </div>
+    {% endif %}
+
+    {% if candidate.status == 'Hired' %}
+    <div style="margin-top:30px; border:1px solid #e0e0e0; background:#fff; padding:12px 10px;">
+      <h3 style="font-size:1.1rem; margin-bottom:10px;">Probation Assessment (6 Months)</h3>
+      <a href="{{ url_for('probation_assessment', candidate_id=candidate.id) }}" class="btn btn-warning" style="font-size:0.95rem; padding:5px 14px; min-width:unset;">Go to Probation Assessment Page</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

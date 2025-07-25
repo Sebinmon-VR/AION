@@ -1,3 +1,5 @@
+PyPDF2
+python-docx
 openai
 python-dotenv
 pytz

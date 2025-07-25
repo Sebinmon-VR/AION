@@ -1,0 +1,16 @@
+[
+    {
+        "candidate_id": 14,
+        "candidate_name": "Bilal Khan",
+        "candidate_email": "bilal.khan@example.com",
+        "cv_link": "resumes/Manager_Resume.pdf",
+        "status": "Shortlisted"
+    },
+    {
+        "candidate_id": 15,
+        "candidate_name": "Maya Thomas",
+        "candidate_email": "maya.thomas@example.com",
+        "cv_link": "resumes/Fresher_Resume.pdf",
+        "status": "Interview Scheduled"
+    }
+]

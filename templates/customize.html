@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Customize Dashboard{% endblock %}
+{% block content %}
+<style>
+.customize-container {
+  max-width: 700px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+  padding: 36px 32px;
+  font-family: 'Segoe UI', sans-serif;
+}
+.customize-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+.options-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px 0;
+}
+.options-list li {
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px 18px;
+  margin-bottom: 10px;
+  font-size: 1.08rem;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.save-btn {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+</style>
+<div class="customize-container">
+  <div class="customize-title">Customize Your Dashboard</div>
+  <form method="post" action="/customize">
+    <p>Drag and drop to arrange the order of main options/pages. The first one will show up by default after login.</p>
+    <ul class="options-list" id="options-list">
+      {% for option in options %}
+        <li draggable="true">
+          <input type="hidden" name="order" value="{{ option }}">
+          <span>{{ option|capitalize }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+    <button type="submit" class="save-btn">Save Order</button>
+  </form>
+</div>
+<script>
+// Simple drag-and-drop for reordering
+const list = document.getElementById('options-list');
+let dragSrcEl = null;
+list.addEventListener('dragstart', function(e) {
+  dragSrcEl = e.target;
+  e.dataTransfer.effectAllowed = 'move';
+});
+list.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+});
+list.addEventListener('drop', function(e) {
+  e.preventDefault();
+  if (dragSrcEl && dragSrcEl !== e.target && e.target.tagName === 'LI') {
+    list.insertBefore(dragSrcEl, e.target.nextSibling);
+  }
+});
+</script>
+{% endblock %}

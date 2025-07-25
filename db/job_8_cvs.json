@@ -1,0 +1,16 @@
+[
+    {
+        "candidate_id": 12,
+        "candidate_name": "Saeed Al Mazrouei",
+        "candidate_email": "saeed.mazrouei@example.com",
+        "cv_link": "resumes/Manager_Resume.pdf",
+        "status": "Shortlisted"
+    },
+    {
+        "candidate_id": 13,
+        "candidate_name": "Huda Al Qasimi",
+        "candidate_email": "huda.qasimi@example.com",
+        "cv_link": "resumes/Fresher_Resume.pdf",
+        "status": "Interview Scheduled"
+    }
+]

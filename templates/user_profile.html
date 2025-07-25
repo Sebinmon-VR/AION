@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+
+<style>
+  .profile-container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+    padding: 36px 32px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+  .profile-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    margin-right: 28px;
+    object-fit: cover;
+    border: 2px solid #007bff;
+  }
+  .profile-main {
+    flex: 1;
+  }
+  .profile-name {
+    font-size: 26px;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 6px;
+  }
+  .profile-username {
+    font-size: 15px;
+    color: #888;
+    margin-bottom: 2px;
+  }
+  .profile-role {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  .profile-details {
+    margin-top: 10px;
+    margin-bottom: 18px;
+  }
+  .profile-details p {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  .profile-section {
+    margin-bottom: 18px;
+  }
+  .profile-section-title {
+    font-size: 17px;
+    font-weight: 500;
+    color: #007bff;
+    margin-bottom: 6px;
+  }
+  .profile-list {
+    margin-left: 12px;
+    font-size: 15px;
+    color: #444;
+  }
+  .edit-btn {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 10px 22px;
+    background: #007bff;
+    color: #fff;
+    border-radius: 7px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.2s;
+    font-weight: 500;
+  }
+  .edit-btn:hover {
+    background: #0056b3;
+  }
+</style>
+
+<div class="profile-container">
+  <div class="profile-header">
+    <img src="{{ user.avatar_url or url_for('static', filename='images/profile.png') }}" alt="Avatar" class="profile-avatar">
+    <div class="profile-main">
+      <div class="profile-name">{{ user.name or user.username }}</div>
+      <div class="profile-username">@{{ user.username }}</div>
+      <div class="profile-role">{{ user.role }}</div>
+    </div>
+  </div>
+  <div class="profile-details">
+    <p><b>Email:</b> {{ user.email }}</p>
+    <p><b>Phone:</b> {{ user.phone }}</p>
+    <p><b>Department:</b> {{ user.department }}</p>
+    <p><b>Joined:</b> {{ user.joined_date or user.created_at or '' }}</p>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title">Skills</div>
+    <div class="profile-list">
+      {% if user.skills %}
+        {{ user.skills | join(', ') }}
+      {% else %}
+        <span style="color:#aaa;">No skills listed.</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title">Experience</div>
+    <div class="profile-list">
+      {% if user.experience %}
+        <ul>
+        {% for exp in user.experience %}
+          <li>{{ exp }}</li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <span style="color:#aaa;">No experience listed.</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title">Education</div>
+    <div class="profile-list">
+      {% if user.education %}
+        <ul>
+        {% for edu in user.education %}
+          <li>{{ edu }}</li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <span style="color:#aaa;">No education listed.</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title">Certifications</div>
+    <div class="profile-list">
+      {% if user.certifications %}
+        <ul>
+        {% for cert in user.certifications %}
+          <li>{{ cert }}</li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <span style="color:#aaa;">No certifications listed.</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title">Projects</div>
+    <div class="profile-list">
+      {% if user.projects %}
+        <ul>
+        {% for proj in user.projects %}
+          <li>{{ proj }}</li>
+        {% endfor %}
+        </ul>
+      {% else %}
+        <span style="color:#aaa;">No projects listed.</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-section-title">Links</div>
+    <div class="profile-list">
+      {% if user.linkedin %}
+        <a href="{{ user.linkedin }}" target="_blank">LinkedIn</a>
+      {% endif %}
+      {% if user.github %}
+        {% if user.linkedin %} | {% endif %}
+        <a href="{{ user.github }}" target="_blank">GitHub</a>
+      {% endif %}
+      {% if not user.linkedin and not user.github %}
+        <span style="color:#aaa;">No links provided.</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <a href="{{ url_for('edit_profile') }}" class="edit-btn">Edit Profile</a>
+</div>
+
+<div class="profile-container" style="margin-top:32px;">
+  <div class="profile-section">
+    <div class="profile-section-title">Settings & Privacy</div>
+    <div class="profile-list">
+      <ul style="list-style:none; padding-left:0;">
+        <li><a href="#" style="color:#007bff;">Account Settings</a> <span style="color:#aaa;">(Update your info, change avatar)</span></li>
+        <li><a href="#" style="color:#007bff;">Data & Privacy</a> <span style="color:#aaa;">(Download your data, privacy controls)</span></li>
+        <li><a href="#" style="color:#007bff;">Notification Preferences</a> <span style="color:#aaa;">(Email, SMS, app notifications)</span></li>
+        <li><a href="#" style="color:#007bff;">Change Password</a> <span style="color:#aaa;">(Update your password)</span></li>
+        <li><a href="#" style="color:#dc3545;">Delete Account</a> <span style="color:#aaa;">(Permanently remove your account)</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/recent_activities_table.css') }}">
+
+<div class="recent-activity-table-section">
+  <h2>Today's Pulse <span style="font-size:0.95rem;color:#aaa;font-weight:400;">(Analytics)</span></h2>
+  <table class="activity-table">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>User</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if todays_activities %}
+        {% for activity in todays_activities %}
+          <tr>
+            <td>{{ activity.description }}</td>
+            <td class="activity-user">{{ activity.user }}</td>
+            <td class="activity-date">{{ activity.date }}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="3" class="no-activity-table">No activities for today.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+  <h2 style="margin-top:2.2rem;">Recent Activities</h2>
+  <table class="activity-table">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>User</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if recent_activities %}
+        {% for activity in recent_activities %}
+          <tr>
+            <td>{{ activity.description }}</td>
+            <td class="activity-user">{{ activity.user }}</td>
+            <td class="activity-date">{{ activity.date }}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="3" class="no-activity-table">No recent activities found.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+  <a href="{{ url_for('index') }}" class="btn btn-link">Back to Dashboard</a>
+</div>
+{% endblock %}

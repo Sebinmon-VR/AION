@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #fafbfc;
+      color: #222;
+    }
+
+    .chat-container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #f9f9f9;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .chat-header {
+      padding: 18px;
+      border-bottom: 1px solid #eee;
+      font-size: 1.3em;
+      font-weight: 600;
+      text-align: center;
+      background: #fafafa;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.3s forwards;
+    }
+
+    .message.user {
+      align-items: flex-end;
+    }
+
+    .message.bot {
+      align-items: flex-start;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .bubble {
+      padding: 12px 18px;
+      border-radius: 18px;
+      max-width: 80%;
+      font-size: 1em;
+      background: #f5f5f5;
+      color: #222;
+      white-space: pre-wrap;
+    }
+
+    .message.user .bubble {
+      background: #e0e7ff;
+    }
+
+    .chat_a {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      background: #fafafa;
+      border-top: 1px solid #eee;
+    }
+
+    .chat-input-area {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    .send-btn {
+      margin-left: 10px;
+      padding: 0 22px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      color: #222;
+      transition: background 0.2s;
+    }
+
+    .send-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .dot-loader {
+      display: inline-block;
+      width: 32px;
+      text-align: left;
+    }
+
+    .dot-loader span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      margin: 0 2px;
+      background: #888;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: dotBounce 1.2s infinite;
+    }
+
+    .dot-loader span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot-loader span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes dotBounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.6; }
+      40% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    .chat-bg-center {
+      position: absolute;
+      left: 0; right: 0; top: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 100;
+      opacity: 1;
+      transition: opacity 0.3s;
+    }
+    .blob-anim {
+      width: 320px;
+      height: 320px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+      filter: none;
+    }
+    .blob-anim img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 1;
+      pointer-events: none;
+      filter: none;
+    }
+    .chat-messages.has-content ~ .chat-bg-center {
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .chat-messages:not(.has-content) ~ .chat-bg-center {
+      opacity: 1;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .chat-bg-center .prompt-text {
+      font-size: 1.25em;
+      color: #1976d2;
+      font-weight: 600;
+      text-shadow: 0 2px 8px #fff, 0 1px 2px #1976d2;
+      letter-spacing: 0.01em;
+      text-align: center;
+      z-index: 3;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="chat-container">
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-bg-center" id="chat-bg-center">
+     <div class="blob-anim" style="position:relative; width:320px; height:320px; margin-bottom:18px;">
+        <!-- <img src="{{ url_for('static', filename='images/blob.gif') }}" alt="Animated Smoke" style="width:100%;height:100%;object-fit:cover;position:absolute;left:0;top:0;z-index:1;pointer-events:none;" /> -->
+        <img src="{{ url_for('static', filename='images/chatbot.png') }}" alt="" style="width: 100px; height: 100px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%); opacity: 0.2;" />
+        
+      </div> 
+            <div class="prompt-text" style="margin-top: -100px;">Ask anything</div>
+
+      
+    </div>
+    <!-- Quick Actions Bar -->
+    <div style="width:100%;display:flex;justify-content:center;align-items:center;padding:10px 0 0 0;background:transparent;gap:8px;">
+      <button id="recent-activities-btn" style="backdrop-filter: blur(8px); background: rgba(255,255,255,0.6); border: 1px solid #e0e7ff; color: #1976d2; border-radius: 6px; padding: 8px 22px; font-size: 1em; font-weight: 500; margin: 0 0 8px 0; box-shadow: 0 2px 8px #e0e7ff33; cursor: pointer; transition: background 0.2s, box-shadow 0.2s;">🕑 Recent Activities</button>
+      <button id="upcoming-events-btn" style="backdrop-filter: blur(8px); background: rgba(255,255,255,0.6); border: 1px solid #e0e7ff; color: #1976d2; border-radius: 6px; padding: 8px 22px; font-size: 1em; font-weight: 500; margin: 0 0 8px 0; box-shadow: 0 2px 8px #e0e7ff33; cursor: pointer; transition: background 0.2s, box-shadow 0.2s;">📅 Upcoming Events</button>
+    </div>
+    <div class="chat_a">
+      <form class="chat-input-area" id="chat-form" autocomplete="off">
+        <input type="text" class="chat-input" id="chat-input" placeholder="Type your message..." required />
+        <button type="submit" class="send-btn">Send</button>
+      </form>
+    </div>
+  </div>
+
+
+  <script>
+    // Quick Action: Recent Activities
+    document.getElementById('recent-activities-btn').addEventListener('click', async function() {
+      const loaderDiv = document.createElement('div');
+      loaderDiv.className = 'message bot';
+      const loaderBubble = document.createElement('div');
+      loaderBubble.className = 'bubble';
+      const loader = document.createElement('div');
+      loader.className = 'dot-loader';
+      loader.innerHTML = '<span></span><span></span><span></span>';
+      loaderBubble.appendChild(loader);
+      loaderDiv.appendChild(loaderBubble);
+      chatMessages.appendChild(loaderDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      updateBgVisibility();
+      try {
+        const res = await fetch('http://127.0.0.1:5000/recent_activities?format=json');
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        if (res.ok) {
+          const data = await res.json();
+          let msg = '<b>Recent Activities:</b><ul style="margin:8px 0 0 16px;">';
+          if (data.recent_activities && data.recent_activities.length > 0) {
+            for (const act of data.recent_activities) {
+              // Try to display a readable string for each activity object
+              if (typeof act === 'string') {
+                msg += `<li>${act}</li>`;
+              } else if (typeof act === 'object' && act !== null) {
+                // Try common fields: text, activity, description, timestamp
+                let main = act.text || act.activity || act.description || JSON.stringify(act);
+                let time = act.timestamp || act.time || '';
+                msg += `<li>${main}${time ? ' <span style=\"color:#888;font-size:0.9em;\">(' + time + ')</span>' : ''}</li>`;
+              } else {
+                msg += `<li>${String(act)}</li>`;
+              }
+            }
+          } else {
+            msg += '<li>No recent activities found.</li>';
+          }
+          msg += '</ul>';
+          appendMessage(msg, 'bot');
+        } else {
+          let errorText = await res.text();
+          appendMessage('Error: Unable to fetch recent activities.\n' + errorText, 'bot');
+        }
+      } catch (err) {
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        appendMessage('Error: Unable to connect to server. ' + (err.message || err), 'bot');
+      }
+    });
+
+    // Quick Action: Upcoming Events (send prompt to bot)
+    document.getElementById('upcoming-events-btn').addEventListener('click', async function() {
+      const loaderDiv = document.createElement('div');
+      loaderDiv.className = 'message bot';
+      const loaderBubble = document.createElement('div');
+      loaderBubble.className = 'bubble';
+      const loader = document.createElement('div');
+      loader.className = 'dot-loader';
+      loader.innerHTML = '<span></span><span></span><span></span>';
+      loaderBubble.appendChild(loader);
+      loaderDiv.appendChild(loaderBubble);
+      chatMessages.appendChild(loaderDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      updateBgVisibility();
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'Show me the upcoming events.' })
+        });
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        if (response.ok) {
+          const data = await response.json();
+          appendMessage(data.reply, 'bot');
+        } else {
+          appendMessage('Error: Unable to get upcoming events.', 'bot');
+        }
+      } catch (err) {
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        appendMessage('Error: Unable to connect to server. ' + (err.message || err), 'bot');
+      }
+    });
+
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+
+    function updateBgVisibility() {
+      const hasContent = chatMessages.children.length > 0;
+      if (hasContent) {
+        chatMessages.classList.add('has-content');
+      } else {
+        chatMessages.classList.remove('has-content');
+      }
+    }
+    updateBgVisibility();
+
+    function appendMessage(text, sender, isTyping = false) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message ' + sender;
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      msgDiv.appendChild(bubble);
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      updateBgVisibility();
+
+      if (sender === 'bot' && !isTyping) {
+        typeHTML(bubble, text, 10);
+      } else {
+        bubble.textContent = text;
+      }
+    }
+
+    function typeHTML(el, html, speed = 10) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      const nodes = Array.from(tempDiv.childNodes);
+
+      let i = 0;
+      function typeNextNode() {
+        if (i >= nodes.length) return;
+        const node = nodes[i++];
+        const clone = node.cloneNode(true);
+        el.appendChild(clone);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        if (clone.nodeType === Node.TEXT_NODE) {
+          const text = clone.textContent;
+          clone.textContent = '';
+          let j = 0;
+          const interval = setInterval(() => {
+            clone.textContent += text[j++];
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            if (j >= text.length) {
+              clearInterval(interval);
+              typeNextNode();
+            }
+          }, speed);
+        } else {
+          typeNextNode();
+        }
+      }
+
+      typeNextNode();
+    }
+
+    chatForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const userMsg = chatInput.value.trim();
+      if (!userMsg) return;
+      appendMessage(userMsg, 'user');
+      chatInput.value = '';
+      updateBgVisibility();
+
+      const loaderDiv = document.createElement('div');
+      loaderDiv.className = 'message bot';
+      const loaderBubble = document.createElement('div');
+      loaderBubble.className = 'bubble';
+      const loader = document.createElement('div');
+      loader.className = 'dot-loader';
+      loader.innerHTML = '<span></span><span></span><span></span>';
+      loaderBubble.appendChild(loader);
+      loaderDiv.appendChild(loaderBubble);
+      chatMessages.appendChild(loaderDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      updateBgVisibility();
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMsg })
+        });
+
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+
+        if (response.ok) {
+          const data = await response.json();
+          appendMessage(data.reply, 'bot');
+        } else {
+          appendMessage('Error: Unable to get response.', 'bot');
+        }
+      } catch (err) {
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        appendMessage('Error: Unable to connect to server.', 'bot');
+      }
+    });
+  </script>
+</body>
+</html>

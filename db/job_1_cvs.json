@@ -1,0 +1,23 @@
+[
+    {
+        "candidate_id": 1,
+        "candidate_name": "John Doe",
+        "candidate_email": "john.doe@email.com",
+        "cv_link": "resumes/Senior_Process_Designer_Resume.pdf",
+        "status": "Shortlisted"
+    },
+    {
+        "candidate_id": 2,
+        "candidate_name": "Michael Brown",
+        "candidate_email": "michaelbrown@example.com",
+        "cv_link": "resumes/Manager_Resume.pdf",
+        "status": "Interview Scheduled"
+    },
+    {
+        "candidate_id": 3,
+        "candidate_name": "Emily Davis",
+        "candidate_email": "emilydavis@example.com",
+        "cv_link": "resumes/Fresher_Resume.pdf",
+        "status": "Rejected"
+    }
+]

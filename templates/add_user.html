@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Add User{% endblock %}
+
+{% block content %}
+<h2>Add New User</h2>
+<form method="POST" action="/add_user" class="user-form">
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username" required><br>
+
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required><br>
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" required><br>
+
+  <label for="phone">Phone:</label>
+  <input type="text" id="phone" name="phone" required><br>
+
+  <label for="department">Department:</label>
+  <input type="text" id="department" name="department" required><br>
+
+  <label for="role">Role:</label>
+  <select id="role" name="role" required>
+    <option value="HR">HR</option>
+    <option value="HR Manager">HR Manager</option>
+    <option value="Manager">Manager</option>
+    <option value="Admin">Admin</option>
+  </select><br>
+
+  <label for="access_control">Access Control (comma separated):</label>
+  <input type="text" id="access_control" name="access_control" placeholder="e.g. post_jobs,manage_candidates"><br>
+
+  <button type="submit">Add User</button>
+</form>
+
+<style>
+.user-form {
+  max-width: 400px;
+  margin: 30px 0;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+}
+.user-form label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 500;
+}
+.user-form input, .user-form select {
+  width: 100%;
+  padding: 7px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.user-form button {
+  margin-top: 18px;
+  padding: 8px 18px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.user-form button:hover {
+  background: #0056b3;
+}
+</style>
+{% endblock %}
