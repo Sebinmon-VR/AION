@@ -554,15 +554,80 @@ def openings_count():
     job_data = fetch_job_data()
     openings_count = 0
     for job in job_data:
-        # Try common key names for openings
+        # Only count jobs that are "Open" or don't have a status (default to Open)
+        job_status = job.get('status', 'Open').lower()
+        if job_status == 'open':
+            # Try common key names for openings
+            for key in ['job_openings', 'openings', 'openings_count', 'vacancies']:
+                if key in job:
+                    try:
+                        openings_count += int(job[key])
+                        break  # Only count one key per job
+                    except (ValueError, TypeError):
+                        continue
+    return openings_count
+
+def open_vacancies_count():
+    """Count vacancies for open jobs only"""
+    job_data = fetch_job_data()
+    open_count = 0
+    for job in job_data:
+        job_status = job.get('status', '').lower()
+        if job_status == 'open':  # Only count explicitly "open" jobs
+            for key in ['job_openings', 'openings', 'openings_count', 'vacancies']:
+                if key in job:
+                    try:
+                        open_count += int(job[key])
+                        break
+                    except (ValueError, TypeError):
+                        continue
+    return open_count
+
+def closed_vacancies_count():
+    """Count vacancies for closed jobs only"""
+    job_data = fetch_job_data()
+    closed_count = 0
+    for job in job_data:
+        job_status = job.get('status', '').lower()
+        if job_status == 'closed':
+            for key in ['job_openings', 'openings', 'openings_count', 'vacancies']:
+                if key in job:
+                    try:
+                        closed_count += int(job[key])
+                        break
+                    except (ValueError, TypeError):
+                        continue
+    return closed_count
+
+def no_status_vacancies_count():
+    """Count vacancies for jobs without status"""
+    job_data = fetch_job_data()
+    no_status_count = 0
+    for job in job_data:
+        job_status = job.get('status', '')
+        if not job_status:  # No status field or empty status
+            for key in ['job_openings', 'openings', 'openings_count', 'vacancies']:
+                if key in job:
+                    try:
+                        no_status_count += int(job[key])
+                        break
+                    except (ValueError, TypeError):
+                        continue
+    return no_status_count
+
+def total_all_vacancies_count():
+    """Count ALL vacancies (open + closed + no status)"""
+    job_data = fetch_job_data()
+    total_count = 0
+    for job in job_data:
         for key in ['job_openings', 'openings', 'openings_count', 'vacancies']:
             if key in job:
                 try:
-                    openings_count += int(job[key])
-                    break  # Only count one key per job
+                    total_count += int(job[key])
+                    break
                 except (ValueError, TypeError):
                     continue
-    return openings_count
+    return total_count
 
     
 # ------------------------------------------------------------------------------------

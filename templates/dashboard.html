@@ -1,3 +1,4 @@
+{% extends 'base.html' %}
 
 {% block content %}
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -95,30 +96,30 @@
     </div>
   </div>
 
-    <!-- Analytics Charts Side by Side -->
-    <div style="width:100%; max-width:900px; margin:0 auto 0 auto; display:flex; flex-direction:row; gap:32px; align-items:flex-start; justify-content:center;">
-      <!-- Candidate Metrics Chart (Radar) -->
-       
-      <div style="flex:1; min-width:260px; max-width:340px;">
-        <h2 style="color:#1976d2; margin-bottom:8px; font-size:1.1rem;">Total Applicants</h2>
-        <!-- Removed separate radar label links -->
-        <div class="chart-wrapper" style="width:100%; max-width:320px; margin-bottom:0;">
-          <canvas id="radarChart" width="220" height="220"></canvas>
-        </div>
-      </div>
+    <!-- Analytics Chart -->
+    <div style="width:100%; max-width:600px; margin:0 auto 0 auto; display:flex; justify-content:center;">
       <!-- Line Chart for Vacancies vs Hired -->
-      <div style="flex:1; min-width:260px; max-width:340px;">
-        <div class="period-selector" style="margin-bottom:6px; display:flex; gap:8px; align-items:center;">
-          <label for="periodSelect"><b>Show for:</b></label>
-          <select id="periodSelect">
-            <option value="month">Months</option>
-            <option value="week">Weeks</option>
-            <option value="day">Days</option>
-          </select>
+      <div style="width:100%; max-width:500px;">
+        <div class="selector-row" style="margin-bottom:6px; display:flex; gap:16px; align-items:center; justify-content:center; flex-wrap:wrap;">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <label for="dataTypeSelect"><b>Data Type:</b></label>
+            <select id="dataTypeSelect">
+              <option value="overall">Overall</option>
+              <option value="active">Active</option>
+            </select>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <label for="periodSelect"><b>Show for:</b></label>
+            <select id="periodSelect">
+              <option value="month">Months</option>
+              <option value="week">Weeks</option>
+              <option value="day">Days</option>
+            </select>
+          </div>
         </div>
-        <h2 style="color:#1976d2; margin-bottom:8px; font-size:1.1rem;">Vacancies vs Hired</h2>
-        <div class="linechart-wrapper" style="width:100%; max-width:320px; margin-bottom:0;">
-          <canvas id="vacancyHiredLineChart" width="220" height="220"></canvas>
+        <h2 style="color:#1976d2; margin-bottom:8px; font-size:1.1rem; text-align:center;">Vacancies vs Hired</h2>
+        <div class="linechart-wrapper" style="width:100%; max-width:500px; margin-bottom:0;">
+          <canvas id="vacancyHiredLineChart" width="400" height="300"></canvas>
         </div>
       </div>
     </div>
@@ -127,23 +128,35 @@
     <div style="width:100%; max-width:900px; margin:36px auto 10px auto; text-align:center;">
       <h2 style="font-size:1.5rem; color:#1976d2; font-weight:700; margin-bottom:4px;">Milestones & Key Metrics</h2>
     </div>
-    <div id="metricsSection" style="width:100%; max-width:900px; margin:32px auto 0 auto; display:flex; gap:32px; justify-content:center; align-items:center;">
-      <div style="flex:1; min-width:160px; text-align:center;">
+    <div id="metricsSection" style="width:100%; max-width:1200px; margin:32px auto 0 auto; display:flex; gap:20px; justify-content:center; align-items:center; flex-wrap:wrap;">
+      <div style="flex:1; min-width:140px; text-align:center;">
         <a href="/milestones_breakup/total_applicants" style="text-decoration:none; color:inherit; cursor:pointer;">
           <div id="countApplicants" style="font-size:2.1rem; font-weight:700; color:#1976d2;">0</div>
           <div style="font-size:1.05rem; color:#444;">Total Applicants</div>
         </a>
       </div>
-      <div style="flex:1; min-width:160px; text-align:center;">
+      <div style="flex:1; min-width:140px; text-align:center;">
+        <a href="/milestones_breakup/total_vacancies" style="text-decoration:none; color:inherit; cursor:pointer;">
+          <div id="countVacancies" style="font-size:2.1rem; font-weight:700; color:#ff9800;">0</div>
+          <div style="font-size:1.05rem; color:#444;">Total Vacancies</div>
+        </a>
+      </div>
+      <div style="flex:1; min-width:140px; text-align:center;">
         <a href="/milestones_breakup/hired" style="text-decoration:none; color:inherit; cursor:pointer;">
           <div id="countHired" style="font-size:2.1rem; font-weight:700; color:#43a047;">0</div>
           <div style="font-size:1.05rem; color:#444;">Hired</div>
         </a>
       </div>
-      <div style="flex:1; min-width:160px; text-align:center;">
-        <a href="/milestones_breakup/attrition_score" style="text-decoration:none; color:inherit; cursor:pointer;">
-          <div id="countAttrition" style="font-size:2.1rem; font-weight:700; color:#e67e22;">0%</div>
-          <div style="font-size:1.05rem; color:#444;">Attrition Score</div>
+      <div style="flex:1; min-width:140px; text-align:center;">
+        <a href="/milestones_breakup/hiring_success_rate" style="text-decoration:none; color:inherit; cursor:pointer;">
+          <div id="countHiringSuccess" style="font-size:2.1rem; font-weight:700; color:#9c27b0;">0%</div>
+          <div style="font-size:1.05rem; color:#444;">Hiring Success Rate</div>
+        </a>
+      </div>
+      <div style="flex:1; min-width:140px; text-align:center;">
+        <a href="/milestones_breakup/hiring_pace" style="text-decoration:none; color:inherit; cursor:pointer;">
+          <div id="hiringPace" style="font-size:2.1rem; font-weight:700; color:#607d8b;">{{ hiring_pace|default('Good') }}</div>
+          <div style="font-size:1.05rem; color:#444;">Hiring Pace</div>
         </a>
       </div>
     </div>
@@ -157,114 +170,22 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Candidate Metrics Chart (Radar) with clickable labels
-(function() {
-  let radarLabels = [];
-  let radarData = [];
-  try {
-    radarLabels = JSON.parse('{{ radar_labels_json | safe }}');
-    radarData = JSON.parse('{{ radar_data_json | safe }}');
-  } catch (e) {}
-  const radarCanvas = document.getElementById('radarChart');
-  // Removed rendering of clickable links above the radar chart
-  if (radarCanvas && radarLabels.length && radarData.length) {
-    const chart = new Chart(radarCanvas.getContext('2d'), {
-      type: 'radar',
-      data: {
-        labels: radarLabels,
-        datasets: [{
-          label: 'Candidate Metrics',
-          data: radarData,
-          fill: true,
-          backgroundColor: 'rgba(37, 99, 235, 0.2)',
-          borderColor: 'rgba(37, 99, 235, 1)',
-          pointBackgroundColor: 'rgba(37, 99, 235, 1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(37, 99, 235, 1)'
-        }]
-      },
-      options: {
-        scales: {
-          r: {
-            angleLines: { display: true },
-            suggestedMin: 0,
-            suggestedMax: Math.max(...radarData, 5),
-            pointLabels: { font: { size: 12, weight: '600' } }
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          title: { display: false }
-        }
-      }
-    });
-
-    // Helper to get label positions
-    function getLabelPositions() {
-      const positions = [];
-      const cx = chart.scales.r.xCenter;
-      const cy = chart.scales.r.yCenter;
-      const outerRadius = chart.scales.r.drawingArea;
-      const labelCount = radarLabels.length;
-      for (let i = 0; i < labelCount; i++) {
-        // Chart.js uses -Math.PI/2 as 0 angle, then clockwise
-        const angle = (Math.PI / 2) - (2 * Math.PI * i / labelCount);
-        const lx = cx + Math.cos(angle) * outerRadius;
-        const ly = cy - Math.sin(angle) * outerRadius;
-        positions.push({x: lx, y: ly, label: radarLabels[i]});
-      }
-      return positions;
-    }
-
-    // Click event for labels
-    radarCanvas.addEventListener('click', function(event) {
-      const rect = radarCanvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const positions = getLabelPositions();
-      for (let i = 0; i < positions.length; i++) {
-        const {x: lx, y: ly, label} = positions[i];
-        if (Math.hypot(x - lx, y - ly) < 28) {
-          const slug = label.toLowerCase().replace(/\s+/g, '_');
-          window.location.href = `/breakdown/${slug}`;
-          break;
-        }
-      }
-    });
-
-    // Pointer cursor on hover over labels
-    radarCanvas.addEventListener('mousemove', function(event) {
-      const rect = radarCanvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const positions = getLabelPositions();
-      let over = false;
-      for (let i = 0; i < positions.length; i++) {
-        const {x: lx, y: ly} = positions[i];
-        if (Math.hypot(x - lx, y - ly) < 28) {
-          over = true;
-          break;
-        }
-      }
-      radarCanvas.style.cursor = over ? 'pointer' : 'default';
-    });
-  }
-})();
-
-
-// Line Chart for Vacancies vs Hired
-let vacancyHiredLabels, totalVacanciesData, totalHiredData;
+// Line Chart for Vacancies vs Hired vs Applicants
+let vacancyHiredLabels, overallVacanciesData, overallHiredData, overallApplicantsData, activeVacanciesData, activeHiredData, activeApplicantsData;
 try {
   vacancyHiredLabels = JSON.parse('{{ vacancy_hired_labels_json | safe }}');
-  totalVacanciesData = JSON.parse('{{ total_vacancies_data_json | safe }}');
-  totalHiredData = JSON.parse('{{ total_hired_data_json | safe }}');
+  overallVacanciesData = JSON.parse('{{ overall_vacancies_data_json | safe }}');
+  overallHiredData = JSON.parse('{{ overall_hired_data_json | safe }}');
+  overallApplicantsData = JSON.parse('{{ overall_applicants_data_json | safe }}');
+  activeVacanciesData = JSON.parse('{{ active_vacancies_data_json | safe }}');
+  activeHiredData = JSON.parse('{{ active_hired_data_json | safe }}');
+  activeApplicantsData = JSON.parse('{{ active_applicants_data_json | safe }}');
 } catch (e) {
   console.error('Error parsing chart data:', e);
 }
 
 let lineChartInstance = null;
-function renderLineChart(labels, vacancies, hired) {
+function renderLineChart(labels, vacancies, hired, applicants, dataType) {
   const canvas = document.getElementById('vacancyHiredLineChart');
   if (!canvas) {
     console.error('Line chart canvas not found');
@@ -272,19 +193,24 @@ function renderLineChart(labels, vacancies, hired) {
   }
   const ctx = canvas.getContext('2d');
   if (lineChartInstance) lineChartInstance.destroy();
-  if (!labels || !vacancies || !hired) {
+  if (!labels || !vacancies || !hired || !applicants) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = '14px sans-serif';
     ctx.fillText('No data available', 10, 30);
     return;
   }
+  
+  const applicantLabel = dataType === 'active' ? 'Active Applicants' : 'Total Applicants';
+  const vacancyLabel = dataType === 'active' ? 'Active Vacancies' : 'Total Vacancies';
+  const hiredLabel = dataType === 'active' ? 'Recently Hired' : 'Total Hired';
+  
   lineChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels,
       datasets: [
         {
-          label: 'Total Vacancies',
+          label: vacancyLabel,
           data: vacancies,
           borderColor: '#1976d2',
           backgroundColor: 'rgba(25, 118, 210, 0.1)',
@@ -292,10 +218,18 @@ function renderLineChart(labels, vacancies, hired) {
           tension: 0.3
         },
         {
-          label: 'Total Hired',
+          label: hiredLabel,
           data: hired,
           borderColor: '#43a047',
           backgroundColor: 'rgba(67, 160, 71, 0.1)',
+          fill: false,
+          tension: 0.3
+        },
+        {
+          label: applicantLabel,
+          data: applicants,
+          borderColor: '#ff9800',
+          backgroundColor: 'rgba(255, 152, 0, 0.1)',
           fill: false,
           tension: 0.3
         }
@@ -315,20 +249,41 @@ function renderLineChart(labels, vacancies, hired) {
   });
 }
 
-// Initial render
-if (vacancyHiredLabels && totalVacanciesData && totalHiredData) {
-  renderLineChart(vacancyHiredLabels.month, totalVacanciesData.month, totalHiredData.month);
+// Function to update chart based on current selections
+function updateChart() {
+  const period = document.getElementById('periodSelect').value;
+  const dataType = document.getElementById('dataTypeSelect').value;
+  
+  if (vacancyHiredLabels && overallVacanciesData && overallHiredData && overallApplicantsData && activeVacanciesData && activeHiredData && activeApplicantsData) {
+    const vacanciesData = dataType === 'active' ? activeVacanciesData : overallVacanciesData;
+    const hiredData = dataType === 'active' ? activeHiredData : overallHiredData;
+    const applicantsData = dataType === 'active' ? activeApplicantsData : overallApplicantsData;
+    
+    renderLineChart(
+      vacancyHiredLabels[period], 
+      vacanciesData[period], 
+      hiredData[period], 
+      applicantsData[period],
+      dataType
+    );
+  }
 }
 
-// Period selector logic
+// Initial render
+if (vacancyHiredLabels && overallVacanciesData && overallHiredData && overallApplicantsData) {
+  renderLineChart(vacancyHiredLabels.month, overallVacanciesData.month, overallHiredData.month, overallApplicantsData.month, 'overall');
+}
+
+// Event listeners for dropdowns
 const periodSelect = document.getElementById('periodSelect');
+const dataTypeSelect = document.getElementById('dataTypeSelect');
+
 if (periodSelect) {
-  periodSelect.addEventListener('change', function() {
-    const period = this.value;
-    if (vacancyHiredLabels && totalVacanciesData && totalHiredData) {
-      renderLineChart(vacancyHiredLabels[period], totalVacanciesData[period], totalHiredData[period]);
-    }
-  });
+  periodSelect.addEventListener('change', updateChart);
+}
+
+if (dataTypeSelect) {
+  dataTypeSelect.addEventListener('change', updateChart);
 }
 </script>
 
@@ -355,9 +310,23 @@ function animateCount(id, end, suffix = '', duration = 3000) {
   requestAnimationFrame(update);
 }
 window.addEventListener('DOMContentLoaded', function() {
-  animateCount('countApplicants', Number('{{ total_applicants|int }}'), '', 2000);
-  animateCount('countHired', Number('{{ total_hired|int }}'), '', 2000);
-  animateCount('countAttrition', Number('{{ attrition_score|int }}'), '%', 2000);
+  animateCount('countApplicants', Number('{{ total_applicants|default(0)|int }}'), '', 2000);
+  animateCount('countVacancies', Number('{{ total_vacancies|default(0)|int }}'), '', 2000);
+  animateCount('countHired', Number('{{ total_hired|default(0)|int }}'), '', 2000);
+  animateCount('countHiringSuccess', Number('{{ hiring_success_rate|default(0)|int }}'), '%', 2000);
+  
+  // Style hiring pace based on value
+  const hiringPaceEl = document.getElementById('hiringPace');
+  if (hiringPaceEl) {
+    const pace = hiringPaceEl.textContent.trim();
+    if (pace === 'Good') {
+      hiringPaceEl.style.color = '#43a047';  // Green
+    } else if (pace === 'Adequate') {
+      hiringPaceEl.style.color = '#ff9800';  // Orange
+    } else if (pace === 'Inadequate') {
+      hiringPaceEl.style.color = '#f44336';  // Red
+    }
+  }
 });
 </script>
 

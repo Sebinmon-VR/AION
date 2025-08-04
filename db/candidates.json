@@ -5,7 +5,7 @@
         "email": "aisha.rahman@example.com",
         "phone": "+971-50-1234567",
         "position": "Process Engineer",
-        "status": "Resigned",
+        "status": "Hired",
         "resume_link": "",
         "applied_date": "2025-07-21",
         "notes": "",
@@ -101,7 +101,7 @@
         "email": "fatima.noor@example.com",
         "phone": "+971-52-1122334",
         "position": "Full Stack Senior Developer",
-        "status": "Shortlisted",
+        "status": "Hired",
         "resume_link": "",
         "applied_date": "2025-07-19",
         "notes": "",
@@ -143,7 +143,14 @@
         "linkedin": "linkedin.com/in/fatimanoor",
         "github": "",
         "match_score": 22,
-        "job_id": "3"
+        "job_id": "3",
+        "offer_letter_details": "Dear Fatima Noor,\r\n\r\nWe are pleased to offer you the position of Full Stack Senior Developer at our company. Your skills and experience will be an ideal fit for our team.\r\n\r\nPosition: Full Stack Senior Developer\r\nStart Date: [Enter Start Date]\r\nSalary: [Enter Salary Details]\r\nReporting Manager: op_mgr\r\n\r\nPlease review the terms and let us know if you have any questions. We look forward to having you on board.\r\n\r\nBest regards,\r\nop_mgr\r\nOperation Manager\r\n",
+        "offer_issued_by": "op_mgr",
+        "offer_issued_by_email": "opmgr@company.com",
+        "onboarding": {
+            "Joining Formalities": "Pending",
+            "HR Introduction": "Pending"
+        }
     },
     {
         "id": 4,
@@ -284,7 +291,37 @@
         "linkedin": "linkedin.com/in/mzayed",
         "github": "",
         "match_score": 16,
-        "job_id": "5"
+        "job_id": "5",
+        "offer_letter_details": "Dear Mohammed Zayed,\r\n\r\nWe are pleased to offer you the position of UI/UX Designer at our company. Your skills and experience will be an ideal fit for our team.\r\n\r\nPosition: UI/UX Designer\r\nStart Date: [Enter Start Date]\r\nSalary: [Enter Salary Details]\r\nReporting Manager: op_mgr\r\n\r\nPlease review the terms and let us know if you have any questions. We look forward to having you on board.\r\n\r\nBest regards,\r\nop_mgr\r\nOperation Manager\r\n",
+        "offer_issued_by": "op_mgr",
+        "offer_issued_by_email": "opmgr@company.com",
+        "onboarding": {
+            "Joining Formalities": "Completed",
+            "HR Introduction": "Completed",
+            "Document Verification": "Completed",
+            "System Allocation": "Completed"
+        },
+        "interview_date": "2025-07-30",
+        "interview_time": "10:43",
+        "intervier": "op_mgr",
+        "interview_transcript": "Hi, guys. It's Ewan at Willow again here. After my video last week, I got a bunch of emails and messages from people asking how to create their own Willow interview. So I thought this would be really simple just to take four minutes out of my day and create a very quick interview process from start to finish. So it's a three-step process to create an interview in Willow. And we're going to jump straight in and see how it's done now. So I click on Interview, and then I click on Create Interview inside my Willow account. Then you'll see here it's a three-step process, as I mentioned. So we set up the initial interview steps. We create the questions, which is obviously the fun part. And then we preview and publish the interview for everyone to complete. So we'll just pop in a title here. So we'll just call it Astronaut. Let's hire an astronaut. And we'll try and find the best one we can. So pop in Virgin Galactic Space Company. And let's create a quick video intro. So the intro is the introduction at the very start of your interview. So it was that video that we spoke about last week that gives the person a reason to complete the interview. It gives a bit of context, and it makes them feel more like a two-way process and puts them at ease. So we'll just record a quick intro. So we get a quick countdown like this. Hi, it's Ewan at Virgin Galactic. We're very excited to have you here. Thank you for clicking on the link and completing our interview. This is the first step of our astronaut selection program. Please answer these three questions, and that will help us to get to know you a little bit better. When you're ready, just click on the button below to start. That will then save in the Willow Cloud. We can also just pop in some details here. So thanks for interest. So we click on Next. And now we're on to the fun part, the questions. So we can choose. Let's have three questions for this one. We can choose whether they are file or video answers. So people can actually answer questions on Willow with a file upload. So perhaps you want them to upload a portfolio, or you want them to upload a visa. They can easily do that. You just choose File Upload like that. And then ask your question, and that person then drags and drops their file. But for the astronaut application, let's just ask them all video questions. We want to get to know these astronauts before we send them off to space. So we'll just pop in our questions. Now you'll see there's a question generator as well. So we actually suggest questions using an algorithm for questions that may be suitable for your interview. And it learns over time as well. Okay, so we've put in our three questions. Now I'm just going to show you something else. It's a bit of a trick. You can actually change the amount of time the person has to answer these questions just by clicking on that little clock there. So we could make this, for example, three minutes because it's a long question. We want a long answer. And then this question here at the end about what was the last book they read for fun. We might want them to expand a bit and open up on that. So we might just set that one to two minutes. We can also set the amount of times the person has to retake their answer. So in this case, it could be we only want them to retake that one a maximum of three times. Put them under a bit of pressure and stop them from waffling on too long. So we've got our three questions. When we're happy with those, we click on Next. The interview is now complete, and all that's left to do is publish it. So the interview is now published, and we have here a link in front of us. It's a short link, and this link is the link that you're going to send out to people in an email, in a WhatsApp, in a Slack message, however you want to communicate with that person. When they click on that link, they'll be able to complete your interview. I'm going to pop this link in the comments below. Go ahead and try the interview yourself, and you'll see how easy it is to complete. Any questions, please just ask.\n",
+        "ai_interview_report": "1. **Comprehensive Performance Summary:**\n   The interview transcript provided is a demonstration by Ewan on how to create an interview using the Willow platform. Ewan effectively guides the audience through the process, explaining each step clearly and concisely. The demonstration is structured, starting from creating an interview to publishing it, and includes practical tips and insights into the platform's features. Ewan maintains a friendly and engaging tone throughout, making the process seem approachable and straightforward.\n\n2. **Specific Feedback:**\n   - **Communication Skills:**\n     Ewan demonstrates strong communication skills. He uses clear and simple language, making the instructions easy to follow. His tone is friendly and engaging, which helps in maintaining the audience's interest. Ewan also uses a logical flow, ensuring that each step is explained before moving on to the next.\n   - **Technical Knowledge:**\n     Ewan shows a good understanding of the Willow platform. He explains the features and functionalities, such as creating questions, setting time limits, and publishing the interview, with confidence. His ability to provide tips, like using the question generator and setting retake limits, indicates a deep familiarity with the platform.\n   - **Overall Interview Performance:**\n     The overall performance is strong. Ewan effectively balances technical details with user-friendly explanations. He anticipates potential questions from the audience and addresses them proactively, such as explaining the purpose of the video intro and the flexibility in question formats.\n\n3. **Areas for Improvement:**\n   - While Ewan's demonstration is clear, incorporating more examples or scenarios could enhance understanding, especially for users unfamiliar with the platform.\n   - Including a brief summary or recap at the end of the demonstration could reinforce the key points and ensure the audience retains the information.\n\n4. **Final Performance Score:**\n   Ewan's performance in this demonstration is commendable, with clear communication and a strong grasp of the technical aspects of the Willow platform. The demonstration is engaging and informative, with only minor areas for potential enhancement.\n\nPerformance Score: 92/100",
+        "interview_score": 92,
+        "probation_assessment": {
+            "1": {
+                "cultural_acceptance": "avg",
+                "loyalty": "good",
+                "teamwork": "good`",
+                "adaptability": "good ",
+                "comments": "ok",
+                "assessed_by": "op_mgr",
+                "date": "2025-07-30"
+            }
+        },
+        "probation_assessment_insights": {
+            "1": "<p>For the month 1 probation assessment:</p>\n<ul>\n<li><strong>Cultural Acceptance:</strong> Average</li>\n<li><strong>Loyalty:</strong> Good</li>\n<li><strong>Teamwork:</strong> Good</li>\n<li><strong>Adaptability:</strong> Good</li>\n<li><strong>Additional Comments:</strong> Ok</li>\n<li><strong>Assessed By:</strong> Operation Manager (op_mgr)</li>\n<li><strong>Assessment Date:</strong> July 30, 2025</li>\n</ul>\n<p>The assessment reveals a positive evaluation in loyalty, teamwork, and adaptability, with an average rating in cultural acceptance.</p>"
+        },
+        "_pa_hash_1": "e5fdda882f19af4f42e67ebee12d6ea1"
     },
     {
         "id": 7,

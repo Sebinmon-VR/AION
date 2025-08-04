@@ -414,7 +414,151 @@ def create_pie_chart(data: Any) -> str:
         return "⚠️ Required libraries for pie chart creation are not installed. Please install matplotlib and pandas."
     except Exception as e:
         return f"⚠️ Error creating pie chart: {e}. Expected format: {{'category1': value1, 'category2': value2}} or [{'category': 'name', 'value': number}]"
+
+def create_radar_chart(data: Any, title: str = "Radar Chart") -> str:
+    """Creates a radar chart based on the provided data.
     
+    Data should be in format:
+    - Dict: {'label1': value1, 'label2': value2, ...}
+    - List of dicts: [{'label': 'name', 'value': number}, ...]
+    - JSON string of either format above
+    
+    Example for vacancy-hiring gap analysis:
+    {'Engineering': 15, 'Digital': 8, 'HR': 3, 'Finance': 5, 'Operations': 12}
+    """
+    try:
+        import matplotlib.pyplot as plt
+        import numpy as np
+        
+        # Handle different data formats
+        if isinstance(data, str):
+            import json
+            data = json.loads(data)
+        
+        if isinstance(data, list):
+            # Convert list of dicts to dict
+            if data and isinstance(data[0], dict):
+                if 'label' in data[0] and 'value' in data[0]:
+                    data = {item['label']: item['value'] for item in data}
+                elif 'category' in data[0] and 'value' in data[0]:
+                    data = {item['category']: item['value'] for item in data}
+        
+        if not isinstance(data, dict):
+            return "⚠️ Data must be a dictionary or list of dictionaries with label/value pairs"
+        
+        # Prepare data for radar chart
+        labels = list(data.keys())
+        values = list(data.values())
+        
+        # Number of variables
+        N = len(labels)
+        
+        # Angles for each axis
+        angles = [n / float(N) * 2 * np.pi for n in range(N)]
+        angles += angles[:1]  # Complete the circle
+        
+        # Close the plot
+        values += values[:1]
+        
+        # Create figure
+        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(projection='polar'))
+        
+        # Plot
+        ax.plot(angles, values, 'o-', linewidth=2, label='Values')
+        ax.fill(angles, values, alpha=0.25)
+        
+        # Add labels
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(labels)
+        
+        # Set title
+        ax.set_title(title, size=16, fontweight='bold', pad=20)
+        
+        # Grid
+        ax.grid(True)
+        
+        # Save chart
+        chart_path = "./db/radar_chart.png"
+        plt.savefig(chart_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        return f"✅ Radar chart created at {chart_path}"
+        
+    except ImportError:
+        return "⚠️ Required libraries for radar chart creation are not installed. Please install matplotlib and numpy."
+    except Exception as e:
+        return f"⚠️ Error creating radar chart: {e}. Expected format: {{'category1': value1, 'category2': value2}}"
+
+def analyze_vacancy_hiring_gap() -> str:
+    """Analyzes the gap between job vacancies and hiring across departments and returns data suitable for radar chart visualization."""
+    try:
+        import json
+        import os
+        
+        # Load jobs and candidates data
+        jobs_file = os.path.join(os.path.dirname(__file__), "db", "jobs.json")
+        candidates_file = os.path.join(os.path.dirname(__file__), "db", "candidates.json")
+        
+        if not os.path.exists(jobs_file) or not os.path.exists(candidates_file):
+            return "⚠️ Required database files not found"
+        
+        with open(jobs_file, 'r', encoding='utf-8') as f:
+            jobs = json.load(f)
+        
+        with open(candidates_file, 'r', encoding='utf-8') as f:
+            candidates = json.load(f)
+        
+        # Analyze vacancy-hiring gap by department
+        department_data = {}
+        
+        # Count open vacancies by department
+        for job in jobs:
+            if job.get('status', '').lower() == 'open':
+                dept = job.get('department', 'Unknown')
+                openings = int(job.get('job_openings', 0))
+                if dept in department_data:
+                    department_data[dept]['vacancies'] += openings
+                else:
+                    department_data[dept] = {'vacancies': openings, 'hired': 0}
+        
+        # Count hired candidates by department/position
+        for candidate in candidates:
+            if candidate.get('status') == 'Hired':
+                position = candidate.get('position', '')
+                # Try to map position to department based on job postings
+                dept = 'Unknown'
+                for job in jobs:
+                    if job.get('job_title', '').lower() in position.lower():
+                        dept = job.get('department', 'Unknown')
+                        break
+                
+                if dept in department_data:
+                    department_data[dept]['hired'] += 1
+                else:
+                    department_data[dept] = {'vacancies': 0, 'hired': 1}
+        
+        # Calculate gaps (vacancies - hired)
+        gap_data = {}
+        for dept, data in department_data.items():
+            gap = data['vacancies'] - data['hired']
+            if gap > 0:  # Only show departments with gaps
+                gap_data[dept] = gap
+        
+        if not gap_data:
+            return "📊 No significant vacancy-hiring gaps found across departments. All positions appear well-filled!"
+        
+        # Format for radar chart
+        analysis = f"📊 **Vacancy-Hiring Gap Analysis by Department:**\n\n"
+        for dept, gap in sorted(gap_data.items(), key=lambda x: x[1], reverse=True):
+            dept_info = department_data[dept]
+            analysis += f"• **{dept}**: {gap} gap ({dept_info['vacancies']} vacancies, {dept_info['hired']} hired)\n"
+        
+        analysis += f"\n**Data for Radar Chart:** {json.dumps(gap_data)}"
+        
+        return analysis
+        
+    except Exception as e:
+        return f"⚠️ Error analyzing vacancy-hiring gap: {e}"
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

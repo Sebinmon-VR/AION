@@ -1,15 +1,8 @@
 from flask import send_from_directory
-# ---------------------------------------------------------------------------------------------------------------------
-
-
 import threading
 from flask import flash, jsonify
 from werkzeug.utils import secure_filename
 import markdown
-
-# ---------------------------------------------------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------------------------------------------------
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from Aion import chat_with_bot, SYSTEM_PROMPT
 from flask_cors import CORS
@@ -69,7 +62,8 @@ def milestones_breakup_label(label):
         'Approved': 'Approved',
         'Hired': 'Hired',
         'Active applicants': 'Active Applicants',
-        'Total applicants': 'Total Applicants'
+        'Total applicants': 'Total Applicants',
+        'Total vacancies': 'Total Vacancies'
     }
     status = label_map.get(label.lower(), label)
     candidates = []
@@ -93,6 +87,9 @@ def milestones_breakup_label(label):
         filtered_candidates = [c for c in candidates if str(c.get('status', '')).strip().lower() not in ['resigned', 'fired']]
     elif label.lower() == 'attrition_score':
         filtered_candidates = [c for c in candidates if str(c.get('status', '')).strip().lower() in ['resigned', 'fired']]
+    elif label.lower() == 'total_vacancies':
+        # For vacancies, we need to work with jobs instead of candidates
+        filtered_candidates = []  # Empty since we're dealing with jobs
     else:
         filtered_candidates = [c for c in candidates if str(c.get('status', '')).strip().lower() == status.lower()]
     # Department analytics (department only, not position, fallback to job's department)
@@ -101,37 +98,67 @@ def milestones_breakup_label(label):
     job_id_to_dept = {str(j.get('job_id')): j.get('department', 'Unknown') for j in jobs}
     all_departments = sorted(set(j.get('department', 'Unknown') for j in jobs))
     dept_data = {dept: 0 for dept in all_departments}
-    for c in filtered_candidates:
-        job_id = c.get('job_id')
-        dept = job_id_to_dept.get(str(job_id), None) if job_id is not None else None
-        if not dept:
-            dept = c.get('department') or c.get('position') or 'Unknown'
-        if dept in dept_data:
-            dept_data[dept] += 1
-        else:
-            dept_data[dept] = 1
+    
+    # Special handling for total_vacancies
+    if label.lower() == 'total_vacancies':
+        # For vacancies, count by department based on job openings
+        for job in jobs:
+            dept = job.get('department', 'Unknown')
+            openings = int(job.get('job_openings', 0))
+            if dept in dept_data:
+                dept_data[dept] += openings
+            else:
+                dept_data[dept] = openings
+    else:
+        # For candidates, count by department
+        for c in filtered_candidates:
+            job_id = c.get('job_id')
+            dept = job_id_to_dept.get(str(job_id), None) if job_id is not None else None
+            if not dept:
+                dept = c.get('department') or c.get('position') or 'Unknown'
+            if dept in dept_data:
+                dept_data[dept] += 1
+            else:
+                dept_data[dept] = 1
     dept_labels = list(dept_data.keys())
     dept_counts = list(dept_data.values())
-    # Candidate table (all filtered candidates, with department info)
+    
+    # Table data - different logic for vacancies vs candidates
     display_candidates = []
-    for c in filtered_candidates:
-        job_id = c.get('job_id')
-        dept = job_id_to_dept.get(str(job_id), None) if job_id is not None else None
-        if not dept:
-            dept = c.get('department') or c.get('position') or 'Unknown'
-        job_title = None
-        if job_id is not None:
-            job = next((j for j in jobs if str(j.get('job_id')) == str(job_id)), None)
-            if job:
-                job_title = job.get('job_title', 'Unknown')
-        display_candidates.append({
-            'name': c.get('name', ''),
-            'job_title': job_title or '',
-            'department': dept,
-            'status': c.get('status', ''),
-            'applied_date': c.get('applied_date', ''),
-            'id': c.get('id'),
-        })
+    if label.lower() == 'total_vacancies':
+        # For vacancies, show job details with breakdown
+        for job in jobs:
+            openings = int(job.get('job_openings', 0))
+            if openings > 0:  # Only show jobs with openings
+                display_candidates.append({
+                    'name': job.get('job_title', ''),
+                    'job_title': job.get('job_title', ''),
+                    'department': job.get('department', 'Unknown'),
+                    'status': job.get('status', ''),
+                    'applied_date': job.get('posted_at', '').split(' ')[0] if job.get('posted_at') else '',
+                    'openings': openings,
+                    'id': job.get('job_id'),
+                })
+    else:
+        # For candidates, show candidate details
+        for c in filtered_candidates:
+            job_id = c.get('job_id')
+            dept = job_id_to_dept.get(str(job_id), None) if job_id is not None else None
+            if not dept:
+                dept = c.get('department') or c.get('position') or 'Unknown'
+            job_title = None
+            if job_id is not None:
+                job = next((j for j in jobs if str(j.get('job_id')) == str(job_id)), None)
+                if job:
+                    job_title = job.get('job_title', 'Unknown')
+            display_candidates.append({
+                'name': c.get('name', ''),
+                'job_title': job_title or '',
+                'department': dept,
+                'status': c.get('status', ''),
+                'applied_date': c.get('applied_date', ''),
+                'id': c.get('id'),
+            })
     import json as pyjson
     # Calculate analytics for 'hired' milestone
     total_applicants = total_hired = success_rate = 0
@@ -143,6 +170,97 @@ def milestones_breakup_label(label):
         hired_candidates = [c for c in all_candidates if str(c.get('status', '')).lower() == 'hired']
         total_hired = len(hired_candidates)
         success_rate = round((total_hired / total_applicants) * 100, 1) if total_applicants else 0
+    
+    # Calculate analytics for 'total_vacancies' milestone
+    open_vacancies = closed_vacancies = total_jobs = 0
+    if label.lower() == 'total_vacancies':
+        open_vacancies = open_vacancies_count()
+        closed_vacancies = closed_vacancies_count()
+        total_jobs = len(jobs)  # Total number of jobs
+    
+    # Calculate analytics for 'hiring_pace' milestone
+    hiring_pace_details = []
+    if label.lower() == 'hiring_pace':
+        # Detailed breakdown of hiring pace for each job
+        for job in jobs:
+            job_status = job.get('status', '').lower()
+            if job_status in ['closed', 'filled', 'cancelled']:
+                continue
+            
+            posted_at = job.get('posted_at', '')
+            if not posted_at:
+                continue
+            
+            try:
+                posted_date = datetime.datetime.strptime(posted_at.split(' ')[0], '%Y-%m-%d')
+                weeks_elapsed = (datetime.datetime.now() - posted_date).days // 7
+                
+                if weeks_elapsed < 1:
+                    continue
+                
+                job_id = job.get('job_id')
+                job_candidates = [c for c in candidates if str(c.get('job_id')) == str(job_id)]
+                
+                max_stages = 0
+                candidate_status = 'No applicants'
+                if job_candidates:
+                    for candidate in job_candidates:
+                        stages = 0
+                        status = candidate.get('status', '').lower()
+                        
+                        if status in ['new', 'shortlisted', 'interview scheduled', 'interviewed', 'pending approval', 'approved', 'selected', 'hired']:
+                            stages += 1
+                        if status in ['interviewed', 'pending approval', 'approved', 'selected', 'hired']:
+                            stages += 1
+                        if status in ['approved', 'selected', 'hired']:
+                            stages += 1
+                        if status in ['hired']:
+                            stages += 1
+                        if status == 'hired' and candidate.get('onboarding'):
+                            onboarding_started = any(v == 'Completed' for v in candidate.get('onboarding', {}).values())
+                            if onboarding_started:
+                                stages += 1
+                        
+                        if stages > max_stages:
+                            max_stages = stages
+                            candidate_status = status.title()
+                
+                # Determine pace
+                pace = 'Inadequate'
+                if weeks_elapsed <= 2:
+                    if max_stages >= 3:
+                        pace = 'Excellent'
+                    elif max_stages >= 2:
+                        pace = 'Good'
+                    else:
+                        pace = 'Adequate'
+                elif weeks_elapsed <= 4:
+                    if max_stages >= 4:
+                        pace = 'Good'
+                    elif max_stages >= 3:
+                        pace = 'Adequate'
+                elif weeks_elapsed <= 10:
+                    if max_stages >= 5:
+                        pace = 'Good'
+                    elif max_stages >= 4:
+                        pace = 'Adequate'
+                else:
+                    if max_stages >= 5:
+                        pace = 'Adequate'
+                
+                hiring_pace_details.append({
+                    'job_title': job.get('job_title', ''),
+                    'department': job.get('department', 'Unknown'),
+                    'posted_at': posted_at.split(' ')[0],
+                    'weeks_elapsed': weeks_elapsed,
+                    'stages_completed': max_stages,
+                    'candidate_status': candidate_status,
+                    'pace': pace,
+                    'applicants_count': len(job_candidates)
+                })
+                
+            except (ValueError, Exception):
+                continue
     return render_template('milestones_breakup.html',
         label=label,
         dept_labels_json=pyjson.dumps(dept_labels),
@@ -153,7 +271,11 @@ def milestones_breakup_label(label):
         display_candidates=display_candidates,
         total_applicants=total_applicants,
         total_hired=total_hired,
-        success_rate=success_rate
+        success_rate=success_rate,
+        open_vacancies=open_vacancies,
+        closed_vacancies=closed_vacancies,
+        total_jobs=total_jobs,
+        hiring_pace_details=hiring_pace_details
     )
 
 @app.route('/breakdown/<label>')
@@ -446,7 +568,137 @@ def index():
                 candidates = []
     total_applicants = len(candidates)
     total_hired = sum(1 for c in candidates if c.get('status', '').lower() == 'hired')
-    # Attrition Score: percent of hired who are no longer with company (status = 'Resigned' or 'Fired')
+    
+    # Total Vacancies: count from total_all_vacancies_count function (includes all jobs)
+    total_vacancies = total_all_vacancies_count()
+    
+    # Breakdown of vacancies
+    open_vacancies = open_vacancies_count()
+    closed_vacancies = closed_vacancies_count()
+    
+    # Hiring Success Rate: percent of applicants who were hired
+    hiring_success_rate = 0
+    if total_applicants > 0:
+        hiring_success_rate = round((total_hired / total_applicants) * 100, 1)
+    
+    # Calculate Hiring Pace
+    def calculate_hiring_pace(jobs_list, candidates_list):
+        """
+        Calculate hiring pace based on job openings, interviews, approvals, hiring, and onboarding
+        Returns: 'Good', 'Adequate', or 'Inadequate'
+        """
+        pace_score = 0
+        total_jobs_evaluated = 0
+        
+        for job in jobs_list:
+            # Only evaluate open/active jobs
+            job_status = job.get('status', '').lower()
+            if job_status in ['closed', 'filled', 'cancelled']:
+                continue
+            
+            posted_at = job.get('posted_at', '')
+            if not posted_at:
+                continue
+            
+            try:
+                posted_date = datetime.datetime.strptime(posted_at.split(' ')[0], '%Y-%m-%d')
+                weeks_elapsed = (datetime.datetime.now() - posted_date).days // 7
+                
+                if weeks_elapsed < 1:  # Skip very new jobs
+                    continue
+                
+                job_id = job.get('job_id')
+                
+                # Find candidates for this job
+                job_candidates = [c for c in candidates_list if str(c.get('job_id')) == str(job_id)]
+                
+                if not job_candidates:
+                    # No candidates yet - evaluate based on time
+                    if weeks_elapsed >= 4:
+                        pace_score += 0  # Inadequate - no candidates after 4 weeks
+                    elif weeks_elapsed >= 2:
+                        pace_score += 1  # Adequate - some time has passed
+                    else:
+                        pace_score += 2  # Good - still early
+                    total_jobs_evaluated += 1
+                    continue
+                
+                # Calculate stages completed for this job's candidates
+                max_stages = 0
+                for candidate in job_candidates:
+                    stages = 0
+                    status = candidate.get('status', '').lower()
+                    
+                    # Stage 1: Application received
+                    if status in ['new', 'shortlisted', 'interview scheduled', 'interviewed', 'pending approval', 'approved', 'selected', 'hired']:
+                        stages += 1
+                    
+                    # Stage 2: Interview conducted
+                    if status in ['interviewed', 'pending approval', 'approved', 'selected', 'hired']:
+                        stages += 1
+                    
+                    # Stage 3: Internal approval
+                    if status in ['approved', 'selected', 'hired']:
+                        stages += 1
+                    
+                    # Stage 4: Hiring (offer letter issued)
+                    if status in ['hired']:
+                        stages += 1
+                    
+                    # Stage 5: Onboarding started
+                    if status == 'hired' and candidate.get('onboarding'):
+                        onboarding_started = any(v == 'Completed' for v in candidate.get('onboarding', {}).values())
+                        if onboarding_started:
+                            stages += 1
+                    
+                    max_stages = max(max_stages, stages)
+                
+                # Evaluate pace based on weeks elapsed and stages completed
+                if weeks_elapsed <= 2:
+                    if max_stages >= 3:
+                        pace_score += 3  # Excellent
+                    elif max_stages >= 2:
+                        pace_score += 2  # Good
+                    else:
+                        pace_score += 1  # Adequate
+                elif weeks_elapsed <= 4:
+                    if max_stages >= 4:
+                        pace_score += 2  # Good
+                    elif max_stages >= 3:
+                        pace_score += 1  # Adequate
+                    else:
+                        pace_score += 0  # Inadequate
+                elif weeks_elapsed <= 10:
+                    if max_stages >= 5:
+                        pace_score += 2  # Good
+                    elif max_stages >= 4:
+                        pace_score += 1  # Adequate
+                    else:
+                        pace_score += 0  # Inadequate
+                else:  # More than 10 weeks
+                    if max_stages >= 5:
+                        pace_score += 1  # Adequate
+                    else:
+                        pace_score += 0  # Inadequate
+                
+                total_jobs_evaluated += 1
+                
+            except (ValueError, Exception):
+                continue
+        
+        if total_jobs_evaluated == 0:
+            return 'Good'  # Default if no jobs to evaluate
+        
+        average_pace = pace_score / total_jobs_evaluated
+        
+        if average_pace >= 2:
+            return 'Good'
+        elif average_pace >= 1:
+            return 'Adequate'
+        else:
+            return 'Inadequate'
+    
+    # Keep attrition_score for backward compatibility (can be removed later)
     total_left = sum(1 for c in candidates if c.get('status', '').lower() in ['resigned', 'fired'])
     attrition_score = 0
     if total_hired > 0:
@@ -544,34 +796,107 @@ def index():
                 jobs = json.load(f)
             except Exception:
                 jobs = []
-    job_items = []
+    
+    # Create vacancy items based on actual job openings (not just job postings)
+    # For "overall" - all posted jobs regardless of status
+    overall_vacancy_items = []
     for job in jobs:
         posted_at = job.get('posted_at', '')
+        job_openings = job.get('job_openings', '0')
         if posted_at:
             try:
                 date_str = posted_at.split(' ')[0]
-                job_items.append({'date': date_str})
-            except Exception:
+                # Add multiple entries for each opening in this job
+                for _ in range(int(job_openings)):
+                    overall_vacancy_items.append({'date': date_str})
+            except (ValueError, Exception):
                 continue
-    hired_candidates = [c for c in candidates if c.get('status', '').lower() == 'hired']
-    hired_items = []
-    for c in hired_candidates:
+    
+    # For "active" - only open/active jobs (not closed/filled)
+    active_vacancy_items = []
+    for job in jobs:
+        posted_at = job.get('posted_at', '')
+        job_openings = job.get('job_openings', '0')
+        job_status = job.get('status', '').lower()
+        # Consider job as active if it's not explicitly closed or filled
+        if posted_at and job_status not in ['closed', 'filled', 'cancelled']:
+            try:
+                date_str = posted_at.split(' ')[0]
+                # Add multiple entries for each opening in this job
+                for _ in range(int(job_openings)):
+                    active_vacancy_items.append({'date': date_str})
+            except (ValueError, Exception):
+                continue
+    
+    # For "overall" - all hired candidates
+    overall_hired_candidates = [c for c in candidates if c.get('status', '').lower() == 'hired']
+    overall_hired_items = []
+    for c in overall_hired_candidates:
         applied_date = c.get('applied_date', '')
         if applied_date:
-            hired_items.append({'date': applied_date})
+            overall_hired_items.append({'date': applied_date})
+    
+    # For "active" - only recently hired candidates (within last 6 months)
+    active_hired_candidates = [c for c in candidates if c.get('status', '').lower() == 'hired']
+    active_hired_items = []
+    cutoff_date = (datetime.datetime.now() - datetime.timedelta(days=180)).strftime('%Y-%m-%d')
+    for c in active_hired_candidates:
+        applied_date = c.get('applied_date', '')
+        date_of_joining = c.get('date_of_joining', '')
+        # Use date_of_joining if available, otherwise applied_date
+        hire_date = date_of_joining if date_of_joining else applied_date
+        if hire_date and hire_date >= cutoff_date:
+            active_hired_items.append({'date': hire_date})
 
     vacancy_hired_labels = {}
-    total_vacancies_data = {}
-    total_hired_data = {}
+    overall_vacancies_data = {}
+    overall_hired_data = {}
+    overall_applicants_data = {}
+    active_vacancies_data = {}
+    active_hired_data = {}
+    active_applicants_data = {}
+    
     for period in ['month', 'week', 'day']:
-        labels, vacancies = group_by_period(job_items, 'date', period)
-        _, hired = group_by_period(hired_items, 'date', period)
+        # Calculate for overall data
+        labels, overall_vacancies = group_by_period(overall_vacancy_items, 'date', period)
+        _, overall_hired = group_by_period(overall_hired_items, 'date', period)
+        
+        # Calculate all applicants for overall
+        all_applicants = []
+        for c in candidates:
+            applied_date = c.get('applied_date', '')
+            if applied_date:
+                all_applicants.append({'date': applied_date})
+        _, overall_applicant_counts = group_by_period(all_applicants, 'date', period)
+        
+        # Calculate for active data
+        _, active_vacancies = group_by_period(active_vacancy_items, 'date', period)
+        _, active_hired = group_by_period(active_hired_items, 'date', period)
+        
+        # Calculate active applicants (not hired, not rejected, not withdrawn)
+        active_applicants = []
+        for c in candidates:
+            applied_date = c.get('applied_date', '')
+            status = c.get('status', '').lower()
+            # Active means not hired, not rejected, not withdrawn
+            if status not in ['hired', 'rejected', 'withdrawn'] and applied_date:
+                active_applicants.append({'date': applied_date})
+        _, active_applicant_counts = group_by_period(active_applicants, 'date', period)
+        
         vacancy_hired_labels[period] = labels
-        total_vacancies_data[period] = vacancies
-        total_hired_data[period] = hired
+        overall_vacancies_data[period] = overall_vacancies
+        overall_hired_data[period] = overall_hired
+        overall_applicants_data[period] = overall_applicant_counts
+        active_vacancies_data[period] = active_vacancies
+        active_hired_data[period] = active_hired
+        active_applicants_data[period] = active_applicant_counts
     vacancy_hired_labels_json = pyjson.dumps(vacancy_hired_labels)
-    total_vacancies_data_json = pyjson.dumps(total_vacancies_data)
-    total_hired_data_json = pyjson.dumps(total_hired_data)
+    overall_vacancies_data_json = pyjson.dumps(overall_vacancies_data)
+    overall_hired_data_json = pyjson.dumps(overall_hired_data)
+    overall_applicants_data_json = pyjson.dumps(overall_applicants_data)
+    active_vacancies_data_json = pyjson.dumps(active_vacancies_data)
+    active_hired_data_json = pyjson.dumps(active_hired_data)
+    active_applicants_data_json = pyjson.dumps(active_applicants_data)
 
     # --- Candidate Spotlight Logic REMOVED ---
     # (Removed to prevent unnecessary API calls and errors)
@@ -603,6 +928,10 @@ def index():
         sum(1 for c in candidates_list if c.get('status') == 'Approved'),
         sum(1 for c in candidates_list if c.get('status') == 'Hired')
     ]
+    
+    # Calculate hiring pace after jobs and candidates are loaded
+    hiring_pace = calculate_hiring_pace(jobs, candidates)
+    
     import json as pyjson
     radar_labels_json = pyjson.dumps(radar_labels)
     radar_data_json = pyjson.dumps(radar_data)
@@ -633,10 +962,19 @@ def index():
                                radar_labels_json=radar_labels_json,
                                radar_data_json=radar_data_json,
                                vacancy_hired_labels_json=vacancy_hired_labels_json,
-                               total_vacancies_data_json=total_vacancies_data_json,
-                               total_hired_data_json=total_hired_data_json,
+                               overall_vacancies_data_json=overall_vacancies_data_json,
+                               overall_hired_data_json=overall_hired_data_json,
+                               overall_applicants_data_json=overall_applicants_data_json,
+                               active_vacancies_data_json=active_vacancies_data_json,
+                               active_hired_data_json=active_hired_data_json,
+                               active_applicants_data_json=active_applicants_data_json,
                                total_applicants=total_applicants,
+                               total_vacancies=total_vacancies,
+                               open_vacancies=open_vacancies,
+                               closed_vacancies=closed_vacancies,
                                total_hired=total_hired,
+                               hiring_success_rate=hiring_success_rate,
+                               hiring_pace=hiring_pace,
                                attrition_score=attrition_score
                                
                                )
@@ -667,8 +1005,20 @@ def index():
                                radar_labels_json=radar_labels_json,
                                radar_data_json=radar_data_json,
                                vacancy_hired_labels_json=vacancy_hired_labels_json,
-                               total_vacancies_data_json=total_vacancies_data_json,
-                               total_hired_data_json=total_hired_data_json,
+                               overall_vacancies_data_json=overall_vacancies_data_json,
+                               overall_hired_data_json=overall_hired_data_json,
+                               overall_applicants_data_json=overall_applicants_data_json,
+                               active_vacancies_data_json=active_vacancies_data_json,
+                               active_hired_data_json=active_hired_data_json,
+                               active_applicants_data_json=active_applicants_data_json,
+                               total_applicants=total_applicants,
+                               total_vacancies=total_vacancies,
+                               open_vacancies=open_vacancies,
+                               closed_vacancies=closed_vacancies,
+                               total_hired=total_hired,
+                               hiring_success_rate=hiring_success_rate,
+                               hiring_pace=hiring_pace,
+                               attrition_score=attrition_score,
                                system_ai_insight=None
                                )
 # Regenerate System Insights API
@@ -851,6 +1201,30 @@ def jobs_list():
                 jobs = json.load(f)
             except json.JSONDecodeError:
                 jobs = []
+    
+    # Load candidates for automatic status calculation
+    candidate_file = os.path.join(db_folder, 'candidates.json')
+    candidates = []
+    if os.path.exists(candidate_file):
+        with open(candidate_file, 'r') as f:
+            try:
+                candidates = json.load(f)
+            except json.JSONDecodeError:
+                candidates = []
+    
+    # Update job statuses automatically
+    status_updated = False
+    for job in jobs:
+        automatic_status = calculate_automatic_job_status(job, candidates)
+        if job.get('status', '').lower() != automatic_status.lower():
+            job['status'] = automatic_status
+            status_updated = True
+    
+    # Save updated jobs if any status changed
+    if status_updated:
+        with open(job_file, 'w') as f:
+            json.dump(jobs, f, indent=4)
+    
     return render_template('jobs_list.html', jobs=jobs ,role=request.cookies.get('role', '') ,view=view)
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1026,20 +1400,27 @@ def generate_probation_insights_async(candidate_id, pa, candidate_file):
             show_interview_form = True
         elif status == 'Interview Scheduled':
             show_video_upload = True
-        elif status == 'Interview Analyzed':
-            if role == 'HR':
+        elif status == 'Interview Analyzed' or status == 'Interviewed':
+            if role in ['HR', 'HR Manager']:
                 show_send_for_approval = True
         elif status == 'Pending Approval':
-            if role == 'HR Manager':
-                show_negotiation_mail = True
+            # Show approve buttons only for users who can approve this candidate
+            if role in ['Discipline Manager', 'Department Manager (MOE)', 'Department Manager (MOP)', 'Operation Manager', 'CEO']:
                 show_approve_button = True
+            if role in ['HR', 'HR Manager']:
+                show_negotiation_mail = True
         elif status == 'On Hold':
-            if role == 'HR Manager':
+            if role in ['HR', 'HR Manager', 'Discipline Manager', 'Department Manager (MOE)', 'Department Manager (MOP)', 'Operation Manager', 'CEO']:
                 show_approve_button = True
         elif status == 'Rejected':
-            pass
+            pass  # No actions available for rejected candidates
         elif status == 'Approved':
-            if role == 'Manager':
+            # HR can update to Selected after final approval
+            if role in ['HR', 'HR Manager']:
+                show_offer_letter = False  # Don't show offer letter form yet
+        elif status == 'Selected':
+            # Operation Manager can issue offer letter
+            if role == 'Operation Manager':
                 show_offer_letter = True
         # Add more status-based logic as needed
         # Fetch notifications for the user
@@ -1321,7 +1702,8 @@ def interview_analysis():
                 c['interview_transcript'] = transcript
                 c['ai_interview_report'] = summary
                 c['interview_score'] = score
-                c['status'] = 'Interview Analyzed'
+                c['status'] = 'Interviewed'  # Changed from 'Interview Analyzed' to 'Interviewed'
+                c['interview_analyzed_at'] = datetime.datetime.now().isoformat()
                 break
 
         with open(candidate_file, 'w') as f:
@@ -1401,17 +1783,21 @@ def update_candidate_status():
 @app.route('/send_for_approval', methods=['POST'])
 def send_for_approval():
     """
-    Sends a candidate for approval based on the provided candidate_id.
+    Sends a candidate for approval based on their position and creates appropriate notifications.
     Accepts form data.
     """
     try:
         candidate_id = request.form.get('candidate_id')
+        approval_message = request.form.get('approval_message', '')
+        
         if not candidate_id:
             return jsonify({'success': False, 'message': 'Missing candidate ID'}), 400
         try:
             candidate_id = int(candidate_id)
         except ValueError:
             return jsonify({'success': False, 'message': 'Invalid candidate ID format'}), 400
+        
+        # Load candidate data
         candidate_file = os.path.join(os.path.dirname(__file__), 'db', 'candidates.json')
         if os.path.exists(candidate_file):
             with open(candidate_file, 'r') as f:
@@ -1421,20 +1807,79 @@ def send_for_approval():
                     candidates = []
         else:
             candidates = []
-        updated = False
+        
+        # Find the candidate
+        candidate = None
         for c in candidates:
             if c.get('id') == candidate_id:
-                c['status'] = 'Pending Approval'
-                updated = True
+                candidate = c
                 break
-        if not updated:
+        
+        if not candidate:
             return jsonify({'success': False, 'message': 'Candidate not found'}), 404
+        
+        # Update candidate status
+        candidate['status'] = 'Pending Approval'
+        candidate['sent_for_approval_at'] = datetime.datetime.now().isoformat()
+        candidate['sent_for_approval_by'] = request.cookies.get('username', '')
+        candidate['approval_request_message'] = approval_message
+        
+        # Create notification for appropriate first approver based on position
+        position = candidate.get('position', '').lower()
+        notification_file = os.path.join(os.path.dirname(__file__), 'db', 'notifications.json')
+        
+        # Load existing notifications
+        if os.path.exists(notification_file):
+            with open(notification_file, 'r') as f:
+                try:
+                    notifications = json.load(f)
+                except json.JSONDecodeError:
+                    notifications = []
+        else:
+            notifications = []
+        
+        # Determine first approver based on position
+        if 'discipline manager' in position or 'project manager' in position:
+            # Senior positions start with Department Manager
+            first_approver = 'Department Manager (MOE)'  # Default to MOE, could be based on department
+            flow_type = 'senior'
+        else:
+            # Regular positions start with Discipline Manager
+            first_approver = 'Discipline Manager'
+            flow_type = 'regular'
+        
+        # Create notification for first approver
+        notification = {
+            'id': len(notifications) + 1,
+            'candidate_id': candidate_id,
+            'candidate_name': candidate.get('name', 'Unknown'),
+            'position': candidate.get('position', ''),
+            'type': 'approval_request',
+            'status': 'Sent',
+            'for_role': first_approver,
+            'from_role': request.cookies.get('role', 'HR'),
+            'message': approval_message or f"Candidate {candidate.get('name', 'Unknown')} for position {candidate.get('position', 'Unknown')} requires your approval.",
+            'timestamp': datetime.datetime.now().isoformat(),
+            'created_by': request.cookies.get('username', ''),
+            'priority': 'high' if 'manager' in position.lower() else 'normal',
+            'flow_type': flow_type,
+            'step_number': 1,
+            'total_steps': 3
+        }
+        
+        notifications.append(notification)
+        
+        # Save notifications
+        with open(notification_file, 'w') as f:
+            json.dump(notifications, f, indent=4)
+        
+        # Save updated candidate data
         with open(candidate_file, 'w') as f:
             json.dump(candidates, f, indent=4)
-        # After updating, reload candidate data for the profile page
-        candidates_list = fetch_candidate_data()
-        candidate = next((c for c in candidates_list if c.get('id') == candidate_id), None)
-        return render_template('candidate_profile.html', candidate=candidate, role=request.cookies.get('role', ''), schedule_interview=False)
+        
+        # Add success message
+        return redirect(url_for('candidate_profile', candidate_id=candidate_id, role=request.cookies.get('role', ''), message=f'Candidate sent for approval to {first_approver}'))
+        
     except Exception as e:
         print(f"[ERROR] Failed to send candidate for approval: {e}")
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
@@ -1442,16 +1887,24 @@ def send_for_approval():
 @app.route('/approve_candidate', methods=['POST'])
 def approve_candidate():
     """
-    Approves a candidate (HR Manager or Manager action).
-    Sets status to 'Approved'.
+    Role-based candidate approval that moves the candidate to the next step in the approval chain.
     """
     try:
         candidate_id = request.form.get('candidate_id')
+        action = request.form.get('action', 'approve')  # approve, reject, hold
         approval_comment = request.form.get('approval_comment', '')
+        current_user_role = request.cookies.get('role', '')
+        
         if not candidate_id:
             return jsonify({'success': False, 'message': 'Missing candidate ID'}), 400
+        
         candidate_id = int(candidate_id)
+        
+        # Load files
         candidate_file = os.path.join(os.path.dirname(__file__), 'db', 'candidates.json')
+        notification_file = os.path.join(os.path.dirname(__file__), 'db', 'notifications.json')
+        
+        # Load candidates
         if os.path.exists(candidate_file):
             with open(candidate_file, 'r') as f:
                 try:
@@ -1460,50 +1913,180 @@ def approve_candidate():
                     candidates = []
         else:
             candidates = []
-        updated = False
+        
+        # Load notifications
+        if os.path.exists(notification_file):
+            with open(notification_file, 'r') as f:
+                try:
+                    notifications = json.load(f)
+                except json.JSONDecodeError:
+                    notifications = []
+        else:
+            notifications = []
+        
+        # Find candidate
+        candidate = None
         for c in candidates:
             if c.get('id') == candidate_id:
-                action = request.form.get('action', 'approve')
-                if action == 'hold':
-                    c['status'] = 'On Hold'
-                elif action == 'reject':
-                    c['status'] = 'Rejected'
-                else:
-                    # If approved by Department Manager, set to Pending Offer for Operation Manager
-                    if request.cookies.get('role', '') in ['Department Manager (MOE)', 'Department Manager (MOP)']:
-                        c['status'] = 'Pending Offer'
-                    elif request.cookies.get('role', '') == 'Operation Manager':
-                        c['status'] = 'Hired'
-                    else:
-                        c['status'] = 'Approved'
-                c['approval_comment'] = approval_comment
-                # Add notification for HR
-                notification_file = os.path.join(os.path.dirname(__file__), 'db', 'notifications.json')
-                if os.path.exists(notification_file):
-                    with open(notification_file, 'r') as nf:
-                        try:
-                            notifications = json.load(nf)
-                        except json.JSONDecodeError:
-                            notifications = []
-                else:
-                    notifications = []
-                notifications.append({
-                    'candidate_id': candidate_id,
-                    'type': 'approval',
-                    'status': c['status'],
-                    'comment': approval_comment,
-                    'timestamp': datetime.datetime.now().isoformat(),
-                    'for_role': 'HR'
-                })
-                with open(notification_file, 'w') as nf:
-                    json.dump(notifications, nf, indent=4)
-                updated = True
+                candidate = c
                 break
-        if not updated:
+        
+        if not candidate:
             return jsonify({'success': False, 'message': 'Candidate not found'}), 404
+        
+        # Update the current notification status
+        for notification in notifications:
+            if (notification.get('candidate_id') == candidate_id and 
+                notification.get('status') == 'Sent' and
+                (notification.get('for_role') == current_user_role or
+                 (notification.get('for_role') in ['Department Manager (MOE)', 'Department Manager (MOP)'] and 
+                  current_user_role in ['Department Manager (MOE)', 'Department Manager (MOP)']))):
+                
+                if action == 'approve':
+                    notification['status'] = 'Approved'
+                elif action == 'reject':
+                    notification['status'] = 'Rejected'
+                elif action == 'hold':
+                    notification['status'] = 'On Hold'
+                
+                notification['comment'] = approval_comment
+                notification['approved_by'] = request.cookies.get('username', '')
+                notification['approved_at'] = datetime.datetime.now().isoformat()
+                break
+        
+        # Handle different actions
+        if action == 'reject':
+            candidate['status'] = 'Rejected'
+            candidate['rejection_reason'] = approval_comment
+            candidate['rejected_by'] = current_user_role
+            candidate['rejected_at'] = datetime.datetime.now().isoformat()
+            
+        elif action == 'hold':
+            candidate['status'] = 'On Hold'
+            candidate['hold_reason'] = approval_comment
+            candidate['put_on_hold_by'] = current_user_role
+            candidate['hold_at'] = datetime.datetime.now().isoformat()
+            
+        elif action == 'approve':
+            # Determine next step in approval chain
+            position = candidate.get('position', '').lower()
+            next_approver = None
+            is_final_approval = False
+            
+            if 'discipline manager' in position or 'project manager' in position:
+                # Senior positions: Department Manager → Operation Manager → CEO
+                if current_user_role in ['Department Manager (MOE)', 'Department Manager (MOP)']:
+                    next_approver = 'Operation Manager'
+                    step_number = 2
+                elif current_user_role == 'Operation Manager':
+                    next_approver = 'CEO'
+                    step_number = 3
+                elif current_user_role == 'CEO':
+                    # Final approval for senior positions
+                    is_final_approval = True
+                    candidate['status'] = 'Approved'
+                    candidate['final_approved_by'] = current_user_role
+                    candidate['final_approved_at'] = datetime.datetime.now().isoformat()
+                    candidate['final_approval_comment'] = approval_comment
+            else:
+                # Regular positions: Discipline Manager → Department Manager → Operation Manager
+                if current_user_role == 'Discipline Manager':
+                    next_approver = 'Department Manager (MOE)'  # Could be dynamic based on department
+                    step_number = 2
+                elif current_user_role in ['Department Manager (MOE)', 'Department Manager (MOP)']:
+                    next_approver = 'Operation Manager'
+                    step_number = 3
+                elif current_user_role == 'Operation Manager':
+                    # Final approval for regular positions
+                    is_final_approval = True
+                    candidate['status'] = 'Approved'
+                    candidate['final_approved_by'] = current_user_role
+                    candidate['final_approved_at'] = datetime.datetime.now().isoformat()
+                    candidate['final_approval_comment'] = approval_comment
+            
+            # Record approval step
+            if 'approval_history' not in candidate:
+                candidate['approval_history'] = []
+            
+            candidate['approval_history'].append({
+                'step': len(candidate['approval_history']) + 1,
+                'approved_by_role': current_user_role,
+                'approved_by_user': request.cookies.get('username', ''),
+                'approved_at': datetime.datetime.now().isoformat(),
+                'comment': approval_comment,
+                'is_final': is_final_approval
+            })
+            
+            # Create notification for next approver if needed
+            if next_approver and not is_final_approval:
+                next_notification = {
+                    'id': len(notifications) + 1,
+                    'candidate_id': candidate_id,
+                    'candidate_name': candidate.get('name', 'Unknown'),
+                    'position': candidate.get('position', ''),
+                    'type': 'approval_request',
+                    'status': 'Sent',
+                    'for_role': next_approver,
+                    'from_role': current_user_role,
+                    'message': f"Candidate {candidate.get('name', 'Unknown')} has been approved by {current_user_role} and now requires your approval.",
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'created_by': request.cookies.get('username', ''),
+                    'priority': 'high' if 'manager' in position.lower() else 'normal',
+                    'previous_approver': current_user_role,
+                    'previous_comment': approval_comment,
+                    'step_number': step_number,
+                    'total_steps': 3
+                }
+                notifications.append(next_notification)
+            
+            # If final approval, notify HR to proceed with offer letter
+            if is_final_approval:
+                hr_notification = {
+                    'id': len(notifications) + 1,
+                    'candidate_id': candidate_id,
+                    'candidate_name': candidate.get('name', 'Unknown'),
+                    'type': 'final_approval_complete',
+                    'status': 'Approved',
+                    'for_role': 'HR',
+                    'from_role': current_user_role,
+                    'message': f"🎉 FINAL APPROVAL: Candidate {candidate.get('name', 'Unknown')} has completed the full approval cycle and is ready for offer letter generation.",
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'final_approver': current_user_role,
+                    'final_approval_comment': approval_comment,
+                    'priority': 'high'
+                }
+                notifications.append(hr_notification)
+        
+        # Add general notification for HR about the action (if not final approval)
+        if action != 'approve' or not is_final_approval:
+            hr_notification = {
+                'id': len(notifications) + 1,
+                'candidate_id': candidate_id,
+                'candidate_name': candidate.get('name', 'Unknown'),
+                'type': 'approval_update',
+                'status': action.title() + 'd',
+                'for_role': 'HR',
+                'from_role': current_user_role,
+                'message': f"Candidate {candidate.get('name', 'Unknown')} has been {action}d by {current_user_role}." + (f" Next: {next_approver}" if next_approver else ""),
+                'timestamp': datetime.datetime.now().isoformat(),
+                'action_by': request.cookies.get('username', ''),
+                'comment': approval_comment
+            }
+            notifications.append(hr_notification)
+        
+        # Save all changes
         with open(candidate_file, 'w') as f:
             json.dump(candidates, f, indent=4)
-        return redirect(url_for('candidate_profile', candidate_id=candidate_id, role=request.cookies.get('role', '')))
+        
+        with open(notification_file, 'w') as f:
+            json.dump(notifications, f, indent=4)
+        
+        # Redirect back to manage HR team or candidate profile
+        if request.referrer and 'manage_hr_team' in request.referrer:
+            return redirect(url_for('manage_hr_team'))
+        else:
+            return redirect(url_for('candidate_profile', candidate_id=candidate_id, role=current_user_role))
+        
     except Exception as e:
         print(f"[ERROR] Failed to approve candidate: {e}")
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
@@ -1526,22 +2109,80 @@ def recent_activities():
         role=request.cookies.get('role', '')
     )
 
+@app.route('/my_approvals')
+def my_approvals():
+    """
+    Show pending approvals for the current user based on their role
+    """
+    current_user_role = request.cookies.get('role', '')
+    
+    # Load notifications
+    notification_file = os.path.join(os.path.dirname(__file__), 'db', 'notifications.json')
+    if os.path.exists(notification_file):
+        with open(notification_file, 'r') as f:
+            try:
+                notifications = json.load(f)
+            except json.JSONDecodeError:
+                notifications = []
+    else:
+        notifications = []
+    
+    # Filter notifications for current user role
+    my_notifications = []
+    for notification in notifications:
+        if (notification.get('for_role') == current_user_role or
+            (notification.get('for_role') in ['Department Manager (MOE)', 'Department Manager (MOP)'] and 
+             current_user_role in ['Department Manager (MOE)', 'Department Manager (MOP)'])):
+            my_notifications.append(notification)
+    
+    # Separate pending vs completed
+    pending_approvals = [n for n in my_notifications if n.get('status') == 'Sent']
+    completed_approvals = [n for n in my_notifications if n.get('status') in ['Approved', 'Rejected', 'On Hold']]
+    
+    # Sort by timestamp (most recent first)
+    pending_approvals.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+    completed_approvals.sort(key=lambda x: x.get('approved_at', x.get('timestamp', '')), reverse=True)
+    
+    return render_template('my_approvals.html', 
+                         pending_approvals=pending_approvals,
+                         completed_approvals=completed_approvals,
+                         role=current_user_role)
+
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 
 @app.route('/manage_hr_team')
 def manage_hr_team():
-    role = request.cookies.get('role', '')
-    if role not in ['HR Manager', 'Manager', 'Admin', 'CEO', 'Operation Manager']:
+    current_user_role = request.cookies.get('role', '')
+    
+    # Define role hierarchy and permissions
+    role_permissions = {
+        'HR': ['view_all'],
+        'HR Manager': ['view_all', 'approve_hr'],
+        'Discipline Manager': ['view_discipline', 'approve_discipline'],
+        'Department Manager (MOE)': ['view_department', 'approve_department'],
+        'Department Manager (MOP)': ['view_department', 'approve_department'],
+        'Operation Manager': ['view_operation', 'approve_operation'],
+        'CEO': ['view_all', 'approve_ceo'],
+        'Manager': ['view_all'],
+        'Admin': ['view_all']
+    }
+    
+    # Check if user has permission to view this page
+    user_permissions = role_permissions.get(current_user_role, [])
+    if not any(perm in user_permissions for perm in ['view_all', 'view_discipline', 'view_department', 'view_operation']):
         msg = "You do not have permission to access this page."
-        return render_template('error.html', message=msg, role=role)
+        return render_template('error.html', message=msg, role=current_user_role)
+    
+    # Load data files
     db_folder = os.path.join(os.path.dirname(__file__), 'db')
     hr_file = os.path.join(db_folder, 'userdata.json')
     candidate_file = os.path.join(db_folder, 'candidates.json')
     notification_file = os.path.join(db_folder, 'notifications.json')
     jobs_file = os.path.join(db_folder, 'jobs.json')
-    # HR team
+    
+    # Load HR team data
     if os.path.exists(hr_file):
         with open(hr_file, 'r') as f:
             try:
@@ -1551,7 +2192,8 @@ def manage_hr_team():
         hr_team = [u for u in users if u.get('role') in ['HR', 'HR Manager']]
     else:
         hr_team = []
-    # Candidates
+    
+    # Load candidates
     if os.path.exists(candidate_file):
         with open(candidate_file, 'r') as f:
             try:
@@ -1560,7 +2202,8 @@ def manage_hr_team():
                 candidates = []
     else:
         candidates = []
-    # Notifications
+    
+    # Load notifications
     if os.path.exists(notification_file):
         with open(notification_file, 'r') as f:
             try:
@@ -1569,7 +2212,8 @@ def manage_hr_team():
                 notifications = []
     else:
         notifications = []
-    # Jobs
+    
+    # Load jobs
     if os.path.exists(jobs_file):
         with open(jobs_file, 'r') as f:
             try:
@@ -1578,121 +2222,223 @@ def manage_hr_team():
                 jobs = []
     else:
         jobs = []
-    # Build approval flows grouped by job
+    
+    # Color mapping for different roles
     color_map = {
         'Discipline Manager': '#dc3545',
         'Department Manager': '#fd7e14',
         'Operation Manager': '#28a745',
         'CEO': '#007bff',
-        'Approved': '#007bff'
+        'Approved': '#28a745',
+        'Pending': '#6c757d',
+        'Rejected': '#dc3545',
+        'Current': '#ffc107'
     }
+    
+    # Build role-specific approval flows
     jobs_with_candidates = []
+    
     for job in jobs:
         job_id = str(job.get('job_id')) if job.get('job_id') is not None else None
         job_candidates = [c for c in candidates if str(c.get('job_id')) == job_id]
-        approval_flows = []
+        
+        # Filter candidates based on user role
+        filtered_candidates = []
         for c in job_candidates:
-            flow = {
-                'candidate_id': c.get('id'),
-                'candidate_name': c.get('name', 'Unknown'),
-                'steps': []
-            }
-            # Determine position for approval cycle
-            position = c.get('position', '').lower()
-            # If candidate is Hired or Approved, mark all steps as Approved
-            if c.get('status') in ['Hired', 'Approved']:
+            should_show = False
+            
+            if 'view_all' in user_permissions:
+                should_show = True
+            elif 'view_discipline' in user_permissions:
+                # Show only if current user is next in approval chain or has already acted
+                position = c.get('position', '').lower()
+                if not ('discipline manager' in position or 'project manager' in position):
+                    # Regular positions start with Discipline Manager
+                    should_show = True
+            elif 'view_department' in user_permissions:
+                # Show candidates that need department manager approval
+                position = c.get('position', '').lower()
                 if 'discipline manager' in position or 'project manager' in position:
-                    flow['steps'].append({'role': 'Department Manager (MOE/MOP)', 'action': 'Approved', 'color': color_map['Department Manager']})
-                    flow['steps'].append({'role': 'Operation Manager', 'action': 'Approved', 'color': color_map['Operation Manager']})
-                    flow['steps'].append({'role': 'CEO', 'action': 'Approved', 'color': color_map['CEO']})
+                    # Senior positions start with Department Manager
+                    should_show = True
                 else:
-                    flow['steps'].append({'role': 'Discipline Manager', 'action': 'Approved', 'color': color_map['Discipline Manager']})
-                    flow['steps'].append({'role': 'Department Manager (MOE/MOP)', 'action': 'Approved', 'color': color_map['Department Manager']})
-                    flow['steps'].append({'role': 'Operation Manager', 'action': 'Approved', 'color': color_map['Operation Manager']})
-            else:
-                if 'discipline manager' in position or 'project manager' in position:
-                    # Step 1: Department Manager (MOE/MOP)
-                    dept_manager_action = None
-                    for n in notifications:
-                        if n.get('candidate_id') == c.get('id') and n.get('for_role') in ['Department Manager (MOE)', 'Department Manager (MOP)']:
-                            dept_manager_action = n.get('status', 'Sent')
-                    flow['steps'].append({
-                        'role': 'Department Manager (MOE/MOP)',
-                        'action': dept_manager_action if dept_manager_action else 'Pending',
-                        'color': color_map['Department Manager']
-                    })
-                    # Step 2: Operation Manager
-                    op_manager_action = None
-                    for n in notifications:
-                        if n.get('candidate_id') == c.get('id') and n.get('for_role') == 'Operation Manager':
-                                                       op_manager_action = n.get('status', 'Sent')
-                    flow['steps'].append({
-                        'role': 'Operation Manager',         
-                        'action': op_manager_action if op_manager_action else 'Pending',
-                        'color': color_map['Operation Manager']
-                    })
-                    # Step 3: CEO
-                    ceo_action = None
-                    for n in notifications:
-                        if n.get('candidate_id') == c.get('id') and n.get('for_role') == 'CEO':
-                            ceo_action = n.get('status', 'Sent')
-                    flow['steps'].append({
-                        'role': 'CEO',
-                        'action': ceo_action if ceo_action else 'Pending',
-                        'color': color_map['CEO']
-                    })
-                else:
-                    # Step 1: Discipline Manager
-                    disc_manager_action = None
-                    for n in notifications:
-                        if n.get('candidate_id') == c.get('id') and n.get('for_role') == 'Discipline Manager':
-                            disc_manager_action = n.get('status', 'Sent')
-                    flow['steps'].append({
-                        'role': 'Discipline Manager',
-                        'action': disc_manager_action if disc_manager_action else 'Pending',
-                        'color': color_map['Discipline Manager']
-                    })
-                    # Step 2: Department Manager (MOE/MOP)
-                    dept_manager_action = None
-                    for n in notifications:
-                        if n.get('candidate_id') == c.get('id') and n.get('for_role') in ['Department Manager (MOE)', 'Department Manager (MOP)']:
-                            dept_manager_action = n.get('status', 'Sent')
-                    flow['steps'].append({
-                        'role': 'Department Manager (MOE/MOP)',
-                        'action': dept_manager_action if dept_manager_action else 'Pending',
-                        'color': color_map['Department Manager']
-                    })
-                    # Step 3: Operation Manager
-                    op_manager_action = None
-                    for n in notifications:
-                        if n.get('candidate_id') == c.get('id') and n.get('for_role') == 'Operation Manager':
-                            op_manager_action = n.get('status', 'Sent')
-                    flow['steps'].append({
-                        'role': 'Operation Manager',
-                        'action': op_manager_action if op_manager_action else 'Pending',
-                        'color': color_map['Operation Manager']
-                    })
-            # Step 4: Approved
-            approved_action = None
-            # If candidate is Hired or Approved, show as Approved
-            if c.get('status') in ['Hired', 'Approved']:
-                approved_action = 'Approved'
-            else:
-                for n in notifications:
-                    if n.get('candidate_id') == c.get('id') and n.get('status') == 'Approved':
-                        approved_action = 'Approved'
-            flow['steps'].append({
-                'role': 'Approved',
-                'action': approved_action if approved_action else 'Pending',
-                'color': color_map['Approved']
-            })
+                    # Regular positions need dept manager after discipline manager
+                    discipline_approved = any(n.get('candidate_id') == c.get('id') and 
+                                           n.get('for_role') == 'Discipline Manager' and 
+                                           n.get('status') == 'Approved' 
+                                           for n in notifications)
+                    if discipline_approved:
+                        should_show = True
+            elif 'view_operation' in user_permissions:
+                # Show candidates that need operation manager approval
+                dept_approved = any(n.get('candidate_id') == c.get('id') and 
+                                  n.get('for_role') in ['Department Manager (MOE)', 'Department Manager (MOP)'] and 
+                                  n.get('status') == 'Approved' 
+                                  for n in notifications)
+                if dept_approved:
+                    should_show = True
+            
+            if should_show:
+                filtered_candidates.append(c)
+        
+        # Build approval flows for filtered candidates
+        approval_flows = []
+        for c in filtered_candidates:
+            flow = build_approval_flow(c, notifications, color_map, current_user_role)
             approval_flows.append(flow)
-        jobs_with_candidates.append({
-            'job_id': job.get('job_id'),
-            'job_title': job.get('job_title'),
-            'approval_flows': approval_flows
+        
+        if approval_flows:  # Only add job if it has candidates to show
+            jobs_with_candidates.append({
+                'job_id': job.get('job_id'),
+                'job_title': job.get('job_title'),
+                'approval_flows': approval_flows
+            })
+    
+    # Get user-specific notifications
+    user_notifications = [n for n in notifications if n.get('for_role') == current_user_role]
+    pending_approvals = [n for n in user_notifications if n.get('status') in ['Sent', 'Pending']]
+    
+    return render_template('manage_hr_team.html', 
+                         hr_team=hr_team, 
+                         role=current_user_role,
+                         jobs_with_candidates=jobs_with_candidates,
+                         user_permissions=user_permissions,
+                         pending_approvals=pending_approvals,
+                         current_user_role=current_user_role)
+
+def build_approval_flow(candidate, notifications, color_map, current_user_role):
+    """
+    Build approval flow for a candidate based on their position and current status
+    """
+    flow = {
+        'candidate_id': candidate.get('id'),
+        'candidate_name': candidate.get('name', 'Unknown'),
+        'candidate_status': candidate.get('status', 'Unknown'),
+        'position': candidate.get('position', ''),
+        'steps': []
+    }
+    
+    position = candidate.get('position', '').lower()
+    candidate_id = candidate.get('id')
+    
+    # Determine approval path based on position
+    if 'discipline manager' in position or 'project manager' in position:
+        # SENIOR POSITIONS: Department Manager (MOE/MOP) → Operation Manager → CEO
+        approval_path = [
+            'Department Manager (MOE/MOP)',
+            'Operation Manager', 
+            'CEO'
+        ]
+        final_approver = 'CEO'
+    else:
+        # REGULAR POSITIONS: Discipline Manager → Department Manager (MOE/MOP) → Operation Manager
+        approval_path = [
+            'Discipline Manager',
+            'Department Manager (MOE/MOP)',
+            'Operation Manager'
+        ]
+        final_approver = 'Operation Manager'
+    
+    # Build steps for each role in the approval path
+    for i, role in enumerate(approval_path):
+        step_action = 'Pending'
+        step_color = color_map['Pending']
+        is_current_step = False
+        
+        # Check if this role has acted on this candidate
+        role_notifications = []
+        if role == 'Department Manager (MOE/MOP)':
+            role_notifications = [n for n in notifications if 
+                                n.get('candidate_id') == candidate_id and 
+                                n.get('for_role') in ['Department Manager (MOE)', 'Department Manager (MOP)']]
+        else:
+            role_notifications = [n for n in notifications if 
+                                n.get('candidate_id') == candidate_id and 
+                                n.get('for_role') == role]
+        
+        if role_notifications:
+            latest_notification = max(role_notifications, key=lambda x: x.get('timestamp', ''))
+            step_action = latest_notification.get('status', 'Sent')
+            if step_action == 'Approved':
+                step_color = color_map['Approved']
+            elif step_action == 'Rejected':
+                step_color = color_map['Rejected']
+            else:
+                step_color = color_map['Pending']
+        
+        # Check if this is the current step for the logged-in user
+        if ((role == current_user_role) or 
+            (role == 'Department Manager (MOE/MOP)' and current_user_role in ['Department Manager (MOE)', 'Department Manager (MOP)'])):
+            if step_action == 'Pending' and candidate.get('status') == 'Pending Approval':
+                is_current_step = True
+                step_color = color_map['Current']
+        
+        # If candidate is already selected/hired/approved, mark all previous steps as approved
+        if candidate.get('status') in ['Hired', 'Approved', 'Selected']:
+            if step_action == 'Pending':
+                step_action = 'Approved'
+                step_color = color_map['Approved']
+        
+        flow['steps'].append({
+            'role': role,
+            'action': step_action,
+            'color': step_color,
+            'is_current': is_current_step,
+            'can_approve': is_current_step and step_action == 'Pending'
         })
-    return render_template('manage_hr_team.html', hr_team=hr_team, role=role, jobs_with_candidates=jobs_with_candidates)
+    
+    # Add final "Approved" step to show the completion of approval cycle
+    final_action = 'Pending'
+    final_color = color_map['Pending']
+    
+    # Check if final approval has been completed
+    if candidate.get('status') in ['Approved', 'Selected', 'Hired']:
+        if candidate.get('status') == 'Approved':
+            final_action = 'Final Approval Complete'
+        elif candidate.get('status') == 'Selected':
+            final_action = 'Approved & Selected'
+        elif candidate.get('status') == 'Hired':
+            final_action = 'Hired Successfully'
+        
+        final_color = color_map['Approved']
+        
+        # Add details about who gave final approval
+        final_approver_info = f"Approved by {candidate.get('final_approved_by', 'System')}"
+        if candidate.get('final_approved_at'):
+            approval_date = candidate.get('final_approved_at').split('T')[0]
+            final_approver_info += f" on {approval_date}"
+        elif candidate.get('status') in ['Selected', 'Hired']:
+            # For candidates without proper approval history, show generic completion
+            final_approver_info = f"Approval cycle completed - Status: {candidate.get('status')}"
+    elif candidate.get('status') in ['Rejected', 'On Hold']:
+        final_action = candidate.get('status')
+        final_color = color_map['Rejected'] if candidate.get('status') == 'Rejected' else color_map['Pending']
+    else:
+        # Check if all previous steps are approved
+        all_approved = all(step['action'] == 'Approved' for step in flow['steps'])
+        if all_approved and candidate.get('status') == 'Pending Approval':
+            # Waiting for final approver
+            if ((final_approver == current_user_role) or 
+                (final_approver == 'Department Manager (MOE/MOP)' and current_user_role in ['Department Manager (MOE)', 'Department Manager (MOP)'])):
+                final_action = 'Ready for Final Approval'
+                final_color = color_map['Current']
+            else:
+                final_action = f'Awaiting {final_approver}'
+                final_color = color_map['Pending']
+        else:
+            final_action = 'Pending Previous Approvals'
+            final_color = color_map['Pending']
+    
+    flow['steps'].append({
+        'role': 'Final Approval',
+        'action': final_action,
+        'color': final_color,
+        'is_current': 'Ready for Final Approval' in final_action,
+        'can_approve': 'Ready for Final Approval' in final_action,
+        'approver_info': final_approver_info if 'final_approver_info' in locals() else None
+    })
+    
+    return flow
 # ---------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -1997,6 +2743,114 @@ def candidate_profile(candidate_id):
 
 
 
+def calculate_job_status_info(job, candidates):
+    """
+    Calculate detailed information about job status for the info popup
+    Returns dict with days_remaining, closing_date, hired_count, total_openings, vacancies_remaining
+    """
+    from datetime import datetime, timedelta
+    
+    # Get current date
+    current_date = datetime.now()
+    
+    # Parse job posted date
+    try:
+        posted_date = datetime.strptime(job.get('posted_at', ''), '%Y-%m-%d %H:%M:%S')
+    except (ValueError, TypeError):
+        posted_date = current_date
+    
+    # Get lead time in days
+    try:
+        lead_time_days = int(job.get('job_lead_time', 30))
+    except (ValueError, TypeError):
+        lead_time_days = 30
+    
+    # Calculate closing date
+    closing_date = posted_date + timedelta(days=lead_time_days)
+    
+    # Calculate days remaining
+    days_remaining = (closing_date - current_date).days
+    
+    # Count hired candidates for this job
+    job_id_str = str(job.get('job_id', ''))
+    hired_count = 0
+    for candidate in candidates:
+        if (candidate.get('status', '').lower() == 'hired' and 
+            str(candidate.get('job_id', '')) == job_id_str):
+            hired_count += 1
+    
+    # Get job openings
+    try:
+        total_openings = int(job.get('job_openings', 0))
+    except (ValueError, TypeError):
+        total_openings = 0
+    
+    # Calculate vacancies remaining
+    vacancies_remaining = max(0, total_openings - hired_count)
+    
+    return {
+        'days_remaining': days_remaining,
+        'closing_date': closing_date.strftime('%Y-%m-%d'),
+        'hired_count': hired_count,
+        'total_openings': total_openings,
+        'vacancies_remaining': vacancies_remaining,
+        'lead_time_days': lead_time_days,
+        'posted_date': posted_date.strftime('%Y-%m-%d'),
+        'is_expired': days_remaining < 0,
+        'is_filled': vacancies_remaining == 0
+    }
+
+def calculate_automatic_job_status(job, candidates):
+    """
+    Calculate automatic job status based on lead time and hired candidates count
+    Returns 'Open' or 'Closed'
+    """
+    from datetime import datetime, timedelta
+    
+    # Get current date
+    current_date = datetime.now()
+    
+    # Parse job posted date
+    try:
+        posted_date = datetime.strptime(job.get('posted_at', ''), '%Y-%m-%d %H:%M:%S')
+    except (ValueError, TypeError):
+        # If date parsing fails, assume it's recent
+        posted_date = current_date
+    
+    # Get lead time in days
+    try:
+        lead_time_days = int(job.get('job_lead_time', 30))
+    except (ValueError, TypeError):
+        lead_time_days = 30
+    
+    # Calculate expiration date
+    expiration_date = posted_date + timedelta(days=lead_time_days)
+    
+    # Check if lead time has expired
+    if current_date > expiration_date:
+        return 'Closed'
+    
+    # Count hired candidates for this job
+    job_id_str = str(job.get('job_id', ''))
+    hired_count = 0
+    for candidate in candidates:
+        if (candidate.get('status', '').lower() == 'hired' and 
+            str(candidate.get('job_id', '')) == job_id_str):
+            hired_count += 1
+    
+    # Get job openings
+    try:
+        job_openings = int(job.get('job_openings', 0))
+    except (ValueError, TypeError):
+        job_openings = 0
+    
+    # Check if all positions are filled
+    if hired_count >= job_openings:
+        return 'Closed'
+    
+    # Otherwise, job is still open
+    return 'Open'
+
 @app.route('/job/<job_id>')
 def job_details(job_id):
     db_folder = os.path.join(os.path.dirname(__file__), 'db')
@@ -2015,6 +2869,30 @@ def job_details(job_id):
             break
     if not job:
         return render_template('error.html', message='Job not found', role=request.cookies.get('role', ''))
+    
+    # Load all candidates to calculate automatic status
+    candidate_file = os.path.join(db_folder, 'candidates.json')
+    candidates = []
+    if os.path.exists(candidate_file):
+        with open(candidate_file, 'r') as f:
+            try:
+                candidates = json.load(f)
+            except json.JSONDecodeError:
+                candidates = []
+    
+    # Calculate and update automatic job status
+    automatic_status = calculate_automatic_job_status(job, candidates)
+    if job.get('status', '').lower() != automatic_status.lower():
+        # Update job status
+        job['status'] = automatic_status
+        # Save updated jobs
+        with open(job_file, 'w') as f:
+            json.dump(jobs, f, indent=4)
+    
+    # Calculate job status information for popup
+    from datetime import datetime, timedelta
+    job_status_info = calculate_job_status_info(job, candidates)
+    
     # Load uploaded CVs for this job and join with candidate details
     cv_file = os.path.join(db_folder, f'job_{job_id}_cvs.json')
     uploaded_cvs = []
@@ -2024,15 +2902,7 @@ def job_details(job_id):
                 uploaded_cvs = json.load(f)
             except json.JSONDecodeError:
                 uploaded_cvs = []
-    # Load all candidates to join details
-    candidate_file = os.path.join(db_folder, 'candidates.json')
-    candidates = []
-    if os.path.exists(candidate_file):
-        with open(candidate_file, 'r') as f:
-            try:
-                candidates = json.load(f)
-            except json.JSONDecodeError:
-                candidates = []
+    
     # Join candidate details to uploaded_cvs
     for cv in uploaded_cvs:
         # Ensure candidate_id is int for comparison
@@ -2044,42 +2914,23 @@ def job_details(job_id):
         candidate = next((c for c in candidates if c.get('id') == cv_cand_id_int), None)
         if candidate:
             cv['candidate_details'] = candidate
-    return render_template('job_details.html', job=job, uploaded_cvs=uploaded_cvs, role=request.cookies.get('role', ''))
+    
+    # Get all candidates for this job (from candidates.json)
+    job_id_str = str(job_id)
+    job_candidates = [c for c in candidates if str(c.get('job_id', '')) == job_id_str]
+    
+    # Remove candidates from job_candidates if they're already in uploaded_cvs to avoid duplicates
+    uploaded_candidate_ids = set()
+    for cv in uploaded_cvs:
+        if cv.get('candidate_details') and cv['candidate_details'].get('id'):
+            uploaded_candidate_ids.add(cv['candidate_details']['id'])
+    
+    # Filter out duplicates
+    job_candidates = [c for c in job_candidates if c.get('id') not in uploaded_candidate_ids]
+    
+    return render_template('job_details.html', job=job, uploaded_cvs=uploaded_cvs, job_candidates=job_candidates, role=request.cookies.get('role', ''), job_status_info=job_status_info)
 
-# Route to update job status
-@app.route('/update_job_status/<job_id>', methods=['POST'])
-def update_job_status(job_id):
-    db_folder = os.path.join(os.path.dirname(__file__), 'db')
-    job_file = os.path.join(db_folder, 'jobs.json')
-    jobs = []
-    if os.path.exists(job_file):
-        with open(job_file, 'r') as f:
-            try:
-                jobs = json.load(f)
-            except json.JSONDecodeError:
-                jobs = []
-    job = None
-    for j in jobs:
-        if str(j.get('job_id')) == str(job_id):
-            job = j
-            break
-    if job:
-        status = request.form.get('status')
-        job['status'] = status
-        with open(job_file, 'w') as f:
-            json.dump(jobs, f, indent=4)
-        # Optionally, reload uploaded CVs for this job
-        cv_file = os.path.join(db_folder, f'job_{job_id}_cvs.json')
-        uploaded_cvs = []
-        if os.path.exists(cv_file):
-            with open(cv_file, 'r') as f:
-                try:
-                    uploaded_cvs = json.load(f)
-                except json.JSONDecodeError:
-                    uploaded_cvs = []
-        return render_template('job_details.html', job=job, uploaded_cvs=uploaded_cvs, role=request.cookies.get('role', ''))
-    else:
-        return render_template('error.html', message='Job not found', role=request.cookies.get('role', ''))
+# Manual job status update route removed - status is now automatic based on lead time and hired candidates
 
 
 

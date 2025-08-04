@@ -49,10 +49,280 @@
   .section-title {
     font-size: 1.1rem;
     font-weight: 600;
+    color: #232323;
+    margin: 24px 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #007acc;
+    display: flex;
+    align-items: center;
+  }
+  
+  .candidates-section {
+    margin: 24px 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  
+  .upload-section {
+    background: #f8f9fa;
+    padding: 16px;
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 8px 8px 0 0;
+  }
+  
+  .upload-section .section-subtitle {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .upload-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .upload-form input[type="file"] {
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .upload-form .btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    background: #007acc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  
+  .upload-form .btn:hover {
+    background: #005999;
+  }
+  
+  .api-note {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: #856404;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .candidates-list {
+    padding: 16px;
+  }
+  
+  .candidates-grid {
+    display: grid;
+    gap: 12px;
+  }
+  
+  .candidate-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: box-shadow 0.2s;
+  }
+  
+  .candidate-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .candidate-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  
+  .candidate-avatar {
+    font-size: 1.2rem;
+  }
+  
+  .candidate-details h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #232323;
+  }
+  
+  .candidate-details p {
+    margin: 2px 0 0 0;
+    font-size: 0.85rem;
+    color: #666;
+  }
+  
+  .candidate-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  
+  .status-new { background: #e3f2fd; color: #1976d2; }
+  .status-shortlisted { background: #fff3e0; color: #f57c00; }
+  .status-interviewed { background: #f3e5f5; color: #7b1fa2; }
+  .status-interview-scheduled { background: #f3e5f5; color: #7b1fa2; }
+  .status-interview-analyzed { background: #f3e5f5; color: #7b1fa2; }
+  .status-hired { background: #e8f5e8; color: #388e3c; }
+  .status-selected { background: #e8f5e8; color: #388e3c; }
+  .status-approved { background: #e8f5e8; color: #388e3c; }
+  .status-rejected { background: #ffebee; color: #d32f2f; }
+  .status-pending { background: #fff8e1; color: #f9a825; }
+  .status-pending-approval { background: #fff8e1; color: #f9a825; }
+  .status-on-hold { background: #f5f5f5; color: #616161; }
+  
+  .view-profile-btn {
+    padding: 6px 12px;
+    background: #007acc;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    transition: background 0.2s;
+  }
+  
+  .view-profile-btn:hover {
+    background: #005999;
+    text-decoration: none;
+    color: white;
+  }
+  
+  .no-candidates {
+    text-align: center;
+    padding: 32px;
+    color: #666;
+    font-style: italic;
+  }
+  
+  /* Job Status Info Popup Styles */
+  .status-info-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .status-info-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+  }
+  
+  .status-info-btn:hover {
+    background: #0056b3;
+  }
+  
+  .status-popup {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    min-width: 280px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  
+  .status-popup.show {
+    display: block;
+  }
+  
+  .popup-header {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 6px;
+  }
+  
+  .popup-item {
+    margin: 4px 0;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .popup-label {
+    color: #666;
+  }
+  
+  .popup-value {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .status-indicator {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  
+  .status-open {
+    background: #d4edda;
+    color: #155724;
+  }
+  
+  .status-closed {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  
+  .status-expired {
+    background: #fff3cd;
+    color: #856404;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
     color: #1976d2;
     margin-top: 24px;
     margin-bottom: 10px;
   }
+  
   .form-section {
     background: #f8f9fa;
     border-radius: 7px;
@@ -61,6 +331,35 @@
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 2px 0 rgba(60,72,88,0.03);
   }
+</style>
+
+<script>
+function toggleStatusPopup(event) {
+  event.stopPropagation();
+  const popup = document.getElementById('statusPopup');
+  const button = event.target;
+  
+  if (popup.classList.contains('show')) {
+    popup.classList.remove('show');
+  } else {
+    // Position popup near the button
+    const rect = button.getBoundingClientRect();
+    popup.style.left = (rect.left - 140) + 'px';
+    popup.style.top = (rect.bottom + 5) + 'px';
+    popup.classList.add('show');
+  }
+}
+
+// Close popup when clicking outside
+document.addEventListener('click', function(event) {
+  const popup = document.getElementById('statusPopup');
+  if (popup && !popup.contains(event.target) && !event.target.classList.contains('status-info-btn')) {
+    popup.classList.remove('show');
+  }
+});
+</script>
+
+<style>
   label {
     font-weight: 500;
     color: #222;
@@ -153,7 +452,14 @@
           <th>{{ label }}</th>
           {% set value = job.get(key, '') %}
           <td>
-            {{ value }}
+            {% if key == 'status' %}
+              <div class="status-info-container">
+                <span>{{ value }}</span>
+                <button type="button" class="status-info-btn" onclick="toggleStatusPopup(event)" title="Job Status Information">i</button>
+              </div>
+            {% else %}
+              {{ value }}
+            {% endif %}
           </td>
         </tr>
       {% endfor %}
@@ -177,43 +483,161 @@
     <div>No JD file uploaded.</div>
   {% endif %}
 
-  {% if role in ['Discipline Manager', 'Department Manager (MOE)', 'Department Manager (MOP)', 'Operation Manager', 'CEO'] %}
-    <div class="form-section">
-      <div class="section-title">Update Job Status</div>
-      <form action="{{ url_for('update_job_status', job_id=job['job_id'] if job['job_id'] is defined else job['id']) }}" method="post">
-        <label for="status">Status:</label>
-        <select name="status" id="status">
-          <option value="active" {% if job['status'] == 'active' %}selected{% endif %}>Active</option>
-          <option value="closed" {% if job['status'] == 'closed' %}selected{% endif %}>Closed</option>
-        </select>
-        <button type="submit" class="btn">Update Status</button>
-      </form>
-    </div>
-    <div class="form-section">
-      <div class="section-title">Upload Candidate CV for this Job</div>
-      <form action="{{ url_for('upload_cv') }}" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="job_id" value="{{ job['job_id'] if job['job_id'] is defined else job['id'] }}">
-        <label for="resume">Upload CV:</label>
-        <input type="file" name="resume" id="resume" accept=".pdf,.doc,.docx" required>
-        <button type="submit" class="btn">Upload CV</button>
-      </form>
-    </div>
-  {% endif %}
-
-  {% if uploaded_cvs %}
-    <div class="candidates-list">
-      <div class="section-title">Candidates Applied for this Job</div>
-      <ul>
-        {% for cv in uploaded_cvs %}
-          <li>
-            <span style="font-size:1.1em;">👤</span> <b>{{ cv.candidate_name }}</b> ({{ cv.candidate_email }})
-            {% if cv.candidate_id is defined %}
-              - <a href="{{ url_for('candidate_profile', candidate_id=cv.candidate_id) }}">View Profile</a>
+  {% if role in ['Discipline Manager', 'Department Manager (MOE)', 'Department Manager (MOP)', 'Operation Manager', 'CEO'] or job_candidates or uploaded_cvs %}
+    <!-- Combined Candidates and Upload Section -->
+    <div class="candidates-section">
+      <div class="section-title">Job Applicants & Candidates</div>
+      
+      <!-- Upload CV Section (smaller, at top) -->
+      {% if role in ['Discipline Manager', 'Department Manager (MOE)', 'Department Manager (MOP)', 'Operation Manager', 'CEO'] %}
+        <div class="upload-section">
+          <div class="section-subtitle">
+            📤 Quick Upload CV
+          </div>
+          <form action="{{ url_for('upload_cv') }}" method="post" enctype="multipart/form-data" class="upload-form">
+            <input type="hidden" name="job_id" value="{{ job['job_id'] if job['job_id'] is defined else job['id'] }}">
+            <input type="file" name="resume" id="resume" accept=".pdf,.doc,.docx" required>
+            <button type="submit" class="btn">Upload CV</button>
+          </form>
+          <div class="api-note">
+            ⚠️ <strong>Note:</strong> This manual upload feature will be replaced with API integration to automatically fetch applicants from job portals and recruitment platforms.
+          </div>
+        </div>
+      {% endif %}
+      
+      <!-- Candidates List -->
+      <div class="candidates-list">
+        {% set all_candidates = [] %}
+        {% set seen_candidate_ids = [] %}
+        
+        <!-- Add candidates from job_candidates first -->
+        {% if job_candidates %}
+          {% for candidate in job_candidates %}
+            {% if candidate.get('id') not in seen_candidate_ids %}
+              {% set _ = all_candidates.append(candidate) %}
+              {% set _ = seen_candidate_ids.append(candidate.get('id')) %}
             {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
+          {% endfor %}
+        {% endif %}
+        
+        <!-- Add candidates from uploaded_cvs if not already added -->
+        {% if uploaded_cvs %}
+          {% for cv in uploaded_cvs %}
+            {% if cv.candidate_details and cv.candidate_details.get('id') not in seen_candidate_ids %}
+              {% set _ = all_candidates.append(cv.candidate_details) %}
+              {% set _ = seen_candidate_ids.append(cv.candidate_details.get('id')) %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        
+        {% if all_candidates %}
+          <div class="candidates-grid">
+            {% for candidate in all_candidates %}
+              <div class="candidate-card">
+                <div class="candidate-info">
+                  <div class="candidate-avatar">👤</div>
+                  <div class="candidate-details">
+                    <h4>{{ candidate.get('name', 'Unknown') }}</h4>
+                    <p>{{ candidate.get('email', 'No email') }} | {{ candidate.get('phone', 'No phone') }}</p>
+                    {% if candidate.get('position') %}
+                      <p><strong>Applied for:</strong> {{ candidate.get('position') }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="candidate-status">
+                  {% set status_class = candidate.get('status', 'new').lower().replace(' ', '-').replace('_', '-') %}
+                  <span class="status-badge status-{{ status_class }}">
+                    {{ candidate.get('status', 'New') }}
+                  </span>
+                  {% if candidate.get('id') %}
+                    <a href="{{ url_for('candidate_profile', candidate_id=candidate.get('id')) }}" class="view-profile-btn">
+                      View Profile
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="no-candidates">
+            <p>🔍 No candidates have applied for this position yet.</p>
+            <p>Candidates will appear here when they apply through job portals or when CVs are uploaded manually.</p>
+          </div>
+        {% endif %}
+      </div>
     </div>
   {% endif %}
 </div>
+
+<!-- Status Information Popup -->
+<div id="statusPopup" class="status-popup">
+  <div class="popup-header">Job Status Information</div>
+  {% if job_status_info %}
+    <div class="popup-item">
+      <span class="popup-label">Current Status:</span>
+      <span class="popup-value">
+        <span class="status-indicator 
+          {% if job_status_info.is_expired %}status-expired
+          {% elif job.get('status', '').lower() == 'closed' %}status-closed
+          {% else %}status-open
+          {% endif %}">
+          {{ job.get('status', 'Unknown') }}
+        </span>
+      </span>
+    </div>
+    
+    {% if job_status_info.days_remaining >= 0 %}
+      <div class="popup-item">
+        <span class="popup-label">Days Remaining:</span>
+        <span class="popup-value">{{ job_status_info.days_remaining }} days</span>
+      </div>
+    {% else %}
+      <div class="popup-item">
+        <span class="popup-label">Status:</span>
+        <span class="popup-value">Expired {{ job_status_info.days_remaining|abs }} days ago</span>
+      </div>
+    {% endif %}
+    
+    <div class="popup-item">
+      <span class="popup-label">Closing Date:</span>
+      <span class="popup-value">{{ job_status_info.closing_date }}</span>
+    </div>
+    
+    <div class="popup-item">
+      <span class="popup-label">Posted Date:</span>
+      <span class="popup-value">{{ job_status_info.posted_date }}</span>
+    </div>
+    
+    <div class="popup-item">
+      <span class="popup-label">Lead Time:</span>
+      <span class="popup-value">{{ job_status_info.lead_time_days }} days</span>
+    </div>
+    
+    <div class="popup-item">
+      <span class="popup-label">Total Openings:</span>
+      <span class="popup-value">{{ job_status_info.total_openings }}</span>
+    </div>
+    
+    <div class="popup-item">
+      <span class="popup-label">Hired Candidates:</span>
+      <span class="popup-value">{{ job_status_info.hired_count }}</span>
+    </div>
+    
+    <div class="popup-item">
+      <span class="popup-label">Vacancies Remaining:</span>
+      <span class="popup-value">{{ job_status_info.vacancies_remaining }}</span>
+    </div>
+    
+    {% if job_status_info.is_filled %}
+      <div style="margin-top: 8px; padding: 6px; background: #d4edda; color: #155724; border-radius: 4px; font-size: 12px;">
+        ✓ All positions filled
+      </div>
+    {% elif job_status_info.is_expired %}
+      <div style="margin-top: 8px; padding: 6px; background: #fff3cd; color: #856404; border-radius: 4px; font-size: 12px;">
+        ⚠ Lead time expired
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
 {% endblock %}

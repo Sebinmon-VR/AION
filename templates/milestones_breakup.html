@@ -18,6 +18,106 @@
       <div id="deptClickHint" style="color:#888;font-size:0.98rem;margin-top:8px;">Click a department label to view applicants</div>
     </div>
   </div>
+  {% elif label|lower == 'total_vacancies' %}
+  <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start;">
+    <div style="flex:1;min-width:320px;max-width:420px;text-align:center;">
+      <h3 style="color:#1976d2;font-size:1.05rem;margin-bottom:8px;">Vacancy Status Breakdown</h3>
+      <canvas id="vacancyStatusChart" width="320" height="320"></canvas>
+      <div style="margin-top:12px;">
+        <span style="font-size:1.1rem;">Open: <b id="openVacanciesVal" style="color:#43a047;">{{ open_vacancies }}</b></span><br>
+        <span style="font-size:1.1rem;">Closed: <b id="closedVacanciesVal" style="color:#f44336;">{{ closed_vacancies }}</b></span><br>
+        <span style="font-size:1.1rem;">Total Jobs: <b id="totalJobsVal" style="color:#1976d2;">{{ total_jobs }}</b></span>
+      </div>
+    </div>
+    <div style="flex:1;min-width:320px;max-width:420px;text-align:center;">
+      <h3 style="color:#1976d2;font-size:1.05rem;margin-bottom:8px;">Department-wise Vacancies</h3>
+      <canvas id="deptRadarChart" width="340" height="320"></canvas>
+      <div id="deptClickHint" style="color:#888;font-size:0.98rem;margin-top:8px;">Click a department label to view jobs</div>
+    </div>
+  </div>
+  {% elif label|lower == 'hiring_pace' %}
+  <div style="margin:20px auto 0 auto; max-width:800px;">
+    <h3 style="color:#1976d2;font-size:1.2rem;margin-bottom:16px;text-align:center;">Hiring Pace Analysis</h3>
+    <p style="text-align:center;color:#666;margin-bottom:24px;">
+      Evaluates hiring efficiency based on job posting duration, stages completed, and process speed.
+    </p>
+    
+    {% if hiring_pace_details %}
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;background:#f9f9fc;margin-bottom:20px;">
+        <thead>
+          <tr style="background:#e3eaf7;color:#1976d2;">
+            <th style="padding:12px 8px;text-align:left;">Job Title</th>
+            <th style="padding:12px 8px;text-align:left;">Department</th>
+            <th style="padding:12px 8px;text-align:center;">Posted Date</th>
+            <th style="padding:12px 8px;text-align:center;">Weeks Elapsed</th>
+            <th style="padding:12px 8px;text-align:center;">Stages Completed</th>
+            <th style="padding:12px 8px;text-align:center;">Applicants</th>
+            <th style="padding:12px 8px;text-align:center;">Current Status</th>
+            <th style="padding:12px 8px;text-align:center;">Pace</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in hiring_pace_details %}
+          <tr style="border-bottom:1px solid #ddd;">
+            <td style="padding:10px 8px;">{{ job.job_title }}</td>
+            <td style="padding:10px 8px;">{{ job.department }}</td>
+            <td style="padding:10px 8px;text-align:center;">{{ job.posted_at }}</td>
+            <td style="padding:10px 8px;text-align:center;">{{ job.weeks_elapsed }}</td>
+            <td style="padding:10px 8px;text-align:center;">{{ job.stages_completed }}/5</td>
+            <td style="padding:10px 8px;text-align:center;">{{ job.applicants_count }}</td>
+            <td style="padding:10px 8px;text-align:center;">{{ job.candidate_status }}</td>
+            <td style="padding:10px 8px;text-align:center;">
+              <span class="pace-badge pace-{{ job.pace|lower }}" style="padding:4px 8px;border-radius:4px;font-weight:600;color:white;">
+                {{ job.pace }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <div style="background:#f5f5f5;padding:16px;border-radius:8px;margin-top:20px;">
+      <h4 style="color:#1976d2;margin-bottom:12px;">Hiring Process Stages</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;">
+        <div style="text-align:center;min-width:100px;">
+          <div style="background:#1976d2;color:white;padding:8px;border-radius:4px;margin-bottom:4px;">Stage 1</div>
+          <div style="font-size:0.9rem;">Application</div>
+        </div>
+        <div style="text-align:center;min-width:100px;">
+          <div style="background:#1976d2;color:white;padding:8px;border-radius:4px;margin-bottom:4px;">Stage 2</div>
+          <div style="font-size:0.9rem;">Interview</div>
+        </div>
+        <div style="text-align:center;min-width:100px;">
+          <div style="background:#1976d2;color:white;padding:8px;border-radius:4px;margin-bottom:4px;">Stage 3</div>
+          <div style="font-size:0.9rem;">Approval</div>
+        </div>
+        <div style="text-align:center;min-width:100px;">
+          <div style="background:#1976d2;color:white;padding:8px;border-radius:4px;margin-bottom:4px;">Stage 4</div>
+          <div style="font-size:0.9rem;">Hiring</div>
+        </div>
+        <div style="text-align:center;min-width:100px;">
+          <div style="background:#1976d2;color:white;padding:8px;border-radius:4px;margin-bottom:4px;">Stage 5</div>
+          <div style="font-size:0.9rem;">Onboarding</div>
+        </div>
+      </div>
+    </div>
+    
+    <div style="background:#e8f5e8;padding:16px;border-radius:8px;margin-top:16px;">
+      <h4 style="color:#2e7d32;margin-bottom:12px;">Pace Evaluation Criteria</h4>
+      <ul style="margin:0;padding-left:20px;">
+        <li><strong>Good:</strong> Meeting or exceeding expected timelines for each stage</li>
+        <li><strong>Adequate:</strong> Slightly behind but within acceptable range</li>
+        <li><strong>Inadequate:</strong> Significantly delayed, requires attention</li>
+      </ul>
+    </div>
+    {% else %}
+    <div style="text-align:center;color:#666;padding:40px;">
+      <p>No active job postings to evaluate hiring pace.</p>
+    </div>
+    {% endif %}
+  </div>
   {% else %}
   <div style="margin:32px auto 0 auto; max-width:500px; text-align:center;">
     <canvas id="deptRadarChart" width="340" height="320"></canvas>
@@ -29,11 +129,19 @@
     <table id="deptApplicantsTable" style="width:100%;border-collapse:collapse;background:#f9f9fc;">
       <thead>
         <tr style="background:#e3eaf7;color:#1976d2;">
+          {% if label|lower == 'total_vacancies' %}
+          <th style="padding:8px 6px;">Job Title</th>
+          <th style="padding:8px 6px;">Department</th>
+          <th style="padding:8px 6px;">Status</th>
+          <th style="padding:8px 6px;">Posted Date</th>
+          <th style="padding:8px 6px;">Openings</th>
+          {% else %}
           <th style="padding:8px 6px;">Name</th>
           <th style="padding:8px 6px;">Job Title</th>
           <th style="padding:8px 6px;">Status</th>
           <th style="padding:8px 6px;">Applied Date</th>
           <th style="padding:8px 6px;">Action</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody></tbody>
@@ -106,6 +214,61 @@
       }
     });
     {% endif %}
+    
+    // Doughnut chart for Vacancy Status Breakdown (only for total_vacancies)
+    {% if label|lower == 'total_vacancies' %}
+    window.addEventListener('DOMContentLoaded', function() {
+      const vacancyData = [
+        Number({{ open_vacancies|default(0) }}),
+        Number({{ closed_vacancies|default(0) }})
+      ];
+      const vacancyLabels = ['Open', 'Closed'];
+      const vacancyColors = [
+        'rgba(67, 160, 71, 0.8)',
+        'rgba(244, 67, 54, 0.8)'
+      ];
+      const vacancyBorderColors = [
+        '#43a047',
+        '#f44336'
+      ];
+      const vacancyCanvas = document.getElementById('vacancyStatusChart');
+      if (vacancyCanvas) {
+        const vacancyCtx = vacancyCanvas.getContext('2d');
+        new Chart(vacancyCtx, {
+          type: 'doughnut',
+          data: {
+            labels: vacancyLabels,
+            datasets: [{
+              data: vacancyData,
+              backgroundColor: vacancyColors,
+              borderColor: vacancyBorderColors,
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                  color: '#222',
+                  font: { size: 14, weight: 'bold' }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ': ' + context.formattedValue;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    });
+    {% endif %}
     // Department Radar Chart
     const deptLabels = {{ dept_labels_json|safe }};
     const deptCounts = {{ dept_counts_json|safe }};
@@ -153,21 +316,60 @@
       const wrapper = document.getElementById('deptApplicantsTableWrapper');
       const title = document.getElementById('deptApplicantsTitle');
       const tbody = document.getElementById('deptApplicantsTable').querySelector('tbody');
-      title.textContent = `Applicants in "${dept}"`;
-      tbody.innerHTML = '';
-      const filtered = allCandidates.filter(c => (c.department || 'Unknown') === dept);
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No applicants in this department.</td></tr>';
+      
+      // Check if this is total_vacancies page
+      const isVacancies = '{{ label|lower }}' === 'total_vacancies';
+      
+      if (isVacancies) {
+        title.textContent = `Jobs in "${dept}"`;
+        tbody.innerHTML = '';
+        const filtered = allCandidates.filter(c => (c.department || 'Unknown') === dept);
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No jobs in this department.</td></tr>';
+        } else {
+          for (const job of filtered) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td style='padding:6px 4px;'>${job.job_title}</td><td style='padding:6px 4px;'>${job.department}</td><td style='padding:6px 4px;'>${job.status}</td><td style='padding:6px 4px;'>${job.applied_date}</td><td style='padding:6px 4px;'>${job.openings}</td>`;
+            tbody.appendChild(tr);
+          }
+        }
       } else {
-        for (const cand of filtered) {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td style='padding:6px 4px;'>${cand.name}</td><td style='padding:6px 4px;'>${cand.job_title}</td><td style='padding:6px 4px;'>${cand.status}</td><td style='padding:6px 4px;'>${cand.applied_date}</td><td style='padding:6px 4px;'><a class='btn btn-primary' style='padding:4px 12px;' href='/candidate/${cand.id}'>View Profile</a></td>`;
-          tbody.appendChild(tr);
+        title.textContent = `Applicants in "${dept}"`;
+        tbody.innerHTML = '';
+        const filtered = allCandidates.filter(c => (c.department || 'Unknown') === dept);
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No applicants in this department.</td></tr>';
+        } else {
+          for (const cand of filtered) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td style='padding:6px 4px;'>${cand.name}</td><td style='padding:6px 4px;'>${cand.job_title}</td><td style='padding:6px 4px;'>${cand.status}</td><td style='padding:6px 4px;'>${cand.applied_date}</td><td style='padding:6px 4px;'><a class='btn btn-primary' style='padding:4px 12px;' href='/candidate/${cand.id}'>View Profile</a></td>`;
+            tbody.appendChild(tr);
+          }
         }
       }
       wrapper.style.display = 'block';
       window.scrollTo({ top: wrapper.offsetTop - 80, behavior: 'smooth' });
     }
+  </script>
+  
+  <!-- CSS for pace badges -->
+  <style>
+    .pace-excellent { background-color: #2e7d32 !important; }
+    .pace-good { background-color: #43a047 !important; }
+    .pace-adequate { background-color: #ff9800 !important; }
+    .pace-inadequate { background-color: #f44336 !important; }
+  </style>
+  
+  <!-- Initialize pace badge colors -->
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      // Apply colors to pace badges
+      const paceBadges = document.querySelectorAll('.pace-badge');
+      paceBadges.forEach(badge => {
+        const pace = badge.textContent.trim().toLowerCase();
+        badge.classList.add('pace-' + pace);
+      });
+    });
   </script>
 </div>
 {% endblock %}
