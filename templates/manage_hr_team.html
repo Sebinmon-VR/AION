@@ -4,29 +4,31 @@
 {% block content %}
 <style>
   body {
-    background-color: #fafafa;
+    background-color: #ffffff;
     font-family: 'Segoe UI', sans-serif;
   }
 
   .page-header {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
+    background: transparent;
+    color: #333333;
+    padding: 20px 0;
     margin-bottom: 30px;
     text-align: center;
+    border: none;
+    box-shadow: none;
   }
 
   .page-header h1 {
     margin: 0;
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
+    color: #333333;
   }
 
   .page-header .user-role {
     font-size: 14px;
-    opacity: 0.9;
     margin-top: 5px;
+    color: #666666;
   }
 
   .dashboard-stats {
@@ -41,14 +43,14 @@
     border-radius: 10px;
     padding: 20px;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border-left: 4px solid #007bff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
   }
 
   .stat-number {
     font-size: 28px;
     font-weight: bold;
-    color: #007bff;
+    color: #333333;
     margin-bottom: 5px;
   }
 
@@ -58,44 +60,48 @@
   }
 
   .section-header {
-    background: white;
-    padding: 15px 20px;
-    border-radius: 10px;
+    background: transparent;
+    padding: 15px 0;
     margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: none;
+    border: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
   .section-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
     color: #333;
     margin: 0;
   }
 
   .role-badge {
-    background: #007bff;
-    color: white;
-    padding: 5px 12px;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+    padding: 6px 16px;
     border-radius: 20px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .approval-container {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    overflow: hidden;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    overflow: visible;
     margin-bottom: 30px;
   }
 
   .job-header {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    background: #ffffff;
     padding: 20px;
     border-bottom: 1px solid #dee2e6;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px 8px 0 0;
   }
 
   .job-title {
@@ -109,8 +115,9 @@
   }
 
   .job-id {
-    background: #007bff;
-    color: white;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
     padding: 4px 8px;
     border-radius: 12px;
     font-size: 11px;
@@ -135,9 +142,11 @@
   }
 
   .candidate-header {
-    background: #f8f9fa;
+    background: #ffffff;
     padding: 15px 20px;
     border-bottom: 1px solid #e9ecef;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px 8px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -157,8 +166,9 @@
   }
 
   .candidate-id {
-    background: #6c757d;
-    color: white;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
     padding: 3px 8px;
     border-radius: 10px;
     font-size: 11px;
@@ -241,9 +251,9 @@
   }
 
   .btn-approve {
-    background: #28a745;
-    color: white;
-    border: none;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
     padding: 8px 16px;
     border-radius: 5px;
     font-size: 12px;
@@ -252,13 +262,13 @@
   }
 
   .btn-approve:hover {
-    background: #218838;
+    background: #f8f9fa;
   }
 
   .btn-reject {
-    background: #dc3545;
-    color: white;
-    border: none;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
     padding: 8px 16px;
     border-radius: 5px;
     font-size: 12px;
@@ -267,13 +277,13 @@
   }
 
   .btn-reject:hover {
-    background: #c82333;
+    background: #f8f9fa;
   }
 
   .btn-view {
-    background: #007bff;
-    color: white;
-    border: none;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
     padding: 8px 16px;
     border-radius: 5px;
     font-size: 12px;
@@ -284,9 +294,9 @@
   }
 
   .btn-view:hover {
-    background: #0056b3;
+    background: #f8f9fa;
     text-decoration: none;
-    color: white;
+    color: #333333;
   }
 
   .no-candidates {
@@ -297,8 +307,8 @@
   }
 
   .permission-info {
-    background: #e7f3ff;
-    border: 1px solid #b8daff;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
@@ -306,7 +316,7 @@
 
   .permission-info h4 {
     margin: 0 0 10px 0;
-    color: #004085;
+    color: #333333;
     font-size: 14px;
   }
 
@@ -317,14 +327,14 @@
   }
 
   .permission-list li {
-    color: #004085;
+    color: #333333;
     font-size: 13px;
     margin-bottom: 5px;
   }
 
   .permission-list li:before {
     content: "✓ ";
-    color: #28a745;
+    color: #333333;
     font-weight: bold;
   }
 
@@ -333,7 +343,8 @@
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
   }
 
   .hr-grid {
@@ -353,12 +364,12 @@
 
   .hr-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   }
 
   .hr-card h3 {
     font-size: 16px;
-    color: #007bff;
+    color: #333333;
     margin-bottom: 10px;
     font-weight: 600;
   }
@@ -367,6 +378,626 @@
     margin: 5px 0;
     color: #666;
     font-size: 13px;
+  }
+
+  /* Hierarchical Flow Styles */
+  .hierarchical-flow {
+    padding: 20px;
+  }
+
+  .hierarchy-level {
+    margin-bottom: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    overflow: hidden;
+  }
+
+  .level-header {
+    background: #ffffff;
+    color: #333333;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .level-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hierarchy-icon {
+    font-size: 20px;
+  }
+
+  .toggle-level {
+    background: none;
+    border: 1px solid #e0e0e0;
+    color: #333333;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    transition: background 0.3s;
+  }
+
+  .toggle-level:hover {
+    background: #f8f9fa;
+  }
+
+  .toggle-icon {
+    font-size: 16px;
+    transition: transform 0.3s;
+  }
+
+  .toggle-icon.rotated {
+    transform: rotate(-90deg);
+  }
+
+  .level-content {
+    padding: 20px;
+    display: block;
+  }
+
+  .level-content.collapsed {
+    display: none;
+  }
+
+  .manager-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+
+  .manager-header {
+    background: #ffffff;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .manager-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .manager-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .manager-role {
+    font-size: 12px;
+    color: #666;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    padding: 2px 8px;
+    border-radius: 10px;
+    align-self: flex-start;
+  }
+
+  .toggle-candidates {
+    background: none;
+    border: 1px solid #e0e0e0;
+    color: #333333;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    transition: background 0.3s;
+  }
+
+  .toggle-candidates:hover {
+    background: #f8f9fa;
+  }
+
+  .candidates-section {
+    padding: 0;
+    display: block;
+  }
+
+  .candidates-section.collapsed {
+    display: none;
+  }
+
+  .status-tabs {
+    display: flex;
+    background: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .status-tab {
+    flex: 1;
+    padding: 12px 16px;
+    text-align: center;
+    cursor: pointer;
+    border-right: 1px solid #dee2e6;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .status-tab:last-child {
+    border-right: none;
+  }
+
+  .status-tab:hover {
+    background: #f8f9fa;
+  }
+
+  .status-tab.active {
+    background: #ffffff;
+    color: #333333;
+    border-bottom: 2px solid #333333;
+  }
+
+  .status-label {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .status-count {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .candidates-list {
+    padding: 15px;
+  }
+
+  .status-content {
+    display: none;
+  }
+
+  .status-content.active {
+    display: block;
+  }
+
+  .candidate-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border-left: 4px solid;
+    transition: all 0.3s;
+  }
+
+  .candidate-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .candidate-item.shortlisted {
+    background: #ffffff;
+    border-left-color: #333333;
+    border: 1px solid #e0e0e0;
+  }
+
+  .candidate-item.onhold {
+    background: #ffffff;
+    border-left-color: #666666;
+    border: 1px solid #e0e0e0;
+  }
+
+  .candidate-item.notapproved {
+    background: #ffffff;
+    border-left-color: #999999;
+    border: 1px solid #e0e0e0;
+  }
+
+  .candidate-name {
+    font-weight: 600;
+    color: #333;
+    margin-right: 10px;
+  }
+
+  .candidate-id {
+    font-size: 11px;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+    padding: 2px 6px;
+    border-radius: 8px;
+    margin-right: auto;
+  }
+
+  .btn-view-small {
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .btn-view-small:hover {
+    background: #f8f9fa;
+  }
+
+  .hierarchy-connection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+  }
+
+  .connection-line {
+    width: 2px;
+    height: 30px;
+    background: #e0e0e0;
+  }
+
+  .connection-arrow {
+    color: #333333;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: -5px;
+  }
+
+  /* Horizontal Flow Styles */
+  .hierarchical-flow-horizontal {
+    padding: 40px 30px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    overflow-x: auto;
+    min-height: 500px;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+  }
+
+  .hierarchy-node {
+    min-width: 350px;
+    max-width: 380px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 2px solid #dee2e6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    flex-shrink: 0;
+    height: fit-content;
+  }
+
+  .hierarchy-node:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    border-color: #adb5bd;
+  }
+
+  .node-header {
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  .node-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #333333;
+  }
+
+  .hierarchy-icon {
+    font-size: 20px;
+  }
+
+  .toggle-node-btn {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    color: #333333;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .toggle-node-btn:hover {
+    background: #f8f9fa;
+  }
+
+  .node-content {
+    padding: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+    background: #ffffff;
+  }
+
+  .node-content.collapsed {
+    display: none;
+  }
+
+  .manager-card-compact {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    overflow: hidden;
+  }
+
+  .manager-card-compact:hover {
+    border-color: #ced4da;
+  }
+
+  .manager-header-compact {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .manager-header-compact:hover {
+    background: #f8f9fa;
+  }
+
+  .manager-info-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .manager-name-compact {
+    font-size: 16px;
+    font-weight: 600;
+    color: #212529;
+  }
+
+  .manager-role-compact {
+    font-size: 12px;
+    color: #6c757d;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    padding: 4px 10px;
+    border-radius: 12px;
+    align-self: flex-start;
+    font-weight: 500;
+  }
+
+  .toggle-icon-small {
+    font-size: 14px;
+    color: #6c757d;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toggle-icon-small.rotated {
+    transform: rotate(-90deg);
+  }
+
+  .candidates-section-compact {
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .candidates-section-compact.collapsed {
+    display: none;
+  }
+
+  .status-tabs-compact {
+    display: flex;
+    background: #ffffff;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .status-tab-compact {
+    flex: 1;
+    padding: 12px 16px;
+    text-align: left;
+    cursor: pointer;
+    border-right: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6c757d;
+  }
+
+  .status-tab-compact:last-child {
+    border-right: none;
+  }
+
+  .status-tab-compact:hover {
+    background: #f8f9fa;
+  }
+
+  .status-tab-compact.active {
+    background: #ffffff;
+    color: #333333;
+    border-bottom: 2px solid #333333;
+  }
+
+  .status-label-compact {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .status-count-compact {
+    font-size: 12px;
+    font-weight: bold;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+    padding: 3px 8px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .status-tab-compact.active .status-count-compact {
+    background: #333333;
+    color: #ffffff;
+  }
+
+  .candidates-list-compact {
+    padding: 15px;
+    min-height: 80px;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #ffffff;
+  }
+
+  .candidate-item-compact {
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    border-left: 3px solid;
+    cursor: pointer;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .candidate-item-compact:hover {
+    background: #f8f9fa;
+  }
+
+  .candidate-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+  .candidate-name {
+    font-weight: 600;
+    color: #333333;
+    font-size: 14px;
+  }
+
+  .candidate-position {
+    font-size: 11px;
+    color: #666666;
+    font-style: italic;
+  }
+
+  .btn-view-profile {
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-view-profile:hover {
+    background: #f8f9fa;
+  }
+
+  .btn-view-profile img {
+    width: 14px;
+    height: 14px;
+    filter: brightness(0) saturate(100%) invert(13%) sepia(6%) saturate(3207%) hue-rotate(197deg) brightness(95%) contrast(80%); /* Makes the icon dark gray */
+  }
+
+  .candidate-item-compact.shortlisted {
+    background: #ffffff;
+    border-left-color: #333333;
+    color: #333333;
+  }
+
+  .candidate-item-compact.onhold {
+    background: #ffffff;
+    border-left-color: #6c757d;
+    color: #333333;
+  }
+
+  .candidate-item-compact.notapproved {
+    background: #ffffff;
+    border-left-color: #999999;
+    color: #333333;
+  }
+
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    height: auto;
+    align-self: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  .arrow-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .arrow-label {
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .arrow-icon {
+    font-size: 24px;
+    color: #333333;
+    font-weight: bold;
+  }
+
+  @keyframes pulse-arrow {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
   }
 
   @media (max-width: 768px) {
@@ -394,187 +1025,408 @@
   <div class="user-role">Logged in as: <strong>{{ current_user_role }}</strong></div>
 </div>
 
-<!-- Dashboard Statistics -->
-<div class="dashboard-stats">
-  <div class="stat-card">
-    <div class="stat-number">{{ pending_approvals|length }}</div>
-    <div class="stat-label">Pending Your Approval</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-number">{{ jobs_with_candidates|length }}</div>
-    <div class="stat-label">Active Jobs</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-number">
-      {% set total_candidates = 0 %}
-      {% for job in jobs_with_candidates %}
-        {% set total_candidates = total_candidates + job.approval_flows|length %}
-      {% endfor %}
-      {{ total_candidates }}
-    </div>
-    <div class="stat-label">Total Candidates</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-number">{{ hr_team|length }}</div>
-    <div class="stat-label">HR Team Members</div>
-  </div>
-</div>
-
-<!-- Role-Based Permissions Info -->
-<div class="permission-info">
-  <h4>Your Role Permissions:</h4>
-  <ul class="permission-list">
-    {% if 'view_all' in user_permissions %}
-      <li>View all candidates and approval flows</li>
-    {% endif %}
-    {% if 'approve_discipline' in user_permissions %}
-      <li>Approve candidates as Discipline Manager</li>
-    {% endif %}
-    {% if 'approve_department' in user_permissions %}
-      <li>Approve candidates as Department Manager</li>
-    {% endif %}
-    {% if 'approve_operation' in user_permissions %}
-      <li>Approve candidates as Operation Manager</li>
-    {% endif %}
-    {% if 'approve_ceo' in user_permissions %}
-      <li>Approve candidates as CEO</li>
-    {% endif %}
-    {% if 'approve_hr' in user_permissions %}
-      <li>Manage HR processes and approvals</li>
-    {% endif %}
-  </ul>
-</div>
-
-<!-- HR Team Section -->
-{% if hr_team %}
-<div class="hr-team-section">
-  <div class="section-header">
-    <h2 class="section-title">HR Team</h2>
-    <span class="role-badge">{{ hr_team|length }} Members</span>
-  </div>
-  <div class="hr-grid">
-    {% for hr in hr_team %}
-    <div class="hr-card">
-      <h3>{{ hr.username }}</h3>
-      <p><strong>Email:</strong> {{ hr.email }}</p>
-      <p><strong>Phone:</strong> {{ hr.phone }}</p>
-      <p><strong>Department:</strong> {{ hr.department }}</p>
-      <p><strong>Role:</strong> {{ hr.role }}</p>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
 
 <!-- Approval Cycles Section -->
 <div class="section-header">
-  <h2 class="section-title">Role-Based Approval Cycles</h2>
+  <h2 class="section-title"></h2>
   <span class="role-badge">Your View: {{ current_user_role }}</span>
 </div>
 
-{% if jobs_with_candidates %}
-  {% for job in jobs_with_candidates %}
-  <div class="approval-container">
-    <div class="job-header">
-      <div class="job-title">
-        <span class="job-id">Job {{ job.job_id }}</span>
-        {{ job.job_title }}
+<!-- Real Hierarchical Approval Flow -->
+<div class="approval-container">
+  <div class="hierarchical-flow-horizontal">
+    <!-- Discipline Managers Node -->
+    <div class="hierarchy-node">
+      <div class="node-header" onclick="toggleNode('discipline-node')">
+        <h3 class="node-title">
+          <span class="hierarchy-icon">👥</span>
+          Discipline Managers
+        </h3>
+        <button class="toggle-node-btn">
+          <span class="toggle-icon">▼</span>
+        </button>
       </div>
-    </div>
-    
-    <div class="candidates-grid">
-      {% if job.approval_flows %}
-        {% for flow in job.approval_flows %}
-        <div class="candidate-card">
-          <div class="candidate-header">
-            <div class="candidate-info">
-              <div>
-                <h3 class="candidate-name">{{ flow.candidate_name }}</h3>
-                <div class="candidate-position">{{ flow.position }}</div>
-              </div>
-              <span class="candidate-id">ID: {{ flow.candidate_id }}</span>
+      
+      <div class="node-content" id="discipline-node">
+        {% for discipline_manager in hierarchical_data.discipline_managers %}
+        <div class="manager-card-compact">
+          <div class="manager-header-compact" onclick="toggleCandidates('disc-{{ discipline_manager.id }}')">
+            <div class="manager-info-compact">
+              <span class="manager-name-compact">{{ discipline_manager.name }}</span>
+              <span class="manager-role-compact">{{ discipline_manager.role }}</span>
             </div>
-            <div class="candidate-status status-{{ flow.candidate_status.lower().replace(' ', '-') }}">
-              {{ flow.candidate_status }}
-            </div>
+            <span class="toggle-icon-small">▼</span>
           </div>
           
-          <div class="approval-flow">
-            <div class="flow-steps">
-              {% for step in flow.steps %}
-                <div class="step {% if step.is_current %}current{% endif %}" 
-                     style="background-color: {{ step.color }}; color: white;">
-                  <div>
-                    <div class="step-role">{{ step.role }}</div>
-                    <div class="step-action">{{ step.action }}</div>
+          <div class="candidates-section-compact" id="disc-{{ discipline_manager.id }}">
+            <div class="status-tabs-compact">
+              <div class="status-tab-compact active" onclick="showStatusTab(this, 'shortlisted')">
+                <span class="status-label-compact">Shortlisted</span>
+                <span class="status-count-compact">{{ discipline_manager.shortlisted|length }}</span>
+              </div>
+              <div class="status-tab-compact" onclick="showStatusTab(this, 'onhold')">
+                <span class="status-label-compact">On Hold</span>
+                <span class="status-count-compact">{{ discipline_manager.onhold|length }}</span>
+              </div>
+              <div class="status-tab-compact" onclick="showStatusTab(this, 'notapproved')">
+                <span class="status-label-compact">Rejected</span>
+                <span class="status-count-compact">{{ discipline_manager.notapproved|length }}</span>
+              </div>
+            </div>
+            
+            <div class="candidates-list-compact">
+              <div class="status-content active" data-status="shortlisted">
+                {% for candidate in discipline_manager.shortlisted %}
+                <div class="candidate-item-compact shortlisted">
+                  <div class="candidate-info">
+                    <span class="candidate-name">{{ candidate.name }}</span>
+                    <small class="candidate-position">({{ candidate.position }})</small>
                   </div>
+                  <button class="btn-view-profile" onclick="viewCandidateProfile('{{ candidate.id }}')">
+                    <img src="{{ url_for('static', filename='images/view.png') }}" alt="View">
+                    View Profile
+                  </button>
                 </div>
-                {% if not loop.last %}
-                  <div class="step-arrow">→</div>
+                {% endfor %}
+                {% if discipline_manager.shortlisted|length == 0 %}
+                <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">No candidates</p>
                 {% endif %}
-              {% endfor %}
-            </div>
-            
-            <!-- Action Buttons for Current User -->
-            {% set can_approve = false %}
-            {% for step in flow.steps %}
-              {% if step.can_approve %}
-                {% set can_approve = true %}
-              {% endif %}
-            {% endfor %}
-            
-            {% if can_approve %}
-            <div class="action-buttons">
-              <form method="POST" action="{{ url_for('approve_candidate') }}" style="display: inline;">
-                <input type="hidden" name="candidate_id" value="{{ flow.candidate_id }}">
-                <input type="hidden" name="action" value="approve">
-                <button type="submit" class="btn-approve">✓ Approve</button>
-              </form>
+              </div>
               
-              <form method="POST" action="{{ url_for('approve_candidate') }}" style="display: inline;">
-                <input type="hidden" name="candidate_id" value="{{ flow.candidate_id }}">
-                <input type="hidden" name="action" value="reject">
-                <button type="submit" class="btn-reject">✗ Reject</button>
-              </form>
+              <div class="status-content" data-status="onhold">
+                {% for candidate in discipline_manager.onhold %}
+                <div class="candidate-item-compact onhold">
+                  <div class="candidate-info">
+                    <span class="candidate-name">{{ candidate.name }}</span>
+                    <small class="candidate-position">({{ candidate.position }})</small>
+                  </div>
+                  <button class="btn-view-profile" onclick="viewCandidateProfile('{{ candidate.id }}')">
+                    <img src="{{ url_for('static', filename='images/view.png') }}" alt="View">
+                    View Profile
+                  </button>
+                </div>
+                {% endfor %}
+                {% if discipline_manager.onhold|length == 0 %}
+                <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">No candidates</p>
+                {% endif %}
+              </div>
               
-              <a href="{{ url_for('candidate_profile', candidate_id=flow.candidate_id) }}" class="btn-view">
-                👤 View Profile
-              </a>
+              <div class="status-content" data-status="notapproved">
+                {% for candidate in discipline_manager.notapproved %}
+                <div class="candidate-item-compact notapproved">
+                  <div class="candidate-info">
+                    <span class="candidate-name">{{ candidate.name }}</span>
+                    <small class="candidate-position">({{ candidate.position }})</small>
+                  </div>
+                  <button class="btn-view-profile" onclick="viewCandidateProfile('{{ candidate.id }}')">
+                    <img src="{{ url_for('static', filename='images/view.png') }}" alt="View">
+                    View Profile
+                  </button>
+                </div>
+                {% endfor %}
+                {% if discipline_manager.notapproved|length == 0 %}
+                <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">No candidates</p>
+                {% endif %}
+              </div>
             </div>
-            {% else %}
-            <div class="action-buttons">
-              <a href="{{ url_for('candidate_profile', candidate_id=flow.candidate_id) }}" class="btn-view">
-                👤 View Profile
-              </a>
-            </div>
-            {% endif %}
           </div>
         </div>
         {% endfor %}
-      {% else %}
-        <div class="no-candidates">
-          <p>No candidates visible for your role in this job.</p>
+        
+        {% if hierarchical_data.discipline_managers|length == 0 %}
+        <p style="text-align: center; color: #999; padding: 20px;">No discipline managers found</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Flow Arrow -->
+    <div class="flow-arrow">
+      <div class="arrow-container">
+        <div class="arrow-label">Approved</div>
+        <div class="arrow-icon">→</div>
+      </div>
+    </div>
+
+    <!-- Department Managers Node -->
+    <div class="hierarchy-node">
+      <div class="node-header" onclick="toggleNode('department-node')">
+        <h3 class="node-title">
+          <span class="hierarchy-icon">🏢</span>
+          Department Managers
+        </h3>
+        <button class="toggle-node-btn">
+          <span class="toggle-icon">▼</span>
+        </button>
+      </div>
+      
+      <div class="node-content" id="department-node">
+        {% for department_manager in hierarchical_data.department_managers %}
+        <div class="manager-card-compact">
+          <div class="manager-header-compact" onclick="toggleCandidates('dept-{{ department_manager.id }}')">
+            <div class="manager-info-compact">
+              <span class="manager-name-compact">{{ department_manager.name }}</span>
+              <span class="manager-role-compact">{{ department_manager.role }}</span>
+            </div>
+            <span class="toggle-icon-small">▼</span>
+          </div>
+          
+          <div class="candidates-section-compact" id="dept-{{ department_manager.id }}">
+            <div class="status-tabs-compact">
+              <div class="status-tab-compact active" onclick="showStatusTab(this, 'shortlisted')">
+                <span class="status-label-compact">Shortlisted</span>
+                <span class="status-count-compact">{{ department_manager.shortlisted|length }}</span>
+              </div>
+              <div class="status-tab-compact" onclick="showStatusTab(this, 'onhold')">
+                <span class="status-label-compact">On Hold</span>
+                <span class="status-count-compact">{{ department_manager.onhold|length }}</span>
+              </div>
+              <div class="status-tab-compact" onclick="showStatusTab(this, 'notapproved')">
+                <span class="status-label-compact">Rejected</span>
+                <span class="status-count-compact">{{ department_manager.notapproved|length }}</span>
+              </div>
+            </div>
+            
+            <div class="candidates-list-compact">
+              <div class="status-content active" data-status="shortlisted">
+                {% for candidate in department_manager.shortlisted %}
+                <div class="candidate-item-compact shortlisted">
+                  <div class="candidate-info">
+                    <span class="candidate-name">{{ candidate.name }}</span>
+                    <small class="candidate-position">({{ candidate.position }})</small>
+                  </div>
+                  <button class="btn-view-profile" onclick="viewCandidateProfile('{{ candidate.id }}')">
+                    <img src="{{ url_for('static', filename='images/view.png') }}" alt="View">
+                    View Profile
+                  </button>
+                </div>
+                {% endfor %}
+                {% if department_manager.shortlisted|length == 0 %}
+                <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">No candidates</p>
+                {% endif %}
+              </div>
+              
+              <div class="status-content" data-status="onhold">
+                {% for candidate in department_manager.onhold %}
+                <div class="candidate-item-compact onhold">
+                  <div class="candidate-info">
+                    <span class="candidate-name">{{ candidate.name }}</span>
+                    <small class="candidate-position">({{ candidate.position }})</small>
+                  </div>
+                  <button class="btn-view-profile" onclick="viewCandidateProfile('{{ candidate.id }}')">
+                    <img src="{{ url_for('static', filename='images/view.png') }}" alt="View">
+                    View Profile
+                  </button>
+                </div>
+                {% endfor %}
+                {% if department_manager.onhold|length == 0 %}
+                <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">No candidates</p>
+                {% endif %}
+              </div>
+              
+              <div class="status-content" data-status="notapproved">
+                {% for candidate in department_manager.notapproved %}
+                <div class="candidate-item-compact notapproved">
+                  <div class="candidate-info">
+                    <span class="candidate-name">{{ candidate.name }}</span>
+                    <small class="candidate-position">({{ candidate.position }})</small>
+                  </div>
+                  <button class="btn-view-profile" onclick="viewCandidateProfile('{{ candidate.id }}')">
+                    <img src="{{ url_for('static', filename='images/view.png') }}" alt="View">
+                    View Profile
+                  </button>
+                </div>
+                {% endfor %}
+                {% if department_manager.notapproved|length == 0 %}
+                <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">No candidates</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
         </div>
-      {% endif %}
+        {% endfor %}
+        
+        {% if hierarchical_data.department_managers|length == 0 %}
+        <p style="text-align: center; color: #999; padding: 20px;">No department managers found</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Flow Arrow -->
+    <div class="flow-arrow">
+      <div class="arrow-container">
+        <div class="arrow-label">Approved</div>
+        <div class="arrow-icon">→</div>
+      </div>
+    </div>
+
+    <!-- Operation Managers Node -->
+    <div class="hierarchy-node">
+      <div class="node-header" onclick="toggleNode('operation-node')">
+        <h3 class="node-title">
+          <span class="hierarchy-icon">⚙️</span>
+          Operation Managers
+        </h3>
+        <button class="toggle-node-btn">
+          <span class="toggle-icon">▼</span>
+        </button>
+      </div>
+      
+      <div class="node-content" id="operation-node">
+        {% for operation_manager in hierarchical_data.operation_managers %}
+        <div class="manager-card-compact">
+          <div class="manager-header-compact" onclick="toggleCandidates('op-{{ operation_manager.id }}')">
+            <div class="manager-info-compact">
+              <span class="manager-name-compact">{{ operation_manager.name }}</span>
+              <span class="manager-role-compact">{{ operation_manager.role }}</span>
+            </div>
+            <span class="toggle-icon-small">▼</span>
+          </div>
+          
+          <div class="candidates-section-compact" id="op-{{ operation_manager.id }}">
+            <div class="status-tabs-compact">
+              <div class="status-tab-compact active" onclick="showStatusTab(this, 'shortlisted')">
+                <span class="status-label-compact">Final Approved</span>
+                <span class="status-count-compact">{{ operation_manager.shortlisted|length }}</span>
+              </div>
+              <div class="status-tab-compact" onclick="showStatusTab(this, 'onhold')">
+                <span class="status-label-compact">On Hold</span>
+                <span class="status-count-compact">{{ operation_manager.onhold|length }}</span>
+              </div>
+              <div class="status-tab-compact" onclick="showStatusTab(this, 'notapproved')">
+                <span class="status-label-compact">Rejected</span>
+                <span class="status-count-compact">{{ operation_manager.notapproved|length }}</span>
+              </div>
+            </div>
+            
+            <div class="candidates-list-compact">
+              <div class="status-content active" data-status="shortlisted">
+                {% for candidate in operation_manager.shortlisted %}
+                <div class="candidate-item-compact shortlisted">
+                  <div class="candidate-info">
+                    <span class="candidate-name">{{ candidate.name }}</span>
+                    <small class="candidate-position">({{ candidate.position }})</small>
+                  </div>
+                  <button class="btn-view-profile" onclick="viewCandidateProfile('{{ candidate.id }}')">
+                    <img src="{{ url_for('static', filename='images/view.png') }}" alt="View">
+                    View Profile
+                  </button>
+                </div>
+                {% endfor %}
+                {% if operation_manager.shortlisted|length == 0 %}
+                <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">No candidates</p>
+                {% endif %}
+              </div>
+              
+              <div class="status-content" data-status="onhold">
+                {% for candidate in operation_manager.onhold %}
+                <div class="candidate-item-compact onhold">
+                  <div class="candidate-info">
+                    <span class="candidate-name">{{ candidate.name }}</span>
+                    <small class="candidate-position">({{ candidate.position }})</small>
+                  </div>
+                  <button class="btn-view-profile" onclick="viewCandidateProfile('{{ candidate.id }}')">
+                    <img src="{{ url_for('static', filename='images/view.png') }}" alt="View">
+                    View Profile
+                  </button>
+                </div>
+                {% endfor %}
+                {% if operation_manager.onhold|length == 0 %}
+                <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">No candidates</p>
+                {% endif %}
+              </div>
+              
+              <div class="status-content" data-status="notapproved">
+                {% for candidate in operation_manager.notapproved %}
+                <div class="candidate-item-compact notapproved">
+                  <div class="candidate-info">
+                    <span class="candidate-name">{{ candidate.name }}</span>
+                    <small class="candidate-position">({{ candidate.position }})</small>
+                  </div>
+                  <button class="btn-view-profile" onclick="viewCandidateProfile('{{ candidate.id }}')">
+                    <img src="{{ url_for('static', filename='images/view.png') }}" alt="View">
+                    View Profile
+                  </button>
+                </div>
+                {% endfor %}
+                {% if operation_manager.notapproved|length == 0 %}
+                <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">No candidates</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        
+        {% if hierarchical_data.operation_managers|length == 0 %}
+        <p style="text-align: center; color: #999; padding: 20px;">No operation managers found</p>
+        {% endif %}
+      </div>
     </div>
   </div>
-  {% endfor %}
-{% else %}
-  <div class="approval-container">
-    <div class="no-candidates">
-      <h3>No Jobs or Candidates Available</h3>
-      <p>There are currently no jobs with candidates that require your attention.</p>
-    </div>
-  </div>
-{% endif %}
+</div>
 
 <script>
-// Auto-refresh every 30 seconds to show real-time updates
-setTimeout(function() {
-  location.reload();
-}, 30000);
+// Toggle hierarchy nodes
+function toggleNode(nodeId) {
+  const content = document.getElementById(nodeId);
+  const button = content.previousElementSibling.querySelector('.toggle-icon');
+  
+  if (content.classList.contains('collapsed')) {
+    content.classList.remove('collapsed');
+    button.classList.remove('rotated');
+  } else {
+    content.classList.add('collapsed');
+    button.classList.add('rotated');
+  }
+}
 
-// Add click event for approve/reject buttons
+// Toggle candidate sections
+function toggleCandidates(sectionId) {
+  const section = document.getElementById(sectionId);
+  const icon = section.previousElementSibling.querySelector('.toggle-icon-small');
+  
+  if (section.classList.contains('collapsed')) {
+    section.classList.remove('collapsed');
+    icon.classList.remove('rotated');
+  } else {
+    section.classList.add('collapsed');
+    icon.classList.add('rotated');
+  }
+}
+
+// Show specific status tab
+function showStatusTab(tabElement, status) {
+  // Remove active class from all tabs in the same hierarchy node
+  const hierarchyNode = tabElement.closest('.hierarchy-node');
+  const managerId = tabElement.closest('.candidates-section-compact').id;
+  
+  // Remove active from all tabs in this manager's section
+  const managerSection = tabElement.closest('.manager-card-compact');
+  managerSection.querySelectorAll('.status-tab-compact').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  managerSection.querySelectorAll('.status-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  
+  // Add active class to clicked tab and corresponding content
+  tabElement.classList.add('active');
+  const contentContainer = managerSection.querySelector('.candidates-list-compact');
+  contentContainer.querySelector(`[data-status="${status}"]`).classList.add('active');
+}
+
+// View candidate profile
+function viewCandidate(candidateId) {
+  window.open(`/candidate_profile/${candidateId}`, '_blank');
+}
+
+// View candidate profile (new function name for consistency)
+function viewCandidateProfile(candidateId) {
+  window.open(`/candidate_profile/${candidateId}`, '_blank');
+}
+
+// Add click event for approve/reject buttons (if any existing ones)
 document.addEventListener('DOMContentLoaded', function() {
   const approveButtons = document.querySelectorAll('.btn-approve');
   const rejectButtons = document.querySelectorAll('.btn-reject');
@@ -593,6 +1445,16 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
       }
     });
+  });
+
+  // Initialize all hierarchy nodes as expanded by default
+  document.querySelectorAll('.node-content').forEach(content => {
+    content.classList.remove('collapsed');
+  });
+
+  // Initialize all candidate sections as collapsed by default
+  document.querySelectorAll('.candidates-section-compact').forEach(section => {
+    section.classList.add('collapsed');
   });
 });
 </script>

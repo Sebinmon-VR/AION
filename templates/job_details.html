@@ -251,6 +251,203 @@
     background: #0056b3;
   }
   
+  /* Candidate Statistics Tree Styles */
+  .candidate-stats-tree {
+    background: #ffffff;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .stats-header {
+    background: #f8f9fa;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e1e5e9;
+    font-weight: 600;
+    color: #343a40;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .stats-tree {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+  }
+  
+  .stats-node {
+    position: relative;
+    border-bottom: 1px solid #f1f3f4;
+  }
+  
+  .stats-node:last-child {
+    border-bottom: none;
+  }
+  
+  .stats-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background: #ffffff;
+    position: relative;
+  }
+  
+  .stats-item:hover {
+    background: #f8f9fa;
+  }
+  
+  .stats-item.active {
+    background: #e3f2fd;
+  }
+  
+  .stats-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.9rem;
+  }
+  
+  .stats-icon {
+    font-size: 12px;
+    transition: transform 0.2s ease;
+    color: #6c757d;
+    width: 14px;
+    text-align: center;
+  }
+  
+  .stats-icon.expanded {
+    transform: rotate(90deg);
+    color: #007bff;
+  }
+  
+  .stats-count {
+    background: #007bff;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 22px;
+    text-align: center;
+  }
+  
+  .stats-count.zero {
+    background: #6c757d;
+  }
+  
+  .stats-dropdown {
+    display: none;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    padding: 0;
+  }
+  
+  .stats-dropdown.show {
+    display: block;
+  }
+  
+  .dropdown-candidates {
+    list-style: none;
+    margin: 0;
+    padding: 12px;
+  }
+  
+  .dropdown-candidate {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+  }
+  
+  .dropdown-candidate:last-child {
+    margin-bottom: 0;
+  }
+  
+  .dropdown-candidate:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: #007bff;
+  }
+  
+  .dropdown-candidate-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  
+  .dropdown-candidate-avatar {
+    font-size: 1.1rem;
+    width: 32px;
+    height: 32px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dee2e6;
+  }
+  
+  .dropdown-candidate-details h5 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.2;
+  }
+  
+  .dropdown-candidate-details p {
+    margin: 2px 0 0 0;
+    font-size: 0.8rem;
+    color: #6c757d;
+    line-height: 1.3;
+  }
+  
+  .dropdown-view-btn {
+    padding: 6px 12px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dropdown-view-btn:hover {
+    background: #0056b3;
+    text-decoration: none;
+    color: white;
+  }
+  
+  .empty-state {
+    padding: 16px;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.85rem;
+    background: #ffffff;
+    border-radius: 4px;
+    border: 1px dashed #dee2e6;
+    margin: 12px;
+  }
+  
   .status-popup {
     display: none;
     position: absolute;
@@ -350,12 +547,36 @@ function toggleStatusPopup(event) {
   }
 }
 
+// Toggle candidate stats dropdown
+function toggleStatsDropdown(event, statusType) {
+  event.preventDefault();
+  event.stopPropagation();
+  
+  const dropdown = document.getElementById(`dropdown-${statusType}`);
+  const icon = event.currentTarget.querySelector('.stats-icon');
+  const item = event.currentTarget;
+  
+  // Toggle current dropdown only (allow multiple open)
+  if (dropdown.classList.contains('show')) {
+    dropdown.classList.remove('show');
+    icon.classList.remove('expanded');
+    item.classList.remove('active');
+  } else {
+    dropdown.classList.add('show');
+    icon.classList.add('expanded');
+    item.classList.add('active');
+  }
+}
+
 // Close popup when clicking outside
 document.addEventListener('click', function(event) {
   const popup = document.getElementById('statusPopup');
   if (popup && !popup.contains(event.target) && !event.target.classList.contains('status-info-btn')) {
     popup.classList.remove('show');
   }
+  
+  // Don't auto-close stats dropdowns - let users manually toggle them
+  // This allows multiple dropdowns to be open simultaneously
 });
 </script>
 
@@ -530,35 +751,192 @@ document.addEventListener('click', function(event) {
           {% endfor %}
         {% endif %}
         
+        <!-- Candidate Statistics Tree -->
         {% if all_candidates %}
-          <div class="candidates-grid">
-            {% for candidate in all_candidates %}
-              <div class="candidate-card">
-                <div class="candidate-info">
-                  <div class="candidate-avatar">👤</div>
-                  <div class="candidate-details">
-                    <h4>{{ candidate.get('name', 'Unknown') }}</h4>
-                    <p>{{ candidate.get('email', 'No email') }} | {{ candidate.get('phone', 'No phone') }}</p>
-                    {% if candidate.get('position') %}
-                      <p><strong>Applied for:</strong> {{ candidate.get('position') }}</p>
-                    {% endif %}
+          <!-- Group candidates by progression logic -->
+          {% set applied_candidates = [] %}
+          {% set shortlisted_candidates = [] %}
+          {% set interviewed_candidates = [] %}
+          {% set hired_candidates = [] %}
+          {% set rejected_candidates = [] %}
+          
+          <!-- First, categorize candidates by their current status -->
+          {% for candidate in all_candidates %}
+            {% set status = candidate.get('status', 'new').lower() %}
+            {% if status in ['rejected'] %}
+              {% set _ = rejected_candidates.append(candidate) %}
+            {% elif status in ['hired', 'approved'] %}
+              {% set _ = hired_candidates.append(candidate) %}
+            {% elif status in ['interviewed', 'interview-scheduled', 'interview-analyzed'] %}
+              {% set _ = interviewed_candidates.append(candidate) %}
+            {% elif status in ['shortlisted', 'selected'] %}
+              {% set _ = shortlisted_candidates.append(candidate) %}
+            {% else %}
+              {% set _ = applied_candidates.append(candidate) %}
+            {% endif %}
+          {% endfor %}
+          
+          <!-- Calculate cumulative counts using hiring pipeline logic -->
+          {% set total_applied = all_candidates|length %}
+          {% set total_shortlisted = (shortlisted_candidates|length) + (interviewed_candidates|length) + (hired_candidates|length) %}
+          {% set total_interviewed = (interviewed_candidates|length) + (hired_candidates|length) %}
+          {% set total_hired = hired_candidates|length %}
+          
+          <!-- Create cumulative candidate lists for dropdowns -->
+          {% set cumulative_applied = all_candidates %}
+          {% set cumulative_shortlisted = shortlisted_candidates + interviewed_candidates + hired_candidates %}
+          {% set cumulative_interviewed = interviewed_candidates + hired_candidates %}
+          {% set cumulative_hired = hired_candidates %}
+          
+          <div class="candidate-stats-tree">
+            <div class="stats-header">
+              📊 Candidate Pipeline Overview
+            </div>
+            <ul class="stats-tree">
+              <!-- Applied Candidates -->
+              <li class="stats-node">
+                <div class="stats-item" onclick="toggleStatsDropdown(event, 'applied')">
+                  <div class="stats-label">
+                    <span class="stats-icon">▶</span>
+                    <span>📝 Applied</span>
                   </div>
-                </div>
-                <div class="candidate-status">
-                  {% set status_class = candidate.get('status', 'new').lower().replace(' ', '-').replace('_', '-') %}
-                  <span class="status-badge status-{{ status_class }}">
-                    {{ candidate.get('status', 'New') }}
+                  <span class="stats-count {% if total_applied == 0 %}zero{% endif %}">
+                    {{ total_applied }}
                   </span>
-                  {% if candidate.get('id') %}
-                    <a href="{{ url_for('candidate_profile', candidate_id=candidate.get('id')) }}" class="view-profile-btn">
-                      View Profile
-                    </a>
+                </div>
+                <div id="dropdown-applied" class="stats-dropdown">
+                  {% if cumulative_applied %}
+                    <ul class="dropdown-candidates">
+                      {% for candidate in cumulative_applied %}
+                        <li class="dropdown-candidate">
+                          <div class="dropdown-candidate-info">
+                            <div class="dropdown-candidate-avatar">👤</div>
+                            <div class="dropdown-candidate-details">
+                              <h5>{{ candidate.get('name', 'Unknown') }}</h5>
+                              <p>{{ candidate.get('email', 'No email') }} - Current: {{ candidate.get('status', 'Unknown') }}</p>
+                            </div>
+                          </div>
+                          {% if candidate.get('id') %}
+                            <a href="{{ url_for('candidate_profile', candidate_id=candidate.get('id')) }}" class="dropdown-view-btn">View</a>
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <div class="empty-state">No candidates have applied yet</div>
                   {% endif %}
                 </div>
-              </div>
-            {% endfor %}
+              </li>
+              
+              <!-- Shortlisted Candidates -->
+              <li class="stats-node">
+                <div class="stats-item" onclick="toggleStatsDropdown(event, 'shortlisted')">
+                  <div class="stats-label">
+                    <span class="stats-icon">▶</span>
+                    <span>📋 Shortlisted</span>
+                  </div>
+                  <span class="stats-count {% if total_shortlisted == 0 %}zero{% endif %}">
+                    {{ total_shortlisted }}
+                  </span>
+                </div>
+                <div id="dropdown-shortlisted" class="stats-dropdown">
+                  {% if cumulative_shortlisted %}
+                    <ul class="dropdown-candidates">
+                      {% for candidate in cumulative_shortlisted %}
+                        <li class="dropdown-candidate">
+                          <div class="dropdown-candidate-info">
+                            <div class="dropdown-candidate-avatar">👤</div>
+                            <div class="dropdown-candidate-details">
+                              <h5>{{ candidate.get('name', 'Unknown') }}</h5>
+                              <p>{{ candidate.get('email', 'No email') }} - Current: {{ candidate.get('status', 'Unknown') }}</p>
+                            </div>
+                          </div>
+                          {% if candidate.get('id') %}
+                            <a href="{{ url_for('candidate_profile', candidate_id=candidate.get('id')) }}" class="dropdown-view-btn">View</a>
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <div class="empty-state">No candidates shortlisted yet</div>
+                  {% endif %}
+                </div>
+              </li>
+              
+              <!-- Interviewed Candidates -->
+              <li class="stats-node">
+                <div class="stats-item" onclick="toggleStatsDropdown(event, 'interviewed')">
+                  <div class="stats-label">
+                    <span class="stats-icon">▶</span>
+                    <span>🎯 Interviewed</span>
+                  </div>
+                  <span class="stats-count {% if total_interviewed == 0 %}zero{% endif %}">
+                    {{ total_interviewed }}
+                  </span>
+                </div>
+                <div id="dropdown-interviewed" class="stats-dropdown">
+                  {% if cumulative_interviewed %}
+                    <ul class="dropdown-candidates">
+                      {% for candidate in cumulative_interviewed %}
+                        <li class="dropdown-candidate">
+                          <div class="dropdown-candidate-info">
+                            <div class="dropdown-candidate-avatar">👤</div>
+                            <div class="dropdown-candidate-details">
+                              <h5>{{ candidate.get('name', 'Unknown') }}</h5>
+                              <p>{{ candidate.get('email', 'No email') }} - Current: {{ candidate.get('status', 'Unknown') }}</p>
+                            </div>
+                          </div>
+                          {% if candidate.get('id') %}
+                            <a href="{{ url_for('candidate_profile', candidate_id=candidate.get('id')) }}" class="dropdown-view-btn">View</a>
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <div class="empty-state">No candidates interviewed yet</div>
+                  {% endif %}
+                </div>
+              </li>
+              
+              <!-- Hired Candidates -->
+              <li class="stats-node">
+                <div class="stats-item" onclick="toggleStatsDropdown(event, 'hired')">
+                  <div class="stats-label">
+                    <span class="stats-icon">▶</span>
+                    <span>✅ Hired</span>
+                  </div>
+                  <span class="stats-count {% if total_hired == 0 %}zero{% endif %}">
+                    {{ total_hired }}
+                  </span>
+                </div>
+                <div id="dropdown-hired" class="stats-dropdown">
+                  {% if cumulative_hired %}
+                    <ul class="dropdown-candidates">
+                      {% for candidate in cumulative_hired %}
+                        <li class="dropdown-candidate">
+                          <div class="dropdown-candidate-info">
+                            <div class="dropdown-candidate-avatar">👤</div>
+                            <div class="dropdown-candidate-details">
+                              <h5>{{ candidate.get('name', 'Unknown') }}</h5>
+                              <p>{{ candidate.get('email', 'No email') }} - Current: {{ candidate.get('status', 'Unknown') }}</p>
+                            </div>
+                          </div>
+                          {% if candidate.get('id') %}
+                            <a href="{{ url_for('candidate_profile', candidate_id=candidate.get('id')) }}" class="dropdown-view-btn">View</a>
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <div class="empty-state">No candidates hired yet</div>
+                  {% endif %}
+                </div>
+              </li>
+            </ul>
           </div>
-        {% else %}
+        {% endif %}
+        
+        {% if not all_candidates %}
           <div class="no-candidates">
             <p>🔍 No candidates have applied for this position yet.</p>
             <p>Candidates will appear here when they apply through job portals or when CVs are uploaded manually.</p>

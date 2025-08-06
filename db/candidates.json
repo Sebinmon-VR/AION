@@ -6,44 +6,30 @@
         "phone": "+971-50-1234567",
         "position": "Process Engineer",
         "status": "Hired",
-        "resume_link": "",
         "applied_date": "2025-07-21",
-        "notes": "",
-        "skills": [
-            "Process Optimization",
-            "Lean Six Sigma",
-            "AutoCAD",
-            "Communication"
-        ],
-        "experience": [
+        "job_id": "1",
+        "status_history": [
             {
-                "job_title": "Process Engineer",
-                "company": "Dubai Industrial Solutions",
-                "location": "Dubai, UAE",
-                "dates": "Jan 2023 - Present",
-                "responsibilities": [
-                    "Designed and optimized manufacturing processes for efficiency.",
-                    "Implemented Lean Six Sigma projects reducing waste by 15%."
-                ]
-            }
-        ],
-        "education": [
+                "status": "Applied",
+                "date": "2025-07-21",
+                "notes": "Initial application received"
+            },
             {
-                "degree": "BSc Chemical Engineering",
-                "institution": "Khalifa University",
-                "year": "2022"
+                "status": "Shortlisted",
+                "date": "2025-07-23",
+                "notes": "CV reviewed and shortlisted for interview"
+            },
+            {
+                "status": "Interviewed",
+                "date": "2025-07-26",
+                "notes": "Technical and HR interviews completed"
+            },
+            {
+                "status": "Hired",
+                "date": "2025-07-29",
+                "notes": "Offer accepted and hiring process completed"
             }
-        ],
-        "certifications": [
-            "Lean Six Sigma Green Belt"
-        ],
-        "projects": [
-            "Process automation for bottling plant"
-        ],
-        "linkedin": "linkedin.com/in/aisharahman",
-        "github": "",
-        "match_score": 18,
-        "job_id": "1"
+        ]
     },
     {
         "id": 2,
@@ -51,49 +37,16 @@
         "email": "omar.alfarsi@example.com",
         "phone": "+971-55-9876543",
         "position": "Full Stack Developer",
-        "status": "Fired",
-        "resume_link": "",
+        "status": "Applied",
         "applied_date": "2025-07-20",
-        "notes": "",
-        "skills": [
-            "Python",
-            "React",
-            "HTML",
-            "CSS",
-            "C",
-            "REST APIs",
-            "Docker"
-        ],
-        "experience": [
+        "job_id": "2",
+        "status_history": [
             {
-                "job_title": "Full Stack Developer",
-                "company": "Dubai Tech Solutions",
-                "location": "Dubai, UAE",
-                "dates": "Aug 2023 - Present",
-                "responsibilities": [
-                    "Developed and maintained web applications using React and Flask.",
-                    "Integrated RESTful APIs and managed cloud deployments."
-                ]
+                "status": "Applied",
+                "date": "2025-07-20",
+                "notes": "Initial application received"
             }
-        ],
-        "education": [
-            {
-                "degree": "BSc Computer Science",
-                "institution": "American University in Dubai",
-                "year": "2023"
-            }
-        ],
-        "certifications": [
-            "AWS Certified Developer Associate"
-        ],
-        "projects": [
-            "E-commerce platform (React, Flask)",
-            "Chatbot for customer support"
-        ],
-        "linkedin": "linkedin.com/in/omaralfarsi",
-        "github": "github.com/omaralfarsi",
-        "match_score": 19,
-        "job_id": "2"
+        ]
     },
     {
         "id": 3,
@@ -102,734 +55,101 @@
         "phone": "+971-52-1122334",
         "position": "Full Stack Senior Developer",
         "status": "Hired",
-        "resume_link": "",
         "applied_date": "2025-07-19",
-        "notes": "",
-        "skills": [
-            "Python",
-            "Flask",
-            "React",
-            "SCSS",
-            "Microservices",
-            "CI/CD",
-            "PostgreSQL"
-        ],
-        "experience": [
-            {
-                "job_title": "Senior Full Stack Developer",
-                "company": "Innovatech LLC",
-                "location": "Abu Dhabi, UAE",
-                "dates": "Jan 2020 - Present",
-                "responsibilities": [
-                    "Led a team of 5 developers to deliver scalable SaaS products.",
-                    "Architected microservices and implemented CI/CD pipelines."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "MSc Software Engineering",
-                "institution": "Khalifa University",
-                "year": "2019"
-            }
-        ],
-        "certifications": [
-            "Certified Kubernetes Administrator"
-        ],
-        "projects": [
-            "HR Management System (Flask, React)",
-            "Real-time analytics dashboard"
-        ],
-        "linkedin": "linkedin.com/in/fatimanoor",
-        "github": "",
-        "match_score": 22,
         "job_id": "3",
-        "offer_letter_details": "Dear Fatima Noor,\r\n\r\nWe are pleased to offer you the position of Full Stack Senior Developer at our company. Your skills and experience will be an ideal fit for our team.\r\n\r\nPosition: Full Stack Senior Developer\r\nStart Date: [Enter Start Date]\r\nSalary: [Enter Salary Details]\r\nReporting Manager: op_mgr\r\n\r\nPlease review the terms and let us know if you have any questions. We look forward to having you on board.\r\n\r\nBest regards,\r\nop_mgr\r\nOperation Manager\r\n",
-        "offer_issued_by": "op_mgr",
-        "offer_issued_by_email": "opmgr@company.com",
-        "onboarding": {
-            "Joining Formalities": "Pending",
-            "HR Introduction": "Pending"
-        }
+        "status_history": [
+            {
+                "status": "Applied",
+                "date": "2025-07-19",
+                "notes": "Initial application received"
+            },
+            {
+                "status": "Shortlisted",
+                "date": "2025-07-21",
+                "notes": "CV reviewed and shortlisted for interview"
+            },
+            {
+                "status": "Interviewed",
+                "date": "2025-07-24",
+                "notes": "Technical and HR interviews completed"
+            },
+            {
+                "status": "Hired",
+                "date": "2025-07-27",
+                "notes": "Offer accepted and hiring process completed"
+            }
+        ]
     },
     {
         "id": 4,
-        "name": "Rohan Mehta",
-        "email": "rohan.mehta@example.com",
-        "phone": "+971-56-2233445",
-        "position": "Data Scientist",
-        "status": "Hired",
-        "resume_link": "",
-        "applied_date": "2025-07-18",
-        "notes": "",
-        "skills": [
-            "Python",
-            "Machine Learning",
-            "Pandas",
-            "TensorFlow",
-            "Data Visualization"
-        ],
-        "experience": [
-            {
-                "job_title": "Data Analyst",
-                "company": "Insight Analytics",
-                "location": "Dubai, UAE",
-                "dates": "Feb 2023 - Present",
-                "responsibilities": [
-                    "Built predictive models for sales forecasting.",
-                    "Automated data pipelines using Python."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "MSc Data Science",
-                "institution": "Heriot-Watt University",
-                "year": "2023"
-            }
-        ],
-        "certifications": [
-            "TensorFlow Developer Certificate"
-        ],
-        "projects": [
-            "Customer churn prediction model"
-        ],
-        "linkedin": "linkedin.com/in/rohanmehta",
-        "github": "github.com/rohanmehta",
-        "match_score": 20,
-        "job_id": "4"
+        "name": "Ahmed Hassan",
+        "email": "ahmed.hassan@example.com",
+        "phone": "+971-50-5555555",
+        "position": "Process Engineer",
+        "status": "Shortlisted",
+        "applied_date": "2025-07-22",
+        "job_id": "1"
     },
     {
         "id": 5,
-        "name": "Sara Al Mansoori",
-        "email": "sara.mansoori@example.com",
-        "phone": "+971-58-3344556",
-        "position": "Data Scientist",
-        "status": "Hired",
-        "resume_link": "",
-        "applied_date": "2025-07-17",
-        "notes": "",
-        "skills": [
-            "R",
-            "Python",
-            "Deep Learning",
-            "SQL",
-            "Data Mining"
-        ],
-        "experience": [
-            {
-                "job_title": "Junior Data Scientist",
-                "company": "AI Labs",
-                "location": "Abu Dhabi, UAE",
-                "dates": "Sep 2022 - Present",
-                "responsibilities": [
-                    "Developed deep learning models for image classification.",
-                    "Performed data mining and feature engineering."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BSc Statistics",
-                "institution": "University of Sharjah",
-                "year": "2022"
-            }
-        ],
-        "certifications": [
-            "IBM Data Science Professional Certificate"
-        ],
-        "projects": [
-            "Image recognition for medical diagnostics"
-        ],
-        "linkedin": "linkedin.com/in/saramansoori",
-        "github": "",
-        "match_score": 17,
-        "job_id": "4"
+        "name": "Sara Al Zahra",
+        "email": "sara.alzahra@example.com",
+        "phone": "+971-55-6666666",
+        "position": "Process Engineer",
+        "status": "Interviewed",
+        "applied_date": "2025-07-18",
+        "job_id": "1"
     },
     {
         "id": 6,
-        "name": "Mohammed Zayed",
-        "email": "mohammed.zayed@example.com",
-        "phone": "+971-54-4455667",
-        "position": "UI/UX Designer",
-        "status": "Hired",
-        "resume_link": "",
-        "applied_date": "2025-07-18",
-        "notes": "",
-        "skills": [
-            "Figma",
-            "Adobe XD",
-            "User Research",
-            "Wireframing",
-            "Prototyping"
-        ],
-        "experience": [
-            {
-                "job_title": "UI/UX Designer",
-                "company": "Creative Minds Studio",
-                "location": "Dubai, UAE",
-                "dates": "Mar 2022 - Present",
-                "responsibilities": [
-                    "Designed user interfaces for mobile and web apps.",
-                    "Conducted usability testing and user interviews."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BA Graphic Design",
-                "institution": "Zayed University",
-                "year": "2021"
-            }
-        ],
-        "certifications": [
-            "Google UX Design Certificate"
-        ],
-        "projects": [
-            "E-learning platform redesign"
-        ],
-        "linkedin": "linkedin.com/in/mzayed",
-        "github": "",
-        "match_score": 16,
-        "job_id": "5",
-        "offer_letter_details": "Dear Mohammed Zayed,\r\n\r\nWe are pleased to offer you the position of UI/UX Designer at our company. Your skills and experience will be an ideal fit for our team.\r\n\r\nPosition: UI/UX Designer\r\nStart Date: [Enter Start Date]\r\nSalary: [Enter Salary Details]\r\nReporting Manager: op_mgr\r\n\r\nPlease review the terms and let us know if you have any questions. We look forward to having you on board.\r\n\r\nBest regards,\r\nop_mgr\r\nOperation Manager\r\n",
-        "offer_issued_by": "op_mgr",
-        "offer_issued_by_email": "opmgr@company.com",
-        "onboarding": {
-            "Joining Formalities": "Completed",
-            "HR Introduction": "Completed",
-            "Document Verification": "Completed",
-            "System Allocation": "Completed"
-        },
-        "interview_date": "2025-07-30",
-        "interview_time": "10:43",
-        "intervier": "op_mgr",
-        "interview_transcript": "Hi, guys. It's Ewan at Willow again here. After my video last week, I got a bunch of emails and messages from people asking how to create their own Willow interview. So I thought this would be really simple just to take four minutes out of my day and create a very quick interview process from start to finish. So it's a three-step process to create an interview in Willow. And we're going to jump straight in and see how it's done now. So I click on Interview, and then I click on Create Interview inside my Willow account. Then you'll see here it's a three-step process, as I mentioned. So we set up the initial interview steps. We create the questions, which is obviously the fun part. And then we preview and publish the interview for everyone to complete. So we'll just pop in a title here. So we'll just call it Astronaut. Let's hire an astronaut. And we'll try and find the best one we can. So pop in Virgin Galactic Space Company. And let's create a quick video intro. So the intro is the introduction at the very start of your interview. So it was that video that we spoke about last week that gives the person a reason to complete the interview. It gives a bit of context, and it makes them feel more like a two-way process and puts them at ease. So we'll just record a quick intro. So we get a quick countdown like this. Hi, it's Ewan at Virgin Galactic. We're very excited to have you here. Thank you for clicking on the link and completing our interview. This is the first step of our astronaut selection program. Please answer these three questions, and that will help us to get to know you a little bit better. When you're ready, just click on the button below to start. That will then save in the Willow Cloud. We can also just pop in some details here. So thanks for interest. So we click on Next. And now we're on to the fun part, the questions. So we can choose. Let's have three questions for this one. We can choose whether they are file or video answers. So people can actually answer questions on Willow with a file upload. So perhaps you want them to upload a portfolio, or you want them to upload a visa. They can easily do that. You just choose File Upload like that. And then ask your question, and that person then drags and drops their file. But for the astronaut application, let's just ask them all video questions. We want to get to know these astronauts before we send them off to space. So we'll just pop in our questions. Now you'll see there's a question generator as well. So we actually suggest questions using an algorithm for questions that may be suitable for your interview. And it learns over time as well. Okay, so we've put in our three questions. Now I'm just going to show you something else. It's a bit of a trick. You can actually change the amount of time the person has to answer these questions just by clicking on that little clock there. So we could make this, for example, three minutes because it's a long question. We want a long answer. And then this question here at the end about what was the last book they read for fun. We might want them to expand a bit and open up on that. So we might just set that one to two minutes. We can also set the amount of times the person has to retake their answer. So in this case, it could be we only want them to retake that one a maximum of three times. Put them under a bit of pressure and stop them from waffling on too long. So we've got our three questions. When we're happy with those, we click on Next. The interview is now complete, and all that's left to do is publish it. So the interview is now published, and we have here a link in front of us. It's a short link, and this link is the link that you're going to send out to people in an email, in a WhatsApp, in a Slack message, however you want to communicate with that person. When they click on that link, they'll be able to complete your interview. I'm going to pop this link in the comments below. Go ahead and try the interview yourself, and you'll see how easy it is to complete. Any questions, please just ask.\n",
-        "ai_interview_report": "1. **Comprehensive Performance Summary:**\n   The interview transcript provided is a demonstration by Ewan on how to create an interview using the Willow platform. Ewan effectively guides the audience through the process, explaining each step clearly and concisely. The demonstration is structured, starting from creating an interview to publishing it, and includes practical tips and insights into the platform's features. Ewan maintains a friendly and engaging tone throughout, making the process seem approachable and straightforward.\n\n2. **Specific Feedback:**\n   - **Communication Skills:**\n     Ewan demonstrates strong communication skills. He uses clear and simple language, making the instructions easy to follow. His tone is friendly and engaging, which helps in maintaining the audience's interest. Ewan also uses a logical flow, ensuring that each step is explained before moving on to the next.\n   - **Technical Knowledge:**\n     Ewan shows a good understanding of the Willow platform. He explains the features and functionalities, such as creating questions, setting time limits, and publishing the interview, with confidence. His ability to provide tips, like using the question generator and setting retake limits, indicates a deep familiarity with the platform.\n   - **Overall Interview Performance:**\n     The overall performance is strong. Ewan effectively balances technical details with user-friendly explanations. He anticipates potential questions from the audience and addresses them proactively, such as explaining the purpose of the video intro and the flexibility in question formats.\n\n3. **Areas for Improvement:**\n   - While Ewan's demonstration is clear, incorporating more examples or scenarios could enhance understanding, especially for users unfamiliar with the platform.\n   - Including a brief summary or recap at the end of the demonstration could reinforce the key points and ensure the audience retains the information.\n\n4. **Final Performance Score:**\n   Ewan's performance in this demonstration is commendable, with clear communication and a strong grasp of the technical aspects of the Willow platform. The demonstration is engaging and informative, with only minor areas for potential enhancement.\n\nPerformance Score: 92/100",
-        "interview_score": 92,
-        "probation_assessment": {
-            "1": {
-                "cultural_acceptance": "avg",
-                "loyalty": "good",
-                "teamwork": "good`",
-                "adaptability": "good ",
-                "comments": "ok",
-                "assessed_by": "op_mgr",
-                "date": "2025-07-30"
-            }
-        },
-        "probation_assessment_insights": {
-            "1": "<p>For the month 1 probation assessment:</p>\n<ul>\n<li><strong>Cultural Acceptance:</strong> Average</li>\n<li><strong>Loyalty:</strong> Good</li>\n<li><strong>Teamwork:</strong> Good</li>\n<li><strong>Adaptability:</strong> Good</li>\n<li><strong>Additional Comments:</strong> Ok</li>\n<li><strong>Assessed By:</strong> Operation Manager (op_mgr)</li>\n<li><strong>Assessment Date:</strong> July 30, 2025</li>\n</ul>\n<p>The assessment reveals a positive evaluation in loyalty, teamwork, and adaptability, with an average rating in cultural acceptance.</p>"
-        },
-        "_pa_hash_1": "e5fdda882f19af4f42e67ebee12d6ea1"
+        "name": "Mohammad Ali",
+        "email": "mohammad.ali@example.com",
+        "phone": "+971-52-7777777",
+        "position": "Full Stack Developer",
+        "status": "Shortlisted",
+        "applied_date": "2025-07-17",
+        "job_id": "2"
     },
     {
         "id": 7,
-        "name": "Lina George",
-        "email": "lina.george@example.com",
-        "phone": "+971-50-5566778",
-        "position": "UI/UX Designer",
-        "status": "Hired",
-        "resume_link": "",
-        "applied_date": "2025-07-17",
-        "notes": "",
-        "skills": [
-            "Sketch",
-            "Figma",
-            "User Flows",
-            "Interaction Design"
-        ],
-        "experience": [
-            {
-                "job_title": "UX Designer",
-                "company": "NextGen Apps",
-                "location": "Dubai, UAE",
-                "dates": "Jan 2023 - Present",
-                "responsibilities": [
-                    "Created wireframes and prototypes for SaaS products.",
-                    "Collaborated with developers for design handoff."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BDes Interaction Design",
-                "institution": "American University in Dubai",
-                "year": "2022"
-            }
-        ],
-        "certifications": [],
-        "projects": [
-            "Mobile banking app UX"
-        ],
-        "linkedin": "linkedin.com/in/linageorge",
-        "github": "",
-        "match_score": 15,
-        "job_id": "5"
+        "name": "Layla Ibrahim",
+        "email": "layla.ibrahim@example.com",
+        "phone": "+971-50-8888888",
+        "position": "Full Stack Developer",
+        "status": "Interviewed",
+        "applied_date": "2025-07-16",
+        "job_id": "2"
     },
     {
         "id": 8,
-        "name": "Yousef Al Nuaimi",
-        "email": "yousef.nuaimi@example.com",
-        "phone": "+971-56-6677889",
-        "position": "QA Engineer",
-        "status": "Hired",
-        "resume_link": "",
-        "applied_date": "2025-07-16",
-        "notes": "",
-        "skills": [
-            "Manual Testing",
-            "Selenium",
-            "Test Automation",
-            "JIRA",
-            "Agile"
-        ],
-        "experience": [
-            {
-                "job_title": "QA Engineer",
-                "company": "Quality First",
-                "location": "Dubai, UAE",
-                "dates": "May 2022 - Present",
-                "responsibilities": [
-                    "Developed and executed test cases for web applications.",
-                    "Automated regression tests using Selenium."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BSc Information Technology",
-                "institution": "University of Dubai",
-                "year": "2021"
-            }
-        ],
-        "certifications": [
-            "ISTQB Foundation Level"
-        ],
-        "projects": [
-            "Test automation for HR portal"
-        ],
-        "linkedin": "linkedin.com/in/yousefalnuaimi",
-        "github": "",
-        "match_score": 16,
-        "job_id": "6"
-    },
-    {
-        "id": 9,
-        "name": "Priya Singh",
-        "email": "priya.singh@example.com",
-        "phone": "+971-58-7788990",
-        "position": "QA Engineer",
-        "status": "Hired",
-        "resume_link": "",
+        "name": "Khalid Rashid",
+        "email": "khalid.rashid@example.com",
+        "phone": "+971-55-9999999",
+        "position": "Process Engineer",
+        "status": "Rejected",
         "applied_date": "2025-07-15",
-        "notes": "",
-        "skills": [
-            "Test Planning",
-            "API Testing",
-            "Jenkins",
-            "Bug Tracking"
-        ],
-        "experience": [
+        "job_id": "1",
+        "status_history": [
             {
-                "job_title": "QA Analyst",
-                "company": "TestPro Solutions",
-                "location": "Abu Dhabi, UAE",
-                "dates": "Jul 2023 - Present",
-                "responsibilities": [
-                    "Planned and executed API and UI tests.",
-                    "Managed bug tracking and reporting."
-                ]
-            }
-        ],
-        "education": [
+                "status": "Applied",
+                "date": "2025-07-15",
+                "notes": "Initial application received"
+            },
             {
-                "degree": "BSc Computer Science",
-                "institution": "Manipal Academy of Higher Education",
-                "year": "2022"
-            }
-        ],
-        "certifications": [],
-        "projects": [
-            "API test suite for fintech app"
-        ],
-        "linkedin": "linkedin.com/in/priyasinghqa",
-        "github": "",
-        "match_score": 15,
-        "job_id": "6"
-    },
-    {
-        "id": 10,
-        "name": "Ahmed Khalil",
-        "email": "ahmed.khalil@example.com",
-        "phone": "+971-50-8899001",
-        "position": "HR Manager",
-        "status": "Approved",
-        "resume_link": "",
-        "applied_date": "2025-07-14",
-        "notes": "",
-        "skills": [
-            "HR Policies",
-            "Recruitment",
-            "Employee Relations",
-            "Payroll",
-            "Onboarding"
-        ],
-        "experience": [
+                "status": "Shortlisted",
+                "date": "2025-07-17",
+                "notes": "CV reviewed and shortlisted"
+            },
             {
-                "job_title": "HR Manager",
-                "company": "PeopleFirst HR",
-                "location": "Dubai, UAE",
-                "dates": "Apr 2021 - Present",
-                "responsibilities": [
-                    "Managed end-to-end recruitment for tech roles.",
-                    "Implemented new onboarding process reducing time-to-hire by 20%."
-                ]
-            }
-        ],
-        "education": [
+                "status": "Interviewed",
+                "date": "2025-07-20",
+                "notes": "Interview completed"
+            },
             {
-                "degree": "MBA Human Resource Management",
-                "institution": "SP Jain School of Global Management",
-                "year": "2020"
+                "status": "Rejected",
+                "date": "2025-07-22",
+                "notes": "Not selected after interview evaluation"
             }
-        ],
-        "certifications": [
-            "SHRM-CP"
-        ],
-        "projects": [
-            "HR digital transformation initiative"
-        ],
-        "linkedin": "linkedin.com/in/ahmedkhalilhr",
-        "github": "",
-        "match_score": 18,
-        "job_id": "7"
-    },
-    {
-        "id": 11,
-        "name": "Noura Al Suwaidi",
-        "email": "noura.suwaidi@example.com",
-        "phone": "+971-52-9900112",
-        "position": "HR Manager",
-        "status": "Interviewed",
-        "resume_link": "",
-        "applied_date": "2025-07-13",
-        "notes": "",
-        "skills": [
-            "Talent Acquisition",
-            "HR Analytics",
-            "Compensation & Benefits"
-        ],
-        "experience": [
-            {
-                "job_title": "HR Business Partner",
-                "company": "Emirates HR Solutions",
-                "location": "Abu Dhabi, UAE",
-                "dates": "Jun 2022 - Present",
-                "responsibilities": [
-                    "Partnered with business units for workforce planning.",
-                    "Analyzed HR metrics to improve retention."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BBA Human Resources",
-                "institution": "University of Dubai",
-                "year": "2021"
-            }
-        ],
-        "certifications": [],
-        "projects": [
-            "Employee engagement survey analysis"
-        ],
-        "linkedin": "linkedin.com/in/nouralsuwaidi",
-        "github": "",
-        "match_score": 16,
-        "job_id": "7"
-    },
-    {
-        "id": 12,
-        "name": "Saeed Al Mazrouei",
-        "email": "saeed.mazrouei@example.com",
-        "phone": "+971-56-1122334",
-        "position": "Business Analyst",
-        "status": "Selected",
-        "resume_link": "",
-        "applied_date": "2025-07-12",
-        "notes": "",
-        "skills": [
-            "Business Analysis",
-            "Process Mapping",
-            "SQL",
-            "Requirements Gathering"
-        ],
-        "experience": [
-            {
-                "job_title": "Business Analyst",
-                "company": "BizTech Consulting",
-                "location": "Dubai, UAE",
-                "dates": "Feb 2023 - Present",
-                "responsibilities": [
-                    "Mapped business processes for ERP implementation.",
-                    "Gathered and documented requirements from stakeholders."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BSc Business Administration",
-                "institution": "American University of Sharjah",
-                "year": "2022"
-            }
-        ],
-        "certifications": [
-            "CBAP"
-        ],
-        "projects": [
-            "ERP requirements documentation"
-        ],
-        "linkedin": "linkedin.com/in/saeedmazrouei",
-        "github": "",
-        "match_score": 17,
-        "job_id": "8"
-    },
-    {
-        "id": 13,
-        "name": "Huda Al Qasimi",
-        "email": "huda.qasimi@example.com",
-        "phone": "+971-58-2233445",
-        "position": "Business Analyst",
-        "status": "Interviewed",
-        "resume_link": "",
-        "applied_date": "2025-07-11",
-        "notes": "",
-        "skills": [
-            "Data Analysis",
-            "Process Improvement",
-            "UML",
-            "Agile"
-        ],
-        "experience": [
-            {
-                "job_title": "Junior Business Analyst",
-                "company": "NextGen Consulting",
-                "location": "Dubai, UAE",
-                "dates": "Jan 2024 - Present",
-                "responsibilities": [
-                    "Assisted in process improvement projects.",
-                    "Created UML diagrams for new features."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BSc Information Systems",
-                "institution": "University of Sharjah",
-                "year": "2023"
-            }
-        ],
-        "certifications": [],
-        "projects": [
-            "Process mapping for CRM system"
-        ],
-        "linkedin": "linkedin.com/in/hudaqasimi",
-        "github": "",
-        "match_score": 15,
-        "job_id": "8"
-    },
-    {
-        "id": 14,
-        "name": "Bilal Khan",
-        "email": "bilal.khan@example.com",
-        "phone": "+971-54-3344556",
-        "position": "DevOps Engineer",
-        "status": "Interviewed",
-        "resume_link": "",
-        "applied_date": "2025-07-10",
-        "notes": "",
-        "skills": [
-            "AWS",
-            "Docker",
-            "Kubernetes",
-            "CI/CD",
-            "Linux"
-        ],
-        "experience": [
-            {
-                "job_title": "DevOps Engineer",
-                "company": "CloudOps Solutions",
-                "location": "Dubai, UAE",
-                "dates": "May 2022 - Present",
-                "responsibilities": [
-                    "Managed AWS infrastructure and automated deployments.",
-                    "Implemented CI/CD pipelines for microservices."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BSc Computer Engineering",
-                "institution": "Khalifa University",
-                "year": "2021"
-            }
-        ],
-        "certifications": [
-            "AWS Certified DevOps Engineer"
-        ],
-        "projects": [
-            "Cloud migration for e-commerce platform"
-        ],
-        "linkedin": "linkedin.com/in/bilalkhan",
-        "github": "github.com/bilalkhan",
-        "match_score": 18,
-        "job_id": "9"
-    },
-    {
-        "id": 15,
-        "name": "Maya Thomas",
-        "email": "maya.thomas@example.com",
-        "phone": "+971-56-4455667",
-        "position": "DevOps Engineer",
-        "status": "Hired",
-        "resume_link": "",
-        "applied_date": "2025-07-09",
-        "notes": "",
-        "skills": [
-            "Azure",
-            "Terraform",
-            "Jenkins",
-            "Monitoring",
-            "Shell Scripting"
-        ],
-        "experience": [
-            {
-                "job_title": "DevOps Specialist",
-                "company": "BlueCloud Technologies",
-                "location": "Abu Dhabi, UAE",
-                "dates": "Aug 2023 - Present",
-                "responsibilities": [
-                    "Automated infrastructure provisioning with Terraform.",
-                    "Set up monitoring and alerting for production systems."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BSc Information Technology",
-                "institution": "University of Dubai",
-                "year": "2022"
-            }
-        ],
-        "certifications": [],
-        "projects": [
-            "CI/CD for fintech startup"
-        ],
-        "linkedin": "linkedin.com/in/mayathomas",
-        "github": "",
-        "match_score": 16,
-        "job_id": "9",
-        "interview_date": "2025-07-23",
-        "interview_time": "09:37",
-        "intervier": "op_mgr",
-        "offer_letter_details": "Dear Maya Thomas,\r\n\r\nWe are pleased to offer you the position of DevOps Engineer at our company. Your skills and experience will be an ideal fit for our team.\r\n\r\nPosition: DevOps Engineer\r\nStart Date: [Enter Start Date]\r\nSalary: [Enter Salary Details]\r\nReporting Manager: op_mgr\r\n\r\nPlease review the terms and let us know if you have any questions. We look forward to having you on board.\r\n\r\nBest regards,\r\nop_mgr\r\nOperation Manager\r\n",
-        "offer_issued_by": "op_mgr",
-        "offer_issued_by_email": "opmgr@company.com",
-        "onboarding": {
-            "Joining Formalities": "Pending",
-            "HR Introduction": "Pending"
-        }
-    },
-    {
-        "id": 16,
-        "name": "Zainab Al Hashimi",
-        "email": "zainab.hashimi@example.com",
-        "phone": "+971-50-5566778",
-        "position": "Product Manager",
-        "status": "Shortlisted",
-        "resume_link": "",
-        "applied_date": "2025-07-08",
-        "notes": "",
-        "skills": [
-            "Product Strategy",
-            "Agile",
-            "Roadmapping",
-            "Stakeholder Management"
-        ],
-        "experience": [
-            {
-                "job_title": "Product Manager",
-                "company": "Visionary Products",
-                "location": "Dubai, UAE",
-                "dates": "Mar 2022 - Present",
-                "responsibilities": [
-                    "Defined product vision and roadmap for SaaS platform.",
-                    "Coordinated cross-functional teams for feature delivery."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "MBA Marketing",
-                "institution": "SP Jain School of Global Management",
-                "year": "2021"
-            }
-        ],
-        "certifications": [
-            "Certified Scrum Product Owner"
-        ],
-        "projects": [
-            "SaaS product launch"
-        ],
-        "linkedin": "linkedin.com/in/zainabhashimi",
-        "github": "",
-        "match_score": 18,
-        "job_id": "10"
-    },
-    {
-        "id": 17,
-        "name": "Mohamed Saleh",
-        "email": "mohamed.saleh@example.com",
-        "phone": "+971-55-1239876",
-        "position": "QA Engineer",
-        "status": "Hired",
-        "resume_link": "",
-        "applied_date": "2025-07-22",
-        "notes": "",
-        "skills": [
-            "Manual Testing",
-            "Automation",
-            "Python",
-            "JIRA"
-        ],
-        "experience": [
-            {
-                "job_title": "QA Engineer",
-                "company": "TestPro Solutions",
-                "location": "Dubai, UAE",
-                "dates": "Jan 2022 - Present",
-                "responsibilities": [
-                    "Led automation testing for web applications.",
-                    "Reduced bug leakage by 30%."
-                ]
-            }
-        ],
-        "education": [
-            {
-                "degree": "BSc Computer Science",
-                "institution": "University of Sharjah",
-                "year": "2021"
-            }
-        ],
-        "certifications": [
-            "ISTQB Foundation Level"
-        ],
-        "projects": [
-            "Test automation framework"
-        ],
-        "linkedin": "linkedin.com/in/mohamedsalehqa",
-        "github": "",
-        "match_score": 20,
-        "job_id": "6"
+        ]
     }
 ]
