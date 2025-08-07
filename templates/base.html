@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Dashboard{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 </head>
 <body>
@@ -14,6 +15,9 @@
 
     <div class="dashboard-layout">
         <div class="main-content">
+            <!-- Logo Header - appears on every page -->
+            {% include '_logo_header.html' %}
+            
             {% block content %}
             <!-- Page-specific content will be injected here -->
             {% endblock %}
@@ -49,6 +53,11 @@
         padding: 0;
         box-sizing: border-box;
         overflow-x: hidden;
+        font-family: 'Poppins', Arial, Helvetica, sans-serif;
+        color: #23272f;
+    }
+    *, *::before, *::after {
+        font-family: 'Poppins', Arial, Helvetica, sans-serif !important;
     }
     body {
         min-height: 100vh;

@@ -660,7 +660,7 @@ document.addEventListener('click', function(event) {
         'job_requirements': 'Job Requirements',
         'job_openings': 'Job Openings',
         'job_posted_by': 'Job Posted By',
-        'job_lead_time': 'Job Lead Time',
+        'job_lead_time': 'Job Lead Time ',
         'department': 'Department',
         'seniority_level': 'Seniority Level',
         'salary_range': 'Salary Range',
@@ -673,14 +673,16 @@ document.addEventListener('click', function(event) {
           <th>{{ label }}</th>
           {% set value = job.get(key, '') %}
           <td>
-            {% if key == 'status' %}
-              <div class="status-info-container">
-                <span>{{ value }}</span>
-                <button type="button" class="status-info-btn" onclick="toggleStatusPopup(event)" title="Job Status Information">i</button>
-              </div>
-            {% else %}
-              {{ value }}
-            {% endif %}
+        {% if key == 'status' %}
+          <div class="status-info-container">
+            <span>{{ value }}</span>
+            <button type="button" class="status-info-btn" onclick="toggleStatusPopup(event)" title="Job Status Information">i</button>
+          </div>
+        {% elif key == 'job_lead_time' %}
+          {{ value }} Days
+        {% else %}
+          {{ value }}
+        {% endif %}
           </td>
         </tr>
       {% endfor %}

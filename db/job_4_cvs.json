@@ -1,8 +1,20 @@
 [
     {
+        "candidate_id": 2,
+        "candidate_name": "Scott Johnson",
+        "candidate_email": "fwall@gmail.com",
+        "cv_link": "resumes/cv_1754551514.docx"
+    },
+    {
+        "candidate_id": 3,
+        "candidate_name": "Matthew Collins",
+        "candidate_email": "stephenfuller@gmail.com",
+        "cv_link": "resumes/cv_1754551543.docx"
+    },
+    {
         "candidate_id": 4,
-        "candidate_name": "Sebinmon V R",
-        "candidate_email": "sebinmonvr@gmail.com",
-        "cv_link": "resumes/cv_1753082650.pdf"
+        "candidate_name": "Kayla Garcia",
+        "candidate_email": "grahamadam@gmail.com",
+        "cv_link": "resumes/cv_1754551568.docx"
     }
 ]

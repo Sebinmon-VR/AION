@@ -818,8 +818,17 @@ def index():
         posted_at = job.get('posted_at', '')
         job_openings = job.get('job_openings', '0')
         job_status = job.get('status', '').lower()
-        # Consider job as active if it's not explicitly closed or filled
-        if posted_at and job_status not in ['closed', 'filled', 'cancelled']:
+        
+        # Calculate automatic status to ensure accuracy
+        automatic_status = calculate_automatic_job_status(job, candidates)
+        
+        # Consider job as active only if it's explicitly 'Open' or if no status and automatic is 'Open'
+        is_active = (
+            automatic_status.lower() == 'open' and 
+            job_status not in ['closed', 'filled', 'cancelled', 'expired', 'on hold']
+        )
+        
+        if posted_at and is_active:
             try:
                 date_str = posted_at.split(' ')[0]
                 # Add multiple entries for each opening in this job
@@ -855,6 +864,7 @@ def index():
     active_vacancies_data = {}
     active_hired_data = {}
     active_applicants_data = {}
+    pending_closed_jobs_data = {}
     
     for period in ['month', 'week', 'day']:
         # Calculate for overall data
@@ -873,15 +883,46 @@ def index():
         _, active_vacancies = group_by_period(active_vacancy_items, 'date', period)
         _, active_hired = group_by_period(active_hired_items, 'date', period)
         
-        # Calculate active applicants (not hired, not rejected, not withdrawn)
+        # Calculate active applicants (candidates who applied to jobs that are still open)
         active_applicants = []
+        pending_from_closed_jobs = []
+        
         for c in candidates:
             applied_date = c.get('applied_date', '')
             status = c.get('status', '').lower()
-            # Active means not hired, not rejected, not withdrawn
-            if status not in ['hired', 'rejected', 'withdrawn'] and applied_date:
-                active_applicants.append({'date': applied_date})
+            job_id = str(c.get('job_id', ''))
+            
+            # Skip if already hired, rejected, or withdrawn
+            if status in ['hired', 'rejected', 'withdrawn'] or not applied_date:
+                continue
+            
+            # Find the job this candidate applied to
+            candidate_job = None
+            for job in jobs:
+                if str(job.get('job_id', '')) == job_id:
+                    candidate_job = job
+                    break
+            
+            if candidate_job:
+                # Check if the job is still active using the same logic as active_vacancy_items
+                automatic_status = calculate_automatic_job_status(candidate_job, candidates)
+                job_status = candidate_job.get('status', '').lower()
+                
+                is_job_active = (
+                    automatic_status.lower() == 'open' and 
+                    job_status not in ['closed', 'filled', 'cancelled', 'expired', 'on hold']
+                )
+                
+                if is_job_active:
+                    active_applicants.append({'date': applied_date})
+                else:
+                    pending_from_closed_jobs.append({'date': applied_date})
+            else:
+                # If no job found or no job_id, consider as pending from closed jobs
+                pending_from_closed_jobs.append({'date': applied_date})
+        
         _, active_applicant_counts = group_by_period(active_applicants, 'date', period)
+        _, pending_closed_job_counts = group_by_period(pending_from_closed_jobs, 'date', period)
         
         vacancy_hired_labels[period] = labels
         overall_vacancies_data[period] = overall_vacancies
@@ -890,6 +931,7 @@ def index():
         active_vacancies_data[period] = active_vacancies
         active_hired_data[period] = active_hired
         active_applicants_data[period] = active_applicant_counts
+        pending_closed_jobs_data[period] = pending_closed_job_counts
     vacancy_hired_labels_json = pyjson.dumps(vacancy_hired_labels)
     overall_vacancies_data_json = pyjson.dumps(overall_vacancies_data)
     overall_hired_data_json = pyjson.dumps(overall_hired_data)
@@ -897,6 +939,7 @@ def index():
     active_vacancies_data_json = pyjson.dumps(active_vacancies_data)
     active_hired_data_json = pyjson.dumps(active_hired_data)
     active_applicants_data_json = pyjson.dumps(active_applicants_data)
+    pending_closed_jobs_data_json = pyjson.dumps(pending_closed_jobs_data)
 
     # --- Candidate Spotlight Logic REMOVED ---
     # (Removed to prevent unnecessary API calls and errors)
@@ -968,6 +1011,7 @@ def index():
                                active_vacancies_data_json=active_vacancies_data_json,
                                active_hired_data_json=active_hired_data_json,
                                active_applicants_data_json=active_applicants_data_json,
+                               pending_closed_jobs_data_json=pending_closed_jobs_data_json,
                                total_applicants=total_applicants,
                                total_vacancies=total_vacancies,
                                open_vacancies=open_vacancies,
@@ -1011,6 +1055,7 @@ def index():
                                active_vacancies_data_json=active_vacancies_data_json,
                                active_hired_data_json=active_hired_data_json,
                                active_applicants_data_json=active_applicants_data_json,
+                               pending_closed_jobs_data_json=pending_closed_jobs_data_json,
                                total_applicants=total_applicants,
                                total_vacancies=total_vacancies,
                                open_vacancies=open_vacancies,

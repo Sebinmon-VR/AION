@@ -570,10 +570,47 @@ def openings_count():
 def open_vacancies_count():
     """Count vacancies for open jobs only"""
     job_data = fetch_job_data()
+    # We need to import the function from app.py or define it here
+    # For now, let's use a simple logic similar to calculate_automatic_job_status
+    from datetime import datetime, timedelta
+    candidates = fetch_candidate_data()
+    
     open_count = 0
+    current_date = datetime.now()
+    
     for job in job_data:
+        # Calculate if job should be considered open
+        is_open = True
+        
+        # Check lead time expiration
+        try:
+            posted_date = datetime.strptime(job.get('posted_at', ''), '%Y-%m-%d %H:%M:%S')
+            lead_time_days = int(job.get('job_lead_time', 30))
+            expiration_date = posted_date + timedelta(days=lead_time_days)
+            if current_date > expiration_date:
+                is_open = False
+        except (ValueError, TypeError):
+            pass  # If we can't parse dates, assume not expired
+        
+        # Check if all positions are filled
+        if is_open:
+            job_id_str = str(job.get('job_id', ''))
+            hired_count = sum(1 for c in candidates 
+                             if c.get('status', '').lower() == 'hired' and 
+                                str(c.get('job_id', '')) == job_id_str)
+            try:
+                job_openings = int(job.get('job_openings', 0))
+                if hired_count >= job_openings:
+                    is_open = False
+            except (ValueError, TypeError):
+                pass
+        
+        # Check explicit status override
         job_status = job.get('status', '').lower()
-        if job_status == 'open':  # Only count explicitly "open" jobs
+        if job_status in ['closed', 'filled', 'cancelled', 'expired', 'on hold']:
+            is_open = False
+        
+        if is_open:
             for key in ['job_openings', 'openings', 'openings_count', 'vacancies']:
                 if key in job:
                     try:
@@ -586,10 +623,45 @@ def open_vacancies_count():
 def closed_vacancies_count():
     """Count vacancies for closed jobs only"""
     job_data = fetch_job_data()
+    from datetime import datetime, timedelta
+    candidates = fetch_candidate_data()
+    
     closed_count = 0
+    current_date = datetime.now()
+    
     for job in job_data:
+        # Calculate if job should be considered closed
+        is_closed = False
+        
+        # Check lead time expiration
+        try:
+            posted_date = datetime.strptime(job.get('posted_at', ''), '%Y-%m-%d %H:%M:%S')
+            lead_time_days = int(job.get('job_lead_time', 30))
+            expiration_date = posted_date + timedelta(days=lead_time_days)
+            if current_date > expiration_date:
+                is_closed = True
+        except (ValueError, TypeError):
+            pass  # If we can't parse dates, assume not expired
+        
+        # Check if all positions are filled
+        if not is_closed:
+            job_id_str = str(job.get('job_id', ''))
+            hired_count = sum(1 for c in candidates 
+                             if c.get('status', '').lower() == 'hired' and 
+                                str(c.get('job_id', '')) == job_id_str)
+            try:
+                job_openings = int(job.get('job_openings', 0))
+                if hired_count >= job_openings:
+                    is_closed = True
+            except (ValueError, TypeError):
+                pass
+        
+        # Check explicit status override
         job_status = job.get('status', '').lower()
-        if job_status == 'closed':
+        if job_status in ['closed', 'filled', 'cancelled', 'expired', 'on hold']:
+            is_closed = True
+        
+        if is_closed:
             for key in ['job_openings', 'openings', 'openings_count', 'vacancies']:
                 if key in job:
                     try:
@@ -782,23 +854,52 @@ def extract_resume_with_openai(resume_path):
     """Extract structured candidate data from a resume using OpenAI."""
     if not os.path.exists(resume_path):
         return {"error": "Resume file not found."}
+    
     try:
         ext = os.path.splitext(resume_path)[1].lower()
         resume_text = ""
+        
+        # Extract text from file
         if ext == ".pdf":
-            import PyPDF2
-            with open(resume_path, "rb") as file:
-                reader = PyPDF2.PdfReader(file)
-                for page in reader.pages:
-                    resume_text += page.extract_text() or ""
+            try:
+                import PyPDF2
+                with open(resume_path, "rb") as file:
+                    reader = PyPDF2.PdfReader(file)
+                    for page in reader.pages:
+                        resume_text += page.extract_text() or ""
+            except ImportError:
+                return {"error": "PyPDF2 not installed for PDF processing"}
+            except Exception as pdf_error:
+                return {"error": f"PDF processing failed: {str(pdf_error)}"}
+                
         elif ext in [".docx"]:
-            import docx
-            doc = docx.Document(resume_path)
-            resume_text = "\n".join([para.text for para in doc.paragraphs])
+            try:
+                import docx
+                doc = docx.Document(resume_path)
+                resume_text = "\n".join([para.text for para in doc.paragraphs])
+            except ImportError:
+                return {"error": "python-docx not installed for DOCX processing"}
+            except Exception as docx_error:
+                return {"error": f"DOCX processing failed: {str(docx_error)}"}
         else:
-            with open(resume_path, "r", encoding="utf-8") as file:
-                resume_text = file.read()
+            try:
+                with open(resume_path, "r", encoding="utf-8") as file:
+                    resume_text = file.read()
+            except UnicodeDecodeError:
+                try:
+                    with open(resume_path, "r", encoding="latin-1") as file:
+                        resume_text = file.read()
+                except Exception as read_error:
+                    return {"error": f"File reading failed: {str(read_error)}"}
 
+        if not resume_text.strip():
+            return {"error": "No text could be extracted from the resume"}
+
+        # Check if OpenAI API key is configured
+        if not openai.api_key:
+            return {"error": "OpenAI API key not configured"}
+
+        # Prepare OpenAI request with error handling
         messages = [
             {
                 "role": "system",
@@ -813,20 +914,36 @@ def extract_resume_with_openai(resume_path):
                     f"Extract the following fields from this resume and return JSON only:\n"
                     f"name, email, phone, skills (as list), experience (as list), education (as list), "
                     f"certifications (as list), projects (as list), linkedin, github, job_title.\n\n"
-                    f"Resume:\n{resume_text}"
+                    f"Resume:\n{resume_text[:4000]}"  # Limit text to avoid token limits
                 )
             }
         ]
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=messages,
-            temperature=0
-        )
-        return response['choices'][0]['message']['content']
+        # Use try-except specifically for OpenAI API call
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4o",
+                messages=messages,
+                temperature=0
+            )
+            return response['choices'][0]['message']['content']
+            
+        except ImportError as import_error:
+            return {"error": f"OpenAI library import failed: {str(import_error)}"}
+        except AttributeError as attr_error:
+            return {"error": f"OpenAI API method not found: {str(attr_error)}"}
+        except KeyError as key_error:
+            return {"error": f"OpenAI API response format error: {str(key_error)}"}
+        except Exception as openai_error:
+            # If OpenAI fails, provide a basic fallback structure
+            error_msg = str(openai_error)
+            if "API key" in error_msg or "authentication" in error_msg.lower():
+                return {"error": "OpenAI API authentication failed. Please check API key configuration."}
+            else:
+                return {"error": f"OpenAI API call failed: {str(openai_error)}"}
 
-    except Exception as e:
-        return {"error": str(e)}
+    except Exception as general_error:
+        return {"error": f"Resume extraction failed: {str(general_error)}"}
     
     
 def create_job_id():

@@ -1,86 +1,26 @@
 [
   {
     "role": "user",
-    "content": "Show me our hiring success rate"
+    "content": "\n        Extract the following information from this job description and return it as a JSON object. \n        If any field is not found, use reasonable defaults or \"Not specified\":\n\n        Required fields:\n        - job_title: The job title/position name\n        - department: The department (try to map to: Process and HSE, Piping & Mechanical, Civil & Structural, Electrical, Instrumentation and Control, Digitization, AI Development)\n        - job_location: Location/city where job is based\n        - job_type: Employment type (Full-time, Part-time, Contract, etc.)\n        - job_openings: Number of positions available (if not specified, use \"1\")\n        - salary_range: Salary range if mentioned\n        - job_requirements: Key requirements and qualifications\n        - job_description: Clean, formatted job description\n        - seniority_level: Experience level (Entry, Mid, Senior)\n        - job_lead_time: How many days to fill position (if not specified, use \"30\")\n\n        Job Description Text:\n        Job Title: 1\nExperience Required: SP3D Designer\nDiscipline: Upto 7 years of experience\nJob Description:\nWe are seeking a skilled and experienced 1 with SP3D Designer of experience in the field of Upto 7\nyears of experience. The ideal candidate will be responsible for contributing to projects, collaborating\nwith cross-functional teams, and ensuring high-quality deliverables.\nResponsibilities:\n- Execute tasks related to Upto 7 years of experience discipline.\n- Collaborate with team members and stakeholders.\n- Maintain documentation and adhere to project standards.\nQualifications:\n- Proven experience as a 1 in Upto 7 years of experience.\n- Strong communication and problem-solving skills.\n- Relevant educational background and certifications.\nJoin our team and be part of a dynamic and innovative environment!\n\n        Return only valid JSON format.\n        "
   },
   {
     "role": "assistant",
-    "content": null,
-    "tool_calls": [
-      {
-        "id": "call_WVljiEsG5m7a50f8aox6inzg",
-        "type": "function",
-        "function": {
-          "name": "get_enhanced_hiring_success_rate",
-          "arguments": "{}"
-        }
-      }
-    ]
-  },
-  {
-    "role": "tool",
-    "tool_call_id": "call_WVljiEsG5m7a50f8aox6inzg",
-    "name": "get_enhanced_hiring_success_rate",
-    "content": "📊 **HIRING SUCCESS RATE - COMPREHENSIVE ANALYSIS**\n\n**Current Performance:** 25.0% (CRITICAL)\n\n**Key Insights:**\n• Current success rate: 25.0%\n• Total candidates processed: 8\n• Successfully hired: 2\n• Status: 🔴 CRITICAL\n\n📈 **Trend Visualization:** ![Hiring Success Trend](hiring_success_trend.png)\n\n**Why this rate is NEEDS IMPROVEMENT:**\n⚠️ Below optimal performance\n🔧 Review screening criteria\n🔧 Improve job descriptions\n\n**Recommendations:**\n• Implement pre-screening questionnaires\n• Enhance employer branding initiatives\n• Provide interview training to hiring managers\n• Streamline application to offer timeline\n"
-  },
-  {
-    "role": "assistant",
-    "content": "Our current hiring success rate is 25.0%, which is considered critical. Out of 8 candidates processed recently, 2 were successfully hired. This performance indicator suggests the need for improvement. It may be beneficial to review our screening criteria, enhance job descriptions, and possibly implement pre-screening questionnaires. Visualize the trend: ![Hiring Success Trend](hiring_success_trend.png). Enhancing employer branding and providing interview training could also help streamline the process and improve outcomes."
+    "content": "```json\n{\n    \"job_title\": \"SP3D Designer\",\n    \"department\": \"Digitization\",\n    \"job_location\": \"Not specified\",\n    \"job_type\": \"Not specified\",\n    \"job_openings\": \"1\",\n    \"salary_range\": \"Not specified\",\n    \"job_requirements\": \"Proven experience as a SP3D Designer with up to 7 years of experience. Strong communication and problem-solving skills. Relevant educational background and certifications.\",\n    \"job_description\": \"We are seeking a skilled and experienced SP3D Designer with up to 7 years of experience. The ideal candidate will be responsible for contributing to projects, collaborating with cross-functional teams, and ensuring high-quality deliverables.\",\n    \"seniority_level\": \"Mid\",\n    \"job_lead_time\": \"30\"\n}\n```"
   },
   {
     "role": "user",
-    "content": "Compare our salaries with market rates"
+    "content": "\n        Extract the following information from this job description and return it as a JSON object. \n        If any field is not found, use reasonable defaults or \"Not specified\":\n\n        Required fields:\n        - job_title: The job title/position name\n        - department: The department (try to map to: Process and HSE, Piping & Mechanical, Civil & Structural, Electrical, Instrumentation and Control, Digitization, AI Development)\n        - job_location: Location/city where job is based\n        - job_type: Employment type (Full-time, Part-time, Contract, etc.)\n        - job_openings: Number of positions available (if not specified, use \"1\")\n        - salary_range: Salary range if mentioned\n        - job_requirements: Key requirements and qualifications\n        - job_description: Clean, formatted job description\n        - seniority_level: Experience level (Entry, Mid, Senior)\n        - job_lead_time: How many days to fill position (if not specified, use \"30\")\n\n        Job Description Text:\n        Job Title: 2\nExperience Required: SP3D Admin.\nDiscipline: Upto 7 years of experience\nJob Description:\nWe are seeking a skilled and experienced 2 with SP3D Admin. of experience in the field of Upto 7\nyears of experience. The ideal candidate will be responsible for contributing to projects, collaborating\nwith cross-functional teams, and ensuring high-quality deliverables.\nResponsibilities:\n- Execute tasks related to Upto 7 years of experience discipline.\n- Collaborate with team members and stakeholders.\n- Maintain documentation and adhere to project standards.\nQualifications:\n- Proven experience as a 2 in Upto 7 years of experience.\n- Strong communication and problem-solving skills.\n- Relevant educational background and certifications.\nJoin our team and be part of a dynamic and innovative environment!\n\n        Return only valid JSON format.\n        "
   },
   {
     "role": "assistant",
-    "content": null,
-    "tool_calls": [
-      {
-        "id": "call_eHBu1kty3W8bAa9GWGMkdUaV",
-        "type": "function",
-        "function": {
-          "name": "get_enhanced_market_salary_comparison",
-          "arguments": "{}"
-        }
-      }
-    ]
-  },
-  {
-    "role": "tool",
-    "tool_call_id": "call_eHBu1kty3W8bAa9GWGMkdUaV",
-    "name": "get_enhanced_market_salary_comparison",
-    "content": "💼 **MARKET SALARY COMPARISON & COMPETITIVE ANALYSIS**\n\n**Competitiveness Overview:**\n• 🎯 Market competitiveness: NEEDS IMPROVEMENT\n• 📈 Above market: 2 positions\n• 📉 Below market: 3 positions\n• 💰 Largest gap: {'our_avg': 85000, 'market_avg': 90000, 'gap': -5.6}\n\n📊 **Comparison Visualization:** ![Market Comparison](market_salary_comparison.png)\n\n**🎯 OVERALL MARKET POSITION: NEEDS IMPROVEMENT**\n• Positions above market: 2\n• Positions below market: 3\n\n**📊 DETAILED POSITION ANALYSIS:**\n\n**🟢 ABOVE MARKET POSITIONS:**\n• **Civil Engineer**\n  - Our offer: $68,000\n  - Market average: $65,000\n  - Advantage: +4.6%\n• **Process Engineer**\n  - Our offer: $75,000\n  - Market average: $72,000\n  - Advantage: +4.2%\n\n**🔴 BELOW MARKET POSITIONS:**\n• **Software Engineer**\n  - Our offer: $85,000\n  - Market average: $90,000\n  - Gap: -5.6%\n• **Data Scientist**\n  - Our offer: $95,000\n  - Market average: $100,000\n  - Gap: -5.0%\n• **Mechanical Engineer**\n  - Our offer: $70,000\n  - Market average: $73,000\n  - Gap: -4.1%\n\n**🔍 COMPETITIVE ANALYSIS:**\n• **Market positioning impact on hiring success**\n• **Talent attraction and retention implications**\n• **Budget optimization opportunities**\n• **Strategic salary adjustment priorities**\n\n**📈 STRATEGIC RECOMMENDATIONS:**\n• **Immediate review** of below-market positions\n• **Budget reallocation** from above-market to below-market roles\n• **Market research** for accurate benchmarking\n• **Regular benchmarking** (quarterly reviews)\n• **Total compensation analysis** (benefits + salary)\n• **Geographic adjustments** for different markets\n• **Performance-based incentives** to optimize costs\n\n**⚠️ RISK ASSESSMENT:**\n• **High risk:** May lose candidates to competitors\n• **Retention risk:** Current employees may seek alternatives\n• **Hiring difficulty:** Extended time-to-fill positions\n"
-  },
-  {
-    "role": "assistant",
-    "content": "The market salary comparison indicates that our salaries need improvement in competitiveness. We have two positions—Civil Engineer and Process Engineer—that are above market averages by about 4.6% and 4.2%, respectively. However, roles like Software Engineer, Data Scientist, and Mechanical Engineer fall below market standards, with the largest gap for Software Engineers being -5.6%. Here's a visual summary of the comparison: ![Market Comparison](market_salary_comparison.png).\n\nTo remain competitive, consider benchmarking regularly, conducting a comprehensive compensation analysis, and possibly reallocating budgets to align with market demands, especially in roles currently below market averages."
+    "content": "```json\n{\n    \"job_title\": \"SP3D Admin.\",\n    \"department\": \"Digitization\",\n    \"job_location\": \"Not specified\",\n    \"job_type\": \"Not specified\",\n    \"job_openings\": \"1\",\n    \"salary_range\": \"Not specified\",\n    \"job_requirements\": \"Proven experience as a SP3D Admin. with up to 7 years of experience. Strong communication and problem-solving skills. Relevant educational background and certifications.\",\n    \"job_description\": \"We are seeking a skilled and experienced SP3D Admin. with up to 7 years of experience. The ideal candidate will be responsible for contributing to projects, collaborating with cross-functional teams, and ensuring high-quality deliverables.\",\n    \"seniority_level\": \"Mid\",\n    \"job_lead_time\": \"30\"\n}\n```"
   },
   {
     "role": "user",
-    "content": "Compare our salaries with market rates"
+    "content": "what is the user name"
   },
   {
     "role": "assistant",
-    "content": null,
-    "tool_calls": [
-      {
-        "id": "call_KrhTwlZYjb30SB6d60iXsgL1",
-        "type": "function",
-        "function": {
-          "name": "get_enhanced_market_salary_comparison",
-          "arguments": "{}"
-        }
-      }
-    ]
-  },
-  {
-    "role": "tool",
-    "tool_call_id": "call_KrhTwlZYjb30SB6d60iXsgL1",
-    "name": "get_enhanced_market_salary_comparison",
-    "content": "💼 **MARKET SALARY COMPARISON & COMPETITIVE ANALYSIS**\n\n**Competitiveness Overview:**\n• 🎯 Market competitiveness: NEEDS IMPROVEMENT\n• 📈 Above market: 2 positions\n• 📉 Below market: 3 positions\n• 💰 Largest gap: {'our_avg': 85000, 'market_avg': 90000, 'gap': -5.6}\n\n📊 **Comparison Visualization:** ![Market Comparison](market_salary_comparison.png)\n\n**🎯 OVERALL MARKET POSITION: NEEDS IMPROVEMENT**\n• Positions above market: 2\n• Positions below market: 3\n\n**📊 DETAILED POSITION ANALYSIS:**\n\n**🟢 ABOVE MARKET POSITIONS:**\n• **Civil Engineer**\n  - Our offer: $68,000\n  - Market average: $65,000\n  - Advantage: +4.6%\n• **Process Engineer**\n  - Our offer: $75,000\n  - Market average: $72,000\n  - Advantage: +4.2%\n\n**🔴 BELOW MARKET POSITIONS:**\n• **Software Engineer**\n  - Our offer: $85,000\n  - Market average: $90,000\n  - Gap: -5.6%\n• **Data Scientist**\n  - Our offer: $95,000\n  - Market average: $100,000\n  - Gap: -5.0%\n• **Mechanical Engineer**\n  - Our offer: $70,000\n  - Market average: $73,000\n  - Gap: -4.1%\n\n**🔍 COMPETITIVE ANALYSIS:**\n• **Market positioning impact on hiring success**\n• **Talent attraction and retention implications**\n• **Budget optimization opportunities**\n• **Strategic salary adjustment priorities**\n\n**📈 STRATEGIC RECOMMENDATIONS:**\n• **Immediate review** of below-market positions\n• **Budget reallocation** from above-market to below-market roles\n• **Market research** for accurate benchmarking\n• **Regular benchmarking** (quarterly reviews)\n• **Total compensation analysis** (benefits + salary)\n• **Geographic adjustments** for different markets\n• **Performance-based incentives** to optimize costs\n\n**⚠️ RISK ASSESSMENT:**\n• **High risk:** May lose candidates to competitors\n• **Retention risk:** Current employees may seek alternatives\n• **Hiring difficulty:** Extended time-to-fill positions\n"
-  },
-  {
-    "role": "assistant",
-    "content": "Our salary structure currently needs improvement to enhance market competitiveness. While Civil Engineer and Process Engineer positions are slightly above market averages by 4.6% and 4.2%, roles like Software Engineer, Data Scientist, and Mechanical Engineer are below the market by up to 5.6%. For a detailed view, please check the visual summary: ![Market Comparison](market_salary_comparison.png).\n\nTo address this, it's recommended to immediately review below-market positions, consider budget reallocations, and perform regular market research and benchmarking to ensure competitive offers."
+    "content": "Your username is \"kevin.\" If you need any assistance or information related to your role, feel free to ask!"
   }
 ]
