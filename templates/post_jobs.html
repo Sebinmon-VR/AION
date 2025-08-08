@@ -3,11 +3,14 @@
 {% block content %}
 
 <style>
+body {
+  background: #ffffff !important;
+}
 .job-form-container {
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  background: #fff;
+  background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   padding: 32px 24px 24px 24px;
@@ -16,13 +19,13 @@
 .job-form-container h2 {
   margin-bottom: 8px;
   font-size: 2rem;
-  color: #222;
+  color: #333333;
   font-weight: 600;
 }
 .job-form-container .subtitle {
   margin-bottom: 28px;
   font-size: 1rem;
-  color: #666;
+  color: #666666;
 }
 .job-form-grid {
   display: grid;
@@ -50,7 +53,7 @@
   font-size: 1rem;
   font-weight: 500;
   margin-bottom: 6px;
-  color: #222;
+  color: #333333;
 }
 .form-group input,
 .form-group select {
@@ -59,31 +62,32 @@
   border: 1px solid #d1d5db;
   border-radius: 5px;
   font-size: 1rem;
-  background: #fff;
+  background: #ffffff;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 2px #e0e7ff;
+  border-color: #e5e7eb;
+  box-shadow: 0 0 0 2px #f3f4f6;
 }
 .btn-primary {
-  background-color: #222;
-  color: #fff;
+  background-color: #ffffff;
+  color: #333333;
   padding: 12px 20px;
   font-size: 1rem;
-  border: none;
+  border: 2px solid #e5e7eb;
   border-radius: 6px;
   cursor: pointer;
   margin-top: 24px;
   font-weight: 500;
   letter-spacing: 0.02em;
-  transition: background 0.2s;
+  transition: all 0.2s;
   grid-column: 1 / -1;
 }
 .btn-primary:hover {
-  background-color: #444;
+  background-color: #f9fafb;
+  border-color: #d1d5db;
 }
 @media (max-width: 900px) {
   .job-form-grid {

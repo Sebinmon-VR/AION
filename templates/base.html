@@ -6,6 +6,7 @@
     <title>{% block title %}Dashboard{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
 </head>
 <body>
 
@@ -26,7 +27,7 @@
             {% set nav_icons = [
                 {'href': '/', 'icon': 'home.png', 'label': 'Dashboard'},
                 {'href': '/post_jobs', 'icon': 'jobs.png', 'label': 'post jobs'},
-                {'href': '/manage_hr_team', 'icon': 'applications.png', 'label': 'Team & Approvals'},
+                {'href': '/manage_hr_team', 'icon': 'team.png', 'label': 'Team & Approvals'},
                 {'href': '/my_approvals', 'icon': 'notification.png', 'label': 'My Approvals'},
                 {'href': '/jobs_list', 'icon': 'search.png', 'label': 'jobs'},
                 {'href': '/manage_candidates', 'icon': 'candidates.png', 'label': 'Candidates'},
@@ -246,5 +247,8 @@
         });
     });
     </script>
+    
+    <!-- Notification System -->
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
 </body>
 </html>

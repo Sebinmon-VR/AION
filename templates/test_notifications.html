@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notification Test</title>
+    <link rel="stylesheet" href="/static/css/notifications.css">
+</head>
+<body style="padding: 20px;">
+    <h1>Notification System Test</h1>
+    <p>Testing notifications for Operation Manager</p>
+    
+    <button onclick="testNotifications()" style="padding: 10px 20px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Test Notifications</button>
+    
+    <div id="debug-output" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
+        <h3>Debug Output:</h3>
+        <div id="logs"></div>
+    </div>
+
+    <script src="/static/js/notifications.js"></script>
+    <script>
+        // Set test cookies
+        document.cookie = "role=Operation Manager; path=/";
+        document.cookie = "username=op_mgr; path=/";
+        
+        function log(message) {
+            const logs = document.getElementById('logs');
+            logs.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+        }
+        
+        async function testNotifications() {
+            log('Testing notification system...');
+            
+            // Test cookie retrieval
+            const role = getCookie('role');
+            const username = getCookie('username');
+            log('Role: ' + role + ', Username: ' + username);
+            
+            // Test API call
+            try {
+                const response = await fetch('/api/notifications');
+                log('API Response Status: ' + response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('API Response: ' + JSON.stringify(data, null, 2));
+                } else {
+                    log('API Error: ' + response.statusText);
+                }
+            } catch (error) {
+                log('Fetch Error: ' + error.message);
+            }
+            
+            // Test notification system
+            if (window.notificationSystem) {
+                log('Notification system exists');
+                notificationSystem.refresh();
+                log('Notification count: ' + notificationSystem.getNotificationCount());
+            } else {
+                log('Notification system not found');
+            }
+        }
+        
+        // Initialize notification system manually for testing
+        window.addEventListener('load', function() {
+            log('Page loaded, initializing...');
+            if (!window.notificationSystem) {
+                log('Creating notification system...');
+                window.notificationSystem = new NotificationSystem();
+            }
+            testNotifications();
+        });
+    </script>
+</body>
+</html>

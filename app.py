@@ -90,6 +90,9 @@ def milestones_breakup_label(label):
     elif label.lower() == 'total_vacancies':
         # For vacancies, we need to work with jobs instead of candidates
         filtered_candidates = []  # Empty since we're dealing with jobs
+    elif label.lower() == 'hiring_success_rate':
+        # For hiring success rate, show all candidates to build department analytics
+        filtered_candidates = candidates
     else:
         filtered_candidates = [c for c in candidates if str(c.get('status', '')).strip().lower() == status.lower()]
     # Department analytics (department only, not position, fallback to job's department)
@@ -109,6 +112,18 @@ def milestones_breakup_label(label):
                 dept_data[dept] += openings
             else:
                 dept_data[dept] = openings
+    elif label.lower() == 'hiring_success_rate':
+        # For hiring success rate, count hired candidates by department
+        hired_candidates = [c for c in candidates if str(c.get('status', '')).lower() == 'hired']
+        for c in hired_candidates:
+            job_id = c.get('job_id')
+            dept = job_id_to_dept.get(str(job_id), None) if job_id is not None else None
+            if not dept:
+                dept = c.get('department') or c.get('position') or 'Unknown'
+            if dept in dept_data:
+                dept_data[dept] += 1
+            else:
+                dept_data[dept] = 1
     else:
         # For candidates, count by department
         for c in filtered_candidates:
@@ -160,16 +175,15 @@ def milestones_breakup_label(label):
                 'id': c.get('id'),
             })
     import json as pyjson
-    # Calculate analytics for 'hired' milestone
+    # Calculate analytics for 'hired' milestone - ALWAYS calculate for all pages
     total_applicants = total_hired = success_rate = 0
-    if label.lower() == 'hired':
-        # Load all candidates from your data source (not just filtered)
-        with open(candidates_file, 'r', encoding='utf-8') as f:
-            all_candidates = json.load(f)
-        total_applicants = len(all_candidates)
-        hired_candidates = [c for c in all_candidates if str(c.get('status', '')).lower() == 'hired']
-        total_hired = len(hired_candidates)
-        success_rate = round((total_hired / total_applicants) * 100, 1) if total_applicants else 0
+    # Load all candidates from your data source (not just filtered) for ALL milestone pages
+    with open(candidates_file, 'r', encoding='utf-8') as f:
+        all_candidates = json.load(f)
+    total_applicants = len(all_candidates)
+    hired_candidates = [c for c in all_candidates if str(c.get('status', '')).lower() == 'hired']
+    total_hired = len(hired_candidates)
+    success_rate = round((total_hired / total_applicants) * 100, 1) if total_applicants else 0
     
     # Calculate analytics for 'total_vacancies' milestone
     open_vacancies = closed_vacancies = total_jobs = 0
@@ -195,7 +209,8 @@ def milestones_breakup_label(label):
                 posted_date = datetime.datetime.strptime(posted_at.split(' ')[0], '%Y-%m-%d')
                 weeks_elapsed = (datetime.datetime.now() - posted_date).days // 7
                 
-                if weeks_elapsed < 1:
+                # Allow jobs that are 0+ weeks old (same day or older)
+                if weeks_elapsed < 0:
                     continue
                 
                 job_id = job.get('job_id')
@@ -604,7 +619,8 @@ def index():
                 posted_date = datetime.datetime.strptime(posted_at.split(' ')[0], '%Y-%m-%d')
                 weeks_elapsed = (datetime.datetime.now() - posted_date).days // 7
                 
-                if weeks_elapsed < 1:  # Skip very new jobs
+                # Allow jobs that are 0+ weeks old (same day or older)
+                if weeks_elapsed < 0:  # Skip future jobs
                     continue
                 
                 job_id = job.get('job_id')
@@ -973,7 +989,11 @@ def index():
     ]
     
     # Calculate hiring pace after jobs and candidates are loaded
-    hiring_pace = calculate_hiring_pace(jobs, candidates)
+    try:
+        hiring_pace = calculate_hiring_pace(jobs, candidates)
+    except Exception as e:
+        print(f"Error calculating hiring pace: {e}")
+        hiring_pace = 'Good'  # Default fallback
     
     import json as pyjson
     radar_labels_json = pyjson.dumps(radar_labels)
@@ -1690,6 +1710,9 @@ def schedule_interview():
                 c['intervier'] = intervier
                 c['status'] = 'Interview Scheduled'
                 
+                # Set specific date field for timeline display
+                c['interview_scheduled_date'] = datetime.datetime.now().strftime('%Y-%m-%d')
+                
                 # Track who scheduled the interview (status update)
                 c['status_updated_by'] = request.cookies.get('username', 'Unknown')
                 c['status_updated_by_role'] = request.cookies.get('role', 'Unknown')
@@ -1796,6 +1819,9 @@ def interview_analysis():
                 c['status'] = 'Interviewed'  # Changed from 'Interview Analyzed' to 'Interviewed'
                 c['interview_analyzed_at'] = datetime.datetime.now().isoformat()
                 
+                # Set specific date field for timeline display
+                c['interviewed_date'] = datetime.datetime.now().strftime('%Y-%m-%d')
+                
                 # Track who updated the status (interview analysis)
                 c['status_updated_by'] = 'System (Interview Analysis)'
                 c['status_updated_by_role'] = 'Automated'
@@ -1881,10 +1907,28 @@ def update_candidate_status():
                 c['status'] = new_status
                 
                 # Track who updated the status and when
+                current_timestamp = datetime.datetime.now().isoformat()
+                current_date = datetime.datetime.now().strftime('%Y-%m-%d')
                 c['status_updated_by'] = request.cookies.get('username', 'Unknown')
                 c['status_updated_by_role'] = request.cookies.get('role', 'Unknown')
-                c['status_updated_at'] = datetime.datetime.now().isoformat()
+                c['status_updated_at'] = current_timestamp
                 c['previous_status'] = previous_status
+                
+                # Set specific date fields based on new status for timeline display
+                if new_status == 'Shortlisted':
+                    c['shortlisted_date'] = current_date
+                elif new_status == 'Interview Scheduled':
+                    c['interview_scheduled_date'] = current_date
+                elif new_status == 'Interviewed':
+                    c['interviewed_date'] = current_date
+                elif new_status == 'Approved':
+                    c['approved_date'] = current_date
+                elif new_status == 'Selected':
+                    c['selected_date'] = current_date
+                elif new_status == 'Hired':
+                    c['hired_date'] = current_date
+                elif new_status == 'Onboarding':
+                    c['onboarding_date'] = current_date
                 
                 # Initialize status_history if it doesn't exist
                 if 'status_history' not in c:
@@ -1896,7 +1940,7 @@ def update_candidate_status():
                     'to_status': new_status,
                     'updated_by': request.cookies.get('username', 'Unknown'),
                     'updated_by_role': request.cookies.get('role', 'Unknown'),
-                    'updated_at': datetime.datetime.now().isoformat(),
+                    'updated_at': current_timestamp,
                     'update_type': 'manual_status_update'
                 })
                 
@@ -1904,6 +1948,84 @@ def update_candidate_status():
                 break
         else:
             return jsonify({'success': False, 'message': 'Candidate not found'}), 404
+        
+        # Send notifications based on status change and role
+        current_user_role = request.cookies.get('role', '')
+        current_username = request.cookies.get('username', '')
+        
+        # Debug logging
+        print(f"DEBUG: Status changed to '{new_status}' by role '{current_user_role}' user '{current_username}'")
+        
+        # Load and create notifications for specific status changes
+        notification_file = os.path.join(os.path.dirname(__file__), 'db', 'notifications.json')
+        if os.path.exists(notification_file):
+            with open(notification_file, 'r') as f:
+                try:
+                    notifications = json.load(f)
+                except json.JSONDecodeError:
+                    notifications = []
+        else:
+            notifications = []
+        
+        # Send notification when Discipline Manager shortlists a candidate
+        if new_status == "Shortlisted" and current_user_role == "Discipline Manager":
+            print(f"DEBUG: Creating shortlist notification for {target_dept_manager}")
+            # Determine which Department Manager to notify based on candidate's department/position
+            position = candidate.get('position', '').lower()
+            if 'moe' in position or 'electrical' in position or 'instrumentation' in position:
+                target_dept_manager = 'Department Manager (MOE)'
+            else:
+                target_dept_manager = 'Department Manager (MOP)'
+            
+            shortlist_notification = {
+                'id': len(notifications) + 1,
+                'candidate_id': candidate_id,
+                'candidate_name': candidate.get('name', 'Unknown'),
+                'position': candidate.get('position', ''),
+                'type': 'candidate_shortlisted',
+                'status': 'Pending',
+                'for_role': target_dept_manager,
+                'from_role': current_user_role,
+                'from_user': current_username,
+                'message': f"🎯 CANDIDATE SHORTLISTED: {candidate.get('name', 'Unknown')} has been shortlisted by {current_user_role} for the position of {candidate.get('position', 'Unknown')}. Please review and take action.",
+                'timestamp': datetime.datetime.now().isoformat(),
+                'created_by': current_username,
+                'priority': 'high',
+                'action_required': True,
+                'notification_type': 'pop_up'
+            }
+            notifications.append(shortlist_notification)
+            print(f"DEBUG: Shortlist notification created and added")
+        
+        # Send notification when Department Manager updates status to "Selected"
+        elif new_status == "Selected" and current_user_role in ['Department Manager (MOE)', 'Department Manager (MOP)']:
+            print(f"DEBUG: Creating selected notification for Operation Manager")
+            selected_notification = {
+                'id': len(notifications) + 1,
+                'candidate_id': candidate_id,
+                'candidate_name': candidate.get('name', 'Unknown'),
+                'position': candidate.get('position', ''),
+                'type': 'candidate_selected',
+                'status': 'Pending',
+                'for_role': 'Operation Manager',
+                'from_role': current_user_role,
+                'from_user': current_username,
+                'message': f"⭐ CANDIDATE SELECTED: {candidate.get('name', 'Unknown')} has been selected by {current_user_role} for the position of {candidate.get('position', 'Unknown')}. Please review for final approval.",
+                'timestamp': datetime.datetime.now().isoformat(),
+                'created_by': current_username,
+                'priority': 'high',
+                'action_required': True,
+                'notification_type': 'pop_up'
+            }
+            notifications.append(selected_notification)
+            print(f"DEBUG: Selected notification created and added")
+        else:
+            print(f"DEBUG: No notification created - Status: {new_status}, Role: {current_user_role}")
+        
+        # Save notifications
+        with open(notification_file, 'w') as f:
+            json.dump(notifications, f, indent=4)
+        
         with open(candidate_file, 'w') as f:
             json.dump(candidates, f, indent=4)
         # If status is Shortlisted, reload candidate and show interview form
@@ -2291,21 +2413,191 @@ def approve_candidate():
 
 @app.route('/recent_activities')
 def recent_activities():
+    """Enhanced recent activities page with comprehensive activity tracking"""
+    from data import fetch_todays_activities, fetch_recent_activities
+    
+    # Get activities from enhanced functions
     todays_activities = fetch_todays_activities()
-    recent_activities = fetch_recent_activities()
+    recent_activities = fetch_recent_activities(show_all=True)  # Get more activities
+    
+    # Get activity statistics
+    activity_stats = {
+        'total_recent': len(recent_activities),
+        'total_today': len(todays_activities),
+        'candidate_activities': len([a for a in recent_activities if a.get('entity_type') == 'candidate']),
+        'job_activities': len([a for a in recent_activities if a.get('entity_type') == 'job']),
+        'interview_activities': len([a for a in recent_activities if a.get('entity_type') == 'interview']),
+        'onboarding_activities': len([a for a in recent_activities if a.get('entity_type') == 'onboarding'])
+    }
+    
+    # Try to get comprehensive activity data from new logger
+    try:
+        from activity_logger import activity_logger
+        
+        # Get activities by type for the dashboard
+        analytics_activities = activity_logger.get_activities_by_type('analytics_view', 10)
+        chat_activities = activity_logger.get_activities_by_type('chat_interaction', 10)
+        
+        activity_stats.update({
+            'analytics_usage': len(analytics_activities),
+            'chat_interactions': len(chat_activities)
+        })
+        
+    except Exception as e:
+        print(f"⚠️ Could not get enhanced activity stats: {e}")
+    
     # If the request is from the chatbot (expects JSON), return JSON
     if 'application/json' in request.headers.get('Accept', '') or request.args.get('format') == 'json':
         return jsonify({
             'recent_activities': recent_activities,
-            'todays_activities': todays_activities
+            'todays_activities': todays_activities,
+            'activity_stats': activity_stats
         })
-    # Otherwise, render the template as before
+    
+    # Otherwise, render the enhanced template
     return render_template(
         'recent_activities.html',
         todays_activities=todays_activities,
         recent_activities=recent_activities,
+        activity_stats=activity_stats,
         role=request.cookies.get('role', '')
     )
+
+
+@app.route('/api/activities/all')
+def api_all_activities():
+    """Comprehensive activities API endpoint for full activity tracking"""
+    try:
+        from activity_logger import activity_logger
+        from data import fetch_recent_activities
+        
+        # Get parameters
+        limit = int(request.args.get('limit', 50))
+        days = int(request.args.get('days', 7))
+        activity_type = request.args.get('type', None)
+        user = request.args.get('user', None)
+        
+        # Get activities from new logger
+        activities = []
+        try:
+            if activity_type:
+                activities = activity_logger.get_activities_by_type(activity_type, limit)
+            elif user:
+                activities = activity_logger.get_activities_by_user(user, limit)
+            else:
+                activities = activity_logger.get_recent_activities(limit, days)
+        except Exception as e:
+            print(f"⚠️ Error fetching from activity logger: {e}")
+            # Fallback to legacy method
+            legacy_activities = fetch_recent_activities(show_all=True)
+            activities = legacy_activities[:limit]
+        
+        # Get activity summary
+        activity_summary = {
+            'total_count': len(activities),
+            'date_range': f"Last {days} days",
+            'types': {},
+            'users': {}
+        }
+        
+        # Calculate type and user distributions
+        for activity in activities:
+            activity_type = activity.get('activity_type', activity.get('type', 'unknown'))
+            user_name = activity.get('user', 'Unknown')
+            
+            activity_summary['types'][activity_type] = activity_summary['types'].get(activity_type, 0) + 1
+            activity_summary['users'][user_name] = activity_summary['users'].get(user_name, 0) + 1
+        
+        return jsonify({
+            'status': 'success',
+            'activities': activities,
+            'summary': activity_summary,
+            'filters': {
+                'limit': limit,
+                'days': days,
+                'type_filter': activity_type,
+                'user_filter': user
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Error fetching activities: {str(e)}',
+            'activities': [],
+            'summary': {}
+        }), 500
+
+
+@app.route('/api/activities/stats')
+def api_activity_stats():
+    """Get activity statistics and metrics"""
+    try:
+        from activity_logger import activity_logger
+        
+        # Get recent activities for analysis
+        activities = activity_logger.get_recent_activities(100, 30)  # Last 30 days
+        
+        # Calculate statistics
+        stats = {
+            'total_activities': len(activities),
+            'activities_by_type': {},
+            'activities_by_user': {},
+            'activities_by_day': {},
+            'most_active_user': None,
+            'most_common_activity': None,
+            'trend': 'stable'
+        }
+        
+        for activity in activities:
+            # By type
+            activity_type = activity.get('activity_type', 'unknown')
+            stats['activities_by_type'][activity_type] = stats['activities_by_type'].get(activity_type, 0) + 1
+            
+            # By user
+            user = activity.get('user', 'Unknown')
+            stats['activities_by_user'][user] = stats['activities_by_user'].get(user, 0) + 1
+            
+            # By day
+            date = activity.get('date', activity.get('timestamp', ''))[:10]  # Get just the date part
+            stats['activities_by_day'][date] = stats['activities_by_day'].get(date, 0) + 1
+        
+        # Find most active user and most common activity
+        if stats['activities_by_user']:
+            stats['most_active_user'] = max(stats['activities_by_user'], key=stats['activities_by_user'].get)
+        
+        if stats['activities_by_type']:
+            stats['most_common_activity'] = max(stats['activities_by_type'], key=stats['activities_by_type'].get)
+        
+        # Calculate trend (compare last 7 days vs previous 7 days)
+        try:
+            from datetime import datetime, timedelta
+            now = datetime.now()
+            last_week = (now - timedelta(days=7)).strftime('%Y-%m-%d')
+            prev_week = (now - timedelta(days=14)).strftime('%Y-%m-%d')
+            
+            recent_count = sum(count for date, count in stats['activities_by_day'].items() if date >= last_week)
+            prev_count = sum(count for date, count in stats['activities_by_day'].items() if prev_week <= date < last_week)
+            
+            if prev_count > 0:
+                if recent_count > prev_count * 1.1:
+                    stats['trend'] = 'increasing'
+                elif recent_count < prev_count * 0.9:
+                    stats['trend'] = 'decreasing'
+        except Exception as e:
+            print(f"⚠️ Error calculating trend: {e}")
+        
+        return jsonify({
+            'status': 'success',
+            'stats': stats
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Error calculating activity stats: {str(e)}',
+            'stats': {}
+        }), 500
 
 @app.route('/my_approvals')
 def my_approvals():
@@ -2334,8 +2626,8 @@ def my_approvals():
             my_notifications.append(notification)
     
     # Separate pending vs completed
-    pending_approvals = [n for n in my_notifications if n.get('status') == 'Sent']
-    completed_approvals = [n for n in my_notifications if n.get('status') in ['Approved', 'Rejected', 'On Hold']]
+    pending_approvals = [n for n in my_notifications if n.get('status') == 'Pending']
+    completed_approvals = [n for n in my_notifications if n.get('status') in ['Approved', 'Rejected', 'On Hold', 'Read']]
     
     # Sort by timestamp (most recent first)
     pending_approvals.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
@@ -2353,6 +2645,9 @@ def my_approvals():
 @app.route('/manage_hr_team')
 def manage_hr_team():
     current_user_role = request.cookies.get('role', '')
+    
+    # Get filter parameter (overall or active)
+    view_filter = request.args.get('filter', 'overall')  # Default to 'overall'
     
     # Define role hierarchy and permissions
     role_permissions = {
@@ -2422,7 +2717,8 @@ def manage_hr_team():
         jobs = []
     
     # Build hierarchical approval data
-    hierarchical_data = build_hierarchical_approval_flow(candidates, notifications, users)
+    hierarchical_data = build_hierarchical_approval_flow(candidates, notifications, users, view_filter)
+    print(f"DEBUG: View Filter: {view_filter}", flush=True)
     print(f"DEBUG: Total candidates: {len(candidates)}", flush=True)
     print(f"DEBUG: Total discipline managers: {len(hierarchical_data['discipline_managers'])}", flush=True)
     for dm in hierarchical_data['discipline_managers']:
@@ -2442,16 +2738,28 @@ def manage_hr_team():
                          hierarchical_data=hierarchical_data,
                          user_permissions=user_permissions,
                          pending_approvals=pending_approvals,
-                         current_user_role=current_user_role)
+                         current_user_role=current_user_role,
+                         view_filter=view_filter)
 
-def build_hierarchical_approval_flow(candidates, notifications, users):
+def build_hierarchical_approval_flow(candidates, notifications, users, view_filter='overall'):
     """
     Build hierarchical approval flow showing how candidates move through the approval process
+    view_filter: 'overall' shows all candidates, 'active' shows only active candidates
     """
     # Get managers by role
     discipline_managers = [u for u in users if u.get('role') == 'Discipline Manager']
     department_managers = [u for u in users if u.get('role') in ['Department Manager (MOE)', 'Department Manager (MOP)']]
     operation_managers = [u for u in users if u.get('role') == 'Operation Manager']
+    
+    # Filter candidates based on view_filter
+    if view_filter == 'active':
+        # Active: exclude hired, rejected, withdrawn candidates
+        filtered_candidates = [c for c in candidates if c.get('status', '').lower() not in ['hired', 'rejected', 'withdrawn']]
+    else:
+        # Overall: show all candidates
+        filtered_candidates = candidates
+    
+    print(f"DEBUG: Filter applied: {view_filter}, Total candidates after filter: {len(filtered_candidates)}", flush=True)
     
     hierarchical_flow = {
         'discipline_managers': [],
@@ -2459,18 +2767,7 @@ def build_hierarchical_approval_flow(candidates, notifications, users):
         'operation_managers': []
     }
     
-    # Create specific position to manager mapping
-    manager_assignments = {
-        'mike': ['process engineer', 'safety engineer', 'hse engineer'],  # Process and HSE
-        'kevin': ['piping engineer', 'mechanical engineer'],              # Piping & Mechanical  
-        'jhon': ['civil engineer', 'structural engineer'],               # Civil & Structural
-        'discipline_mgr_elec': ['electrical engineer', 'power engineer'], # Electrical
-        'discipline_mgr_inst': ['instrumentation engineer', 'control engineer'], # Instrumentation
-        'discipline_mgr_digi': ['software engineer', 'digital engineer'], # Digitization
-        'discipline_mgr_ai': ['ai engineer', 'data scientist', 'machine learning engineer'] # AI
-    }
-    
-    # Process Discipline Managers
+    # Process Discipline Managers - Show only candidates they specifically updated
     for i, manager in enumerate(discipline_managers):
         manager_username = manager.get('username', '')
         manager_data = {
@@ -2483,71 +2780,72 @@ def build_hierarchical_approval_flow(candidates, notifications, users):
             'notapproved': []
         }
         
-        # Get assigned positions for this manager
-        assigned_positions = manager_assignments.get(manager_username, [])
-        print(f"[DEBUG] Manager {manager_username} handles positions: {assigned_positions}")
-        
-        # Get candidates assigned to this specific manager
-        for candidate in candidates:
-            position = candidate.get('position', '').lower()
-            candidate_status = candidate.get('status', '')
+        # Only show candidates that THIS specific manager has acted upon
+        for candidate in filtered_candidates:
+            candidate_info = {
+                'id': candidate.get('id'),
+                'name': candidate.get('name', 'Unknown'),
+                'position': candidate.get('position', ''),
+                'status': candidate.get('status', '')
+            }
             
-            # Skip senior positions that don't go through discipline managers
-            if any(title in position for title in ['manager', 'director', 'head', 'lead']):
-                continue
+            # Check if THIS discipline manager has made a decision on this candidate
+            candidate_notifications = [n for n in notifications if 
+                                     n.get('candidate_id') == candidate.get('id') and 
+                                     n.get('for_role') == 'Discipline Manager' and
+                                     n.get('approved_by') == manager_username]  # Only this manager's actions
             
-            # Check if this candidate's position matches this manager's specialty
-            position_match = any(pos in position for pos in assigned_positions)
-            
-            # More lenient status check - include more statuses including Hired
-            valid_statuses = ['Applied', 'New', 'Under Review', 'Interviewed', 'Shortlisted', 'Approved', 'Pending', 'Hired']
-            
-            if position_match and candidate_status in valid_statuses:
-                print(f"[DEBUG] Assigning candidate {candidate.get('name')} ({position}) to manager {manager_username} - Status: {candidate_status}")
+            if candidate_notifications:
+                # Found notification from THIS manager - use the latest one
+                latest_notification = max(candidate_notifications, key=lambda x: x.get('timestamp', ''))
+                notification_status = latest_notification.get('status', 'Pending')
                 
-                candidate_info = {
-                    'id': candidate.get('id'),
-                    'name': candidate.get('name', 'Unknown'),
-                    'position': candidate.get('position', ''),
-                    'status': candidate.get('status', '')
-                }
+                if notification_status == 'Approved':
+                    manager_data['shortlisted'].append(candidate_info)
+                elif notification_status == 'Rejected':
+                    manager_data['notapproved'].append(candidate_info)
+                else:
+                    manager_data['onhold'].append(candidate_info)
+            else:
+                # Check if THIS manager updated the candidate status directly
+                status_updated_by = candidate.get('status_updated_by', '')
+                status_updated_by_role = candidate.get('status_updated_by_role', '')
                 
-                # Check if discipline manager has made a decision
-                candidate_notifications = [n for n in notifications if 
-                                         n.get('candidate_id') == candidate.get('id') and 
-                                         n.get('for_role') == 'Discipline Manager']
-                
-                if candidate_notifications:
-                    latest_notification = max(candidate_notifications, key=lambda x: x.get('timestamp', ''))
-                    status = latest_notification.get('status', 'Pending')
-                    
-                    if status == 'Approved':
+                # Check current status update
+                if (status_updated_by == manager_username or 
+                    (status_updated_by_role == 'Discipline Manager' and status_updated_by == manager_username)):
+                    candidate_status = candidate.get('status', '').lower()
+                    if candidate_status in ['shortlisted', 'approved', 'hired']:
                         manager_data['shortlisted'].append(candidate_info)
-                    elif status == 'Rejected':
+                    elif candidate_status in ['rejected']:
                         manager_data['notapproved'].append(candidate_info)
                     else:
                         manager_data['onhold'].append(candidate_info)
                 else:
-                    # No notification yet - assign based on current candidate status
-                    if candidate_status in ['Shortlisted', 'Approved']:
-                        manager_data['shortlisted'].append(candidate_info)
-                    elif candidate_status in ['Rejected']:
-                        manager_data['notapproved'].append(candidate_info)
-                    elif candidate_status in ['Hired']:
-                        # Hired candidates are automatically approved at discipline level
-                        manager_data['shortlisted'].append(candidate_info)
-                    else:
-                        manager_data['onhold'].append(candidate_info)
-            elif position_match:
-                print(f"[DEBUG] Position match for {candidate.get('name')} but status '{candidate_status}' not in valid statuses")
+                    # Check status history to see if THIS manager ever acted on this candidate
+                    status_history = candidate.get('status_history', [])
+                    for history_entry in status_history:
+                        if (history_entry.get('updated_by') == manager_username or
+                            (history_entry.get('updated_by_role') == 'Discipline Manager' and 
+                             history_entry.get('updated_by') == manager_username)):
+                            # This manager acted on this candidate in the past
+                            candidate_status = candidate.get('status', '').lower()
+                            if candidate_status in ['shortlisted', 'approved', 'hired', 'interviewed', 'interview scheduled']:
+                                manager_data['shortlisted'].append(candidate_info)
+                            elif candidate_status in ['rejected']:
+                                manager_data['notapproved'].append(candidate_info)
+                            else:
+                                manager_data['onhold'].append(candidate_info)
+                            break
         
         print(f"[DEBUG] Manager {manager_username} has {len(manager_data['shortlisted'])} shortlisted, {len(manager_data['onhold'])} on hold, {len(manager_data['notapproved'])} rejected")
         hierarchical_flow['discipline_managers'].append(manager_data)
     
-    # Process Department Managers
+    # Process Department Managers - Show only candidates they specifically updated
     for i, manager in enumerate(department_managers):
+        manager_username = manager.get('username', f'dept_mgr_{i}')
         manager_data = {
-            'id': manager.get('username', f'dept_mgr_{i}'),
+            'id': manager_username,
             'name': manager.get('username', 'Unknown').title().replace('_', ' '),
             'role': manager.get('role', ''),
             'department': manager.get('department', ''),
@@ -2556,129 +2854,140 @@ def build_hierarchical_approval_flow(candidates, notifications, users):
             'notapproved': []
         }
         
-        # Get candidates that should be at department manager level
-        for candidate in candidates:
-            candidate_id = candidate.get('id')
-            position = candidate.get('position', '').lower()
+        # Only show candidates that THIS specific department manager has acted upon
+        for candidate in filtered_candidates:
+            candidate_info = {
+                'id': candidate.get('id'),
+                'name': candidate.get('name', 'Unknown'),
+                'position': candidate.get('position', ''),
+                'status': candidate.get('status', '')
+            }
             
-            # Check if candidate should be at this level
-            should_process = False
+            # Check if THIS department manager has made a decision
+            dept_notifications = [n for n in notifications if 
+                                n.get('candidate_id') == candidate.get('id') and 
+                                n.get('for_role') in ['Department Manager (MOE)', 'Department Manager (MOP)'] and
+                                n.get('approved_by') == manager_username]  # Only this manager's actions
             
-            if any(title in position for title in ['manager', 'director', 'head', 'lead']):
-                # Senior positions start with department managers
-                should_process = True
+            if dept_notifications:
+                # Found notification from THIS manager - use the latest one
+                latest_notification = max(dept_notifications, key=lambda x: x.get('timestamp', ''))
+                notification_status = latest_notification.get('status', 'Pending')
+                
+                if notification_status == 'Approved':
+                    manager_data['shortlisted'].append(candidate_info)
+                elif notification_status == 'Rejected':
+                    manager_data['notapproved'].append(candidate_info)
+                else:
+                    manager_data['onhold'].append(candidate_info)
             else:
-                # Regular positions - check if approved by discipline manager
-                discipline_approved = any(n.get('candidate_id') == candidate_id and 
-                                       n.get('for_role') == 'Discipline Manager' and 
-                                       n.get('status') == 'Approved' 
-                                       for n in notifications)
-                if discipline_approved:
-                    should_process = True
-            
-            if should_process:
-                # For department level, assign based on department manager type
-                should_assign_to_this_manager = False
+                # Check if THIS manager updated the candidate status directly
+                status_updated_by = candidate.get('status_updated_by', '')
+                status_updated_by_role = candidate.get('status_updated_by_role', '')
                 
-                if manager.get('role') == 'Department Manager (MOE)':
-                    # MOE handles Process, Civil, Electrical departments
-                    moe_positions = ['process', 'civil', 'electrical', 'safety', 'hse']
-                    should_assign_to_this_manager = any(pos in position for pos in moe_positions)
-                elif manager.get('role') == 'Department Manager (MOP)':
-                    # MOP handles Piping, Mechanical, Instrumentation, AI, Digitization
-                    mop_positions = ['piping', 'mechanical', 'instrumentation', 'control', 'ai', 'digital', 'software']
-                    should_assign_to_this_manager = any(pos in position for pos in mop_positions)
-                
-                if should_assign_to_this_manager:
-                    candidate_info = {
-                        'id': candidate.get('id'),
-                        'name': candidate.get('name', 'Unknown'),
-                        'position': candidate.get('position', ''),
-                        'status': candidate.get('status', '')
-                    }
-                    
-                    # Check department manager's decision
-                    dept_notifications = [n for n in notifications if 
-                                        n.get('candidate_id') == candidate_id and 
-                                        n.get('for_role') in ['Department Manager (MOE)', 'Department Manager (MOP)']]
-                    
-                    if dept_notifications:
-                        latest_notification = max(dept_notifications, key=lambda x: x.get('timestamp', ''))
-                        status = latest_notification.get('status', 'Pending')
-                        
-                        if status == 'Approved':
-                            manager_data['shortlisted'].append(candidate_info)
-                        elif status == 'Rejected':
-                            manager_data['notapproved'].append(candidate_info)
-                        else:
-                            manager_data['onhold'].append(candidate_info)
-                    else:
-                        # Pending department manager approval
-                        manager_data['onhold'].append(candidate_info)
-        
-        hierarchical_flow['department_managers'].append(manager_data)
-    
-    # Process Operation Managers
-    for i, manager in enumerate(operation_managers):
-        manager_data = {
-            'id': manager.get('username', f'op_mgr_{i}'),
-            'name': manager.get('username', 'Unknown').title().replace('_', ' '),
-            'role': manager.get('role', ''),
-            'department': manager.get('department', ''),
-            'shortlisted': [],
-            'onhold': [],
-            'notapproved': []
-        }
-        
-        # Get candidates that should be at operation manager level
-        for candidate in candidates:
-            candidate_id = candidate.get('id')
-            candidate_status = candidate.get('status', '')
-            
-            # Hired candidates automatically go to operation manager (final approval)
-            if candidate_status == 'Hired':
-                candidate_info = {
-                    'id': candidate.get('id'),
-                    'name': candidate.get('name', 'Unknown'),
-                    'position': candidate.get('position', ''),
-                    'status': candidate.get('status', '')
-                }
-                manager_data['shortlisted'].append(candidate_info)
-                print(f"[DEBUG] Adding hired candidate {candidate.get('name')} to operation manager")
-                continue
-            
-            # Check if approved by department manager
-            dept_approved = any(n.get('candidate_id') == candidate_id and 
-                              n.get('for_role') in ['Department Manager (MOE)', 'Department Manager (MOP)'] and 
-                              n.get('status') == 'Approved' 
-                              for n in notifications)
-            
-            if dept_approved:
-                candidate_info = {
-                    'id': candidate.get('id'),
-                    'name': candidate.get('name', 'Unknown'),
-                    'position': candidate.get('position', ''),
-                    'status': candidate.get('status', '')
-                }
-                
-                # Check operation manager's decision
-                op_notifications = [n for n in notifications if 
-                                  n.get('candidate_id') == candidate_id and 
-                                  n.get('for_role') == 'Operation Manager']
-                
-                if op_notifications:
-                    latest_notification = max(op_notifications, key=lambda x: x.get('timestamp', ''))
-                    status = latest_notification.get('status', 'Pending')
-                    
-                    if status == 'Approved':
+                # Check current status update
+                if (status_updated_by == manager_username or 
+                    (status_updated_by_role in ['Department Manager (MOE)', 'Department Manager (MOP)'] and 
+                     status_updated_by == manager_username)):
+                    candidate_status = candidate.get('status', '').lower()
+                    if candidate_status in ['shortlisted', 'approved', 'hired']:
                         manager_data['shortlisted'].append(candidate_info)
-                    elif status == 'Rejected':
+                    elif candidate_status in ['rejected']:
                         manager_data['notapproved'].append(candidate_info)
                     else:
                         manager_data['onhold'].append(candidate_info)
                 else:
-                    # Pending operation manager approval
+                    # Check status history to see if THIS manager ever acted on this candidate
+                    status_history = candidate.get('status_history', [])
+                    for history_entry in status_history:
+                        if (history_entry.get('updated_by') == manager_username or
+                            (history_entry.get('updated_by_role') in ['Department Manager (MOE)', 'Department Manager (MOP)'] and 
+                             history_entry.get('updated_by') == manager_username)):
+                            # This manager acted on this candidate in the past
+                            candidate_status = candidate.get('status', '').lower()
+                            if candidate_status in ['shortlisted', 'approved', 'hired', 'interviewed', 'interview scheduled']:
+                                manager_data['shortlisted'].append(candidate_info)
+                            elif candidate_status in ['rejected']:
+                                manager_data['notapproved'].append(candidate_info)
+                            else:
+                                manager_data['onhold'].append(candidate_info)
+                            break
+        
+        hierarchical_flow['department_managers'].append(manager_data)
+    
+    # Process Operation Managers - Show only candidates they specifically updated
+    for i, manager in enumerate(operation_managers):
+        manager_username = manager.get('username', f'op_mgr_{i}')
+        manager_data = {
+            'id': manager_username,
+            'name': manager.get('username', 'Unknown').title().replace('_', ' '),
+            'role': manager.get('role', ''),
+            'department': manager.get('department', ''),
+            'shortlisted': [],
+            'onhold': [],
+            'notapproved': []
+        }
+        
+        # Only show candidates that THIS specific operation manager has acted upon
+        for candidate in filtered_candidates:
+            candidate_id = candidate.get('id')
+            candidate_status = candidate.get('status', '').lower()
+            
+            candidate_info = {
+                'id': candidate.get('id'),
+                'name': candidate.get('name', 'Unknown'),
+                'position': candidate.get('position', ''),
+                'status': candidate.get('status', '')
+            }
+            
+            # Check if THIS operation manager has made a decision
+            op_notifications = [n for n in notifications if 
+                              n.get('candidate_id') == candidate_id and 
+                              n.get('for_role') == 'Operation Manager' and
+                              n.get('approved_by') == manager_username]  # Only this manager's actions
+            
+            if op_notifications:
+                # Found notification from THIS manager - use the latest one
+                latest_notification = max(op_notifications, key=lambda x: x.get('timestamp', ''))
+                notification_status = latest_notification.get('status', 'Pending')
+                
+                if notification_status == 'Approved':
+                    manager_data['shortlisted'].append(candidate_info)
+                elif notification_status == 'Rejected':
+                    manager_data['notapproved'].append(candidate_info)
+                else:
                     manager_data['onhold'].append(candidate_info)
+            else:
+                # Check if THIS manager updated the candidate status directly
+                status_updated_by = candidate.get('status_updated_by', '')
+                status_updated_by_role = candidate.get('status_updated_by_role', '')
+                
+                # Check current status update
+                if (status_updated_by == manager_username or 
+                    (status_updated_by_role == 'Operation Manager' and status_updated_by == manager_username)):
+                    if candidate_status == 'hired':
+                        manager_data['shortlisted'].append(candidate_info)
+                    elif candidate_status in ['approved']:
+                        manager_data['shortlisted'].append(candidate_info)
+                    elif candidate_status in ['rejected']:
+                        manager_data['notapproved'].append(candidate_info)
+                    else:
+                        manager_data['onhold'].append(candidate_info)
+                else:
+                    # Check status history to see if THIS manager ever acted on this candidate
+                    status_history = candidate.get('status_history', [])
+                    for history_entry in status_history:
+                        if (history_entry.get('updated_by') == manager_username or
+                            (history_entry.get('updated_by_role') == 'Operation Manager' and 
+                             history_entry.get('updated_by') == manager_username)):
+                            # This manager acted on this candidate in the past
+                            if candidate_status in ['hired', 'approved', 'interviewed', 'interview scheduled', 'shortlisted']:
+                                manager_data['shortlisted'].append(candidate_info)
+                            elif candidate_status in ['rejected']:
+                                manager_data['notapproved'].append(candidate_info)
+                            else:
+                                manager_data['onhold'].append(candidate_info)
+                            break
         
         hierarchical_flow['operation_managers'].append(manager_data)
     
@@ -2770,11 +3079,9 @@ def build_approval_flow(candidate, notifications, color_map, current_user_role):
     final_color = color_map['Pending']
     
     # Check if final approval has been completed
-    if candidate.get('status') in ['Approved', 'Selected', 'Hired']:
+    if candidate.get('status') in ['Approved', 'Hired']:
         if candidate.get('status') == 'Approved':
             final_action = 'Final Approval Complete'
-        elif candidate.get('status') == 'Selected':
-            final_action = 'Approved & Selected'
         elif candidate.get('status') == 'Hired':
             final_action = 'Hired Successfully'
         
@@ -2792,20 +3099,29 @@ def build_approval_flow(candidate, notifications, color_map, current_user_role):
         final_action = candidate.get('status')
         final_color = color_map['Rejected'] if candidate.get('status') == 'Rejected' else color_map['Pending']
     else:
-        # Check if all previous steps are approved
-        all_approved = all(step['action'] == 'Approved' for step in flow['steps'])
-        if all_approved and candidate.get('status') == 'Pending Approval':
-            # Waiting for final approver
-            if ((final_approver == current_user_role) or 
-                (final_approver == 'Department Manager (MOE/MOP)' and current_user_role in ['Department Manager (MOE)', 'Department Manager (MOP)'])):
+        # For candidates with "Selected" status, they need Operation Manager approval
+        if candidate.get('status') == 'Selected':
+            if current_user_role == 'Operation Manager':
                 final_action = 'Ready for Final Approval'
                 final_color = color_map['Current']
             else:
-                final_action = f'Awaiting {final_approver}'
+                final_action = 'Awaiting Operation Manager Approval'
                 final_color = color_map['Pending']
         else:
-            final_action = 'Pending Previous Approvals'
-            final_color = color_map['Pending']
+            # Check if all previous steps are approved
+            all_approved = all(step['action'] == 'Approved' for step in flow['steps'])
+            if all_approved and candidate.get('status') == 'Pending Approval':
+                # Waiting for final approver
+                if ((final_approver == current_user_role) or 
+                    (final_approver == 'Department Manager (MOE/MOP)' and current_user_role in ['Department Manager (MOE)', 'Department Manager (MOP)'])):
+                    final_action = 'Ready for Final Approval'
+                    final_color = color_map['Current']
+                else:
+                    final_action = f'Awaiting {final_approver}'
+                    final_color = color_map['Pending']
+            else:
+                final_action = 'Pending Previous Approvals'
+                final_color = color_map['Pending']
     
     flow['steps'].append({
         'role': 'Final Approval',
@@ -3348,6 +3664,69 @@ def manage_onboarding():
     role = request.cookies.get('role', '')
     view = request.args.get('view', 'table')
     return render_template('manage_onboarding.html', candidates_list=candidates_list, role=role, view=view)
+
+@app.route('/api/notifications')
+def get_notifications():
+    
+    try:
+        current_role = request.cookies.get('role', '')
+        if not current_role:
+            return jsonify({'success': False, 'message': 'User role not found'}), 403
+        
+        notification_file = os.path.join(os.path.dirname(__file__), 'db', 'notifications.json')
+        if os.path.exists(notification_file):
+            with open(notification_file, 'r') as f:
+                try:
+                    notifications = json.load(f)
+                except json.JSONDecodeError:
+                    notifications = []
+        else:
+            notifications = []
+        
+        # Filter notifications for current user role
+        user_notifications = [
+            n for n in notifications 
+            if n.get('for_role') == current_role and n.get('status') == 'Pending'
+        ]
+        
+        return jsonify({
+            'success': True,
+            'notifications': user_notifications,
+            'count': len(user_notifications)
+        })
+    except Exception as e:
+        print(f'''Error fetching notifications: {e}''')
+        return jsonify({'success': False, 'message': 'Error fetching notifications'}), 500 
+
+@app.route('/api/notifications/<int:notification_id>/mark_read', methods=['POST'])
+def mark_notification_read(notification_id):
+    
+    try:
+        notification_file = os.path.join(os.path.dirname(__file__), 'db', 'notifications.json')
+        if os.path.exists(notification_file):
+            with open(notification_file, 'r') as f:
+                try:
+                    notifications = json.load(f)
+                except json.JSONDecodeError:
+                    notifications = []
+        else:
+            notifications = []
+        
+        # Find and update notification
+        for notification in notifications:
+            if notification.get('id') == notification_id:
+                notification['status'] = 'Read'
+                notification['read_at'] = datetime.datetime.now().isoformat()
+                break
+        
+        # Save updated notifications
+        with open(notification_file, 'w') as f:
+            json.dump(notifications, f, indent=4)
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f'''Error marking notification as read: {e}''')
+        return jsonify({'success': False, 'message': 'Error updating notification'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

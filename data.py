@@ -239,13 +239,41 @@ def fetch_all_db_data():
         "users": users,
         "notifications": notifications
     }
-# Recent activities fetcher
+# Enhanced Recent Activities fetcher with new activity logger integration
 def fetch_recent_activities(show_all=False):
+    """
+    Fetch recent activities using both legacy data and new activity logger.
+    Returns combined activities from multiple sources for comprehensive view.
+    """
+    all_activities = []
+    
+    # Try to get activities from new activity logger first
+    try:
+        from activity_logger import activity_logger
+        new_activities = activity_logger.get_recent_activities(limit=20, days=7)
+        
+        # Convert new activity format to expected format
+        for activity in new_activities:
+            all_activities.append({
+                'date': activity.get('timestamp', activity.get('date', '')),
+                'description': activity.get('description', ''),
+                'user': activity.get('user', 'Unknown'),
+                'is_new': True,
+                'type': activity.get('activity_type', 'unknown'),
+                'entity_type': activity.get('entity_type', ''),
+                'entity_id': activity.get('entity_id', '')
+            })
+        
+        print(f"✅ Fetched {len(new_activities)} activities from new logger")
+    except Exception as e:
+        print(f"⚠️ Could not fetch from new activity logger: {e}")
+    
+    # Fallback to legacy activity fetching from JSON files
     db_folder = os.path.join(os.path.dirname(__file__), 'db')
     candidate_file = os.path.join(db_folder, 'candidates.json')
     job_file = os.path.join(db_folder, 'jobs.json')
-    activities = []
-    # Candidate activities
+    
+    # Get username mapping
     usernames = {}
     user_file = os.path.join(db_folder, 'userdata.json')
     if os.path.exists(user_file):
@@ -259,77 +287,138 @@ def fetch_recent_activities(show_all=False):
                 usernames[u['email']] = u.get('username', '')
             if u.get('username'):
                 usernames[u['username']] = u.get('username', '')
+    
+    # Legacy candidate activities
     if os.path.exists(candidate_file):
         with open(candidate_file, 'r') as f:
             try:
                 candidates = json.load(f)
             except json.JSONDecodeError:
                 candidates = []
+        
         for c in candidates:
-            # Log initial creation
+            # Initial application
             if c.get('applied_date'):
                 user_val = c.get('email', '')
                 user_val = usernames.get(user_val, user_val)
-                activities.append({
+                all_activities.append({
                     'date': c.get('applied_date'),
-                    'description': f"Candidate {c.get('name', '')} (ID: {c.get('id', '')}) created",
+                    'description': f"Candidate {c.get('name', '')} (ID: {c.get('id', '')}) applied",
                     'user': user_val if user_val else 'Unknown',
-                    'is_new': True
+                    'is_new': True,
+                    'type': 'candidate_applied',
+                    'entity_type': 'candidate',
+                    'entity_id': c.get('id', '')
                 })
-            # Log every update as a separate activity
+            
+            # Updates
             if c.get('updated_at') and c.get('updated_by'):
                 user_val = c.get('updated_by', c.get('email', ''))
                 user_val = usernames.get(user_val, user_val)
                 date_val = c.get('updated_at')
                 candidate_name = c.get('name', '')
                 candidate_id = c.get('id', '')
-                descs = []
+                
+                # Status changes
                 if c.get('status'):
-                    descs.append(f"Status of candidate {candidate_name} (ID: {candidate_id}) changed to {c.get('status', '')} by {user_val}")
-                if c.get('interview_date') and c.get('interview_time'):
-                    descs.append(f"Interview scheduled for {candidate_name} (ID: {candidate_id}) on {c.get('interview_date', '')} at {c.get('interview_time', '')} by {user_val}")
-                if c.get('onboarding'):
-                    descs.append(f"Onboarding updated for {candidate_name} (ID: {candidate_id}) by {user_val}")
-                if not descs:
-                    descs.append(f"Candidate {candidate_name} (ID: {candidate_id}) updated by {user_val}")
-                for desc in descs:
-                    activities.append({
+                    all_activities.append({
                         'date': date_val,
-                        'description': desc,
+                        'description': f"Candidate {candidate_name} (ID: {candidate_id}) status changed to {c.get('status', '')}",
                         'user': user_val if user_val else 'Unknown',
-                        'is_new': True if (datetime.datetime.now() - datetime.datetime.strptime(date_val, '%Y-%m-%d %H:%M:%S')).days < 2 else False
+                        'is_new': True,
+                        'type': 'candidate_status_updated',
+                        'entity_type': 'candidate',
+                        'entity_id': candidate_id
                     })
-    # Job activities
+                
+                # Interview scheduling
+                if c.get('interview_date') and c.get('interview_time'):
+                    all_activities.append({
+                        'date': date_val,
+                        'description': f"Interview scheduled for {candidate_name} (ID: {candidate_id}) on {c.get('interview_date', '')} at {c.get('interview_time', '')}",
+                        'user': user_val if user_val else 'Unknown',
+                        'is_new': True,
+                        'type': 'interview_scheduled',
+                        'entity_type': 'interview',
+                        'entity_id': candidate_id
+                    })
+                
+                # Onboarding updates
+                if c.get('onboarding'):
+                    all_activities.append({
+                        'date': date_val,
+                        'description': f"Onboarding updated for {candidate_name} (ID: {candidate_id})",
+                        'user': user_val if user_val else 'Unknown',
+                        'is_new': True,
+                        'type': 'onboarding_updated',
+                        'entity_type': 'onboarding',
+                        'entity_id': candidate_id
+                    })
+    
+    # Legacy job activities
     if os.path.exists(job_file):
         with open(job_file, 'r') as f:
             try:
                 jobs = json.load(f)
             except json.JSONDecodeError:
                 jobs = []
+        
         for job in jobs:
             user_val = job.get('job_posted_by', '')
             user_val = usernames.get(user_val, user_val)
-            activity = {
+            all_activities.append({
                 'date': job.get('posted_at', ''),
                 'description': f"Job posted: {job.get('job_title', '')}",
                 'user': user_val,
-                'is_new': False
-            }
-            activities.append(activity)
+                'is_new': False,
+                'type': 'job_posted',
+                'entity_type': 'job',
+                'entity_id': job.get('id', '')
+            })
+    
+    # Remove duplicates based on description and date
+    unique_activities = []
+    seen = set()
+    for activity in all_activities:
+        key = f"{activity.get('date', '')}_{activity.get('description', '')}"
+        if key not in seen:
+            seen.add(key)
+            unique_activities.append(activity)
+    
     # Sort by date descending
-    activities = sorted(activities, key=lambda x: x['date'], reverse=True)
-    # Always show the latest 10 activities, but mark 'is_new' for those in the last 2 days
-    for a in activities:
+    try:
+        unique_activities = sorted(unique_activities, key=lambda x: x.get('date', ''), reverse=True)
+    except Exception as e:
+        print(f"⚠️ Error sorting activities: {e}")
+    
+    # Mark activities as new if they're within the last 2 days
+    for a in unique_activities:
         try:
-            dt = datetime.datetime.strptime(a['date'], '%Y-%m-%d')
-        except Exception:
-            try:
-                dt = datetime.datetime.strptime(a['date'], '%Y-%m-%d %H:%M:%S')
-            except Exception:
+            date_str = a.get('date', '')
+            if not date_str:
                 a['is_new'] = False
                 continue
-        a['is_new'] = (datetime.datetime.now() - dt).days < 2
-    return activities[:10]
+                
+            # Try different date formats
+            dt = None
+            for fmt in ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d']:
+                try:
+                    dt = datetime.datetime.strptime(date_str, fmt)
+                    break
+                except ValueError:
+                    continue
+            
+            if dt:
+                a['is_new'] = (datetime.datetime.now() - dt).days < 2
+            else:
+                a['is_new'] = False
+        except Exception:
+            a['is_new'] = False
+    
+    # Return the most recent activities
+    result = unique_activities[:20] if show_all else unique_activities[:10]
+    print(f"✅ Returning {len(result)} total activities")
+    return result
 
 # ------------------------------------------------------------------------------------
 # Extract text from uploaded JD file (txt, pdf, docx)
@@ -968,11 +1057,37 @@ def fetch_job_by_id(job_id):
 def fetch_todays_activities():
     """
     Return a list of activities (candidate and job) that occurred today.
-    Useful for daily analytics/pulse.
+    Enhanced with new activity logger integration.
     """
+    todays_activities = []
+    today = datetime.datetime.now().date()
+    
+    # Try to get today's activities from new activity logger first
+    try:
+        from activity_logger import activity_logger
+        new_todays_activities = activity_logger.get_todays_activities()
+        
+        # Convert new activity format to expected format
+        for activity in new_todays_activities:
+            todays_activities.append({
+                'date': activity.get('timestamp', activity.get('date', '')),
+                'description': activity.get('description', ''),
+                'user': activity.get('user', 'Unknown'),
+                'type': activity.get('activity_type', 'unknown'),
+                'entity_type': activity.get('entity_type', ''),
+                'entity_id': activity.get('entity_id', '')
+            })
+        
+        print(f"✅ Fetched {len(new_todays_activities)} today's activities from new logger")
+    except Exception as e:
+        print(f"⚠️ Could not fetch today's activities from new activity logger: {e}")
+    
+    # Fallback to legacy method
     db_folder = os.path.join(os.path.dirname(__file__), 'db')
     candidate_file = os.path.join(db_folder, 'candidates.json')
     job_file = os.path.join(db_folder, 'jobs.json')
+    
+    # Get username mapping
     usernames = {}
     user_file = os.path.join(db_folder, 'userdata.json')
     if os.path.exists(user_file):
@@ -986,17 +1101,17 @@ def fetch_todays_activities():
                 usernames[u['email']] = u.get('username', '')
             if u.get('username'):
                 usernames[u['username']] = u.get('username', '')
-    today = datetime.datetime.now().date()
-    activities = []
-    # Candidate activities
+    
+    # Legacy candidate activities for today
     if os.path.exists(candidate_file):
         with open(candidate_file, 'r') as f:
             try:
                 candidates = json.load(f)
             except json.JSONDecodeError:
                 candidates = []
+        
         for c in candidates:
-            # Initial creation
+            # Check applied date
             if c.get('applied_date'):
                 try:
                     applied_dt = datetime.datetime.strptime(c.get('applied_date'), '%Y-%m-%d')
@@ -1005,13 +1120,16 @@ def fetch_todays_activities():
                 if applied_dt and applied_dt.date() == today:
                     user_val = c.get('email', '')
                     user_val = usernames.get(user_val, user_val)
-                    activities.append({
+                    todays_activities.append({
                         'date': c.get('applied_date'),
-                        'description': f"Candidate {c.get('name', '')} (ID: {c.get('id', '')}) created",
+                        'description': f"Candidate {c.get('name', '')} (ID: {c.get('id', '')}) applied",
                         'user': user_val if user_val else 'Unknown',
-                        'type': 'candidate'
+                        'type': 'candidate_applied',
+                        'entity_type': 'candidate',
+                        'entity_id': c.get('id', '')
                     })
-            # Updates
+            
+            # Check updates today
             if c.get('updated_at') and c.get('updated_by'):
                 try:
                     updated_dt = datetime.datetime.strptime(c.get('updated_at'), '%Y-%m-%d %H:%M:%S')
@@ -1022,29 +1140,46 @@ def fetch_todays_activities():
                     user_val = usernames.get(user_val, user_val)
                     candidate_name = c.get('name', '')
                     candidate_id = c.get('id', '')
-                    descs = []
+                    
+                    # Different types of updates
                     if c.get('status'):
-                        descs.append(f"Status of candidate {candidate_name} (ID: {candidate_id}) changed to {c.get('status', '')} by {user_val}")
-                    if c.get('interview_date') and c.get('interview_time'):
-                        descs.append(f"Interview scheduled for {candidate_name} (ID: {candidate_id}) on {c.get('interview_date', '')} at {c.get('interview_time', '')} by {user_val}")
-                    if c.get('onboarding'):
-                        descs.append(f"Onboarding updated for {candidate_name} (ID: {candidate_id}) by {user_val}")
-                    if not descs:
-                        descs.append(f"Candidate {candidate_name} (ID: {candidate_id}) updated by {user_val}")
-                    for desc in descs:
-                        activities.append({
+                        todays_activities.append({
                             'date': c.get('updated_at'),
-                            'description': desc,
+                            'description': f"Candidate {candidate_name} (ID: {candidate_id}) status changed to {c.get('status', '')}",
                             'user': user_val if user_val else 'Unknown',
-                            'type': 'candidate'
+                            'type': 'candidate_status_updated',
+                            'entity_type': 'candidate',
+                            'entity_id': candidate_id
                         })
-    # Job activities
+                    
+                    if c.get('interview_date') and c.get('interview_time'):
+                        todays_activities.append({
+                            'date': c.get('updated_at'),
+                            'description': f"Interview scheduled for {candidate_name} (ID: {candidate_id}) on {c.get('interview_date', '')} at {c.get('interview_time', '')}",
+                            'user': user_val if user_val else 'Unknown',
+                            'type': 'interview_scheduled',
+                            'entity_type': 'interview',
+                            'entity_id': candidate_id
+                        })
+                    
+                    if c.get('onboarding'):
+                        todays_activities.append({
+                            'date': c.get('updated_at'),
+                            'description': f"Onboarding updated for {candidate_name} (ID: {candidate_id})",
+                            'user': user_val if user_val else 'Unknown',
+                            'type': 'onboarding_updated',
+                            'entity_type': 'onboarding',
+                            'entity_id': candidate_id
+                        })
+    
+    # Legacy job activities for today
     if os.path.exists(job_file):
         with open(job_file, 'r') as f:
             try:
                 jobs = json.load(f)
             except json.JSONDecodeError:
                 jobs = []
+        
         for job in jobs:
             posted_at = job.get('posted_at', '')
             try:
@@ -1054,12 +1189,29 @@ def fetch_todays_activities():
             if posted_dt and posted_dt.date() == today:
                 user_val = job.get('job_posted_by', '')
                 user_val = usernames.get(user_val, user_val)
-                activities.append({
+                todays_activities.append({
                     'date': posted_at,
                     'description': f"Job posted: {job.get('job_title', '')}",
                     'user': user_val,
-                    'type': 'job'
+                    'type': 'job_posted',
+                    'entity_type': 'job',
+                    'entity_id': job.get('id', '')
                 })
+    
+    # Remove duplicates
+    unique_activities = []
+    seen = set()
+    for activity in todays_activities:
+        key = f"{activity.get('date', '')}_{activity.get('description', '')}"
+        if key not in seen:
+            seen.add(key)
+            unique_activities.append(activity)
+    
     # Sort by date descending
-    activities = sorted(activities, key=lambda x: x['date'], reverse=True)
-    return activities
+    try:
+        unique_activities = sorted(unique_activities, key=lambda x: x.get('date', ''), reverse=True)
+    except Exception as e:
+        print(f"⚠️ Error sorting today's activities: {e}")
+    
+    print(f"✅ Returning {len(unique_activities)} today's activities")
+    return unique_activities

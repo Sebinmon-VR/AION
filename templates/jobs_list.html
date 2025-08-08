@@ -8,6 +8,86 @@
         text-align: right;
         margin-bottom: 12px; /* slightly less margin */
         user-select: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .filter-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sort-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .sort-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border: 1px solid #eaeaea;
+        border-radius: 6px;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .sort-btn:hover {
+        background-color: #f9f9f9;
+        border-color: #007bff;
+        color: #007bff;
+    }
+
+    .sort-dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: #fff;
+        min-width: 160px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 6px;
+        border: 1px solid #eaeaea;
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    .sort-dropdown-content.show {
+        display: block;
+    }
+
+    .sort-option {
+        display: block;
+        padding: 10px 15px;
+        color: #333;
+        text-decoration: none;
+        font-size: 13px;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .sort-option:last-child {
+        border-bottom: none;
+    }
+
+    .sort-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    .sort-option.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .view-buttons {
+        display: flex;
+        gap: 6px;
     }
 
     .view-switcher a {
@@ -44,28 +124,70 @@
         background-color: #fff; /* pure white */
         border-radius: 12px;
         box-shadow: 0 3px 10px rgba(0,0,0,0.05); /* subtle soft shadow */
+        overflow-x: auto; /* Add horizontal scroll for small screens */
+    }
+
+    .table-container h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+        font-weight: 600;
     }
 
     /* Table view styles */
     .table-view table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 14px; /* smaller font size */
+        font-size: 12px; /* even smaller font size */
+        table-layout: fixed; /* Fixed layout for better control */
+        border-spacing: 0; /* Remove any spacing between cells */
+        border: none; /* Remove table border */
+        margin: 0; /* Remove table margin */
+        padding: 0; /* Remove table padding */
     }
 
     .table-view th,
     .table-view td {
-        padding: 10px 14px; /* smaller padding */
-        width: auto;
-        border-bottom: 1px solid #f0f0f0; /* lighter border */
-        vertical-align: top;
+        padding: 4px 8px; /* Much smaller padding */
+        border-bottom: 1px solid #e0e0e0; /* slightly darker border */
+        vertical-align: middle; /* center align content */
         position: relative;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.1; /* Even tighter line height */
+        margin: 0; /* Remove any margins */
+        height: 28px; /* Fixed small row height */
+        border-left: none; /* Remove left borders */
+        border-right: none; /* Remove right borders */
+        border-top: none; /* Remove top borders */
+        text-align: left; /* Ensure left alignment for both th and td */
     }
 
+    /* Column width distribution */
+    .table-view th:nth-child(1), .table-view td:nth-child(1) { width: 40%; } /* Name */
+    .table-view th:nth-child(2), .table-view td:nth-child(2) { width: 30%; } /* Status */
+    .table-view th:nth-child(3), .table-view td:nth-child(3) { width: 30%; } /* Actions */
+
     .table-view thead th {
-        background-color: #fafafa; /* lighter header bg */
+        background-color: #f8f9fa; /* slightly different header bg */
         font-weight: 600;
         color: #444;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #dee2e6; /* stronger bottom border for header */
+        padding: 4px 8px; /* EXACT same padding as td */
+        height: 28px; /* EXACT same height as td */
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        text-align: left; /* Same alignment as td */
+        vertical-align: middle; /* Same vertical alignment */
+        margin: 0;
+        position: relative;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.1;
     }
 
     /* Card view styles */
@@ -130,14 +252,18 @@
     .btn-white {
         background-color: #ffffff;
         color: #333333;
-        border-radius: 6px;
-        padding: 6px 12px; /* smaller padding */
+        border-radius: 4px;
+        padding: 4px 8px; /* smaller padding */
         text-decoration: none;
         transition: all 0.2s ease-in-out;
-        font-size: 13px; /* smaller font */
+        font-size: 11px; /* smaller font */
         margin-right: 6px;
         border: 1px solid #ddd;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        white-space: nowrap;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
     }
 
     .btn-white:hover {
@@ -156,57 +282,183 @@
         align-items: center;
         justify-content: flex-start;
         position: relative;
+        gap: 2px; /* Smaller gap between buttons */
+        flex-wrap: nowrap; /* Prevent wrapping */
     }
 
     .icon-btn {
         background: none;
         border: none;
-        padding: 3px; /* smaller padding */
+        padding: 3px; /* even smaller padding */
         cursor: pointer;
         vertical-align: middle;
         display: inline-flex;
         align-items: center;
         transition: background 0.2s;
-        border-radius: 4px;
+        border-radius: 3px;
         text-decoration: none;
+        min-width: 24px; /* Smaller minimum width */
+        height: 24px;
+        justify-content: center;
     }
 
     .icon-btn:hover {
         background: #f9f9f9;
     }
+
+    /* Status badge styling */
+    .status-badge {
+        padding: 2px 8px; /* Smaller padding */
+        border-radius: 12px; /* Smaller border radius */
+        font-size: 10px; /* Smaller font */
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px; /* Reduced letter spacing */
+        display: inline-block;
+    }
+
+    .status-badge.active {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-badge.open {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-badge.closed {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .table-view th:nth-child(2), .table-view td:nth-child(2) { 
+            width: 30%; /* Increase description width on mobile */
+        }
+        .table-view th:nth-child(5), .table-view td:nth-child(5) { 
+            width: 15%; /* Decrease requirements width on mobile */
+        }
+        
+        .job-card {
+            flex: 1 1 100%; /* Full width cards on mobile */
+        }
+        
+        .table-container {
+            padding: 15px;
+        }
+        
+        .view-switcher {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    }
+
+    /* Ensure no text overflow */
+    .table-view td {
+        word-wrap: break-word;
+        word-break: break-word;
+        max-width: 0; /* Allow tables to constrain width */
+    }
+
+    /* Make action buttons more compact */
+    .btn-white {
+        background-color: #ffffff;
+        color: #333333;
+        border-radius: 4px;
+        padding: 4px 8px; /* smaller padding */
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+        font-size: 11px; /* smaller font */
+        border: 1px solid #ddd;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        white-space: nowrap;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+    }
 </style>
 
 <div class="table-container {{ 'card-view' if view == 'card' else 'table-view' }}">
+<h2 style="margin-top: 5%;">Jobs List</h2>
 
-    <h2>Jobs List</h2>
 
     <div class="view-switcher" aria-label="View Switcher">
-        <a href="{{ url_for('jobs_list', view='table') }}" 
-           class="{{ 'active' if view == 'table' else '' }}" 
-           title="Table View" aria-pressed="{{ 'true' if view == 'table' else 'false' }}">
-            <!-- Table icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-            Table View
-        </a>
+        <div class="filter-section">
+            <div class="sort-dropdown">
+                <button class="sort-btn" onclick="toggleSortDropdown()" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M3 6h18M7 12h10m-7 6h4"/>
+                    </svg>
+                    Sort
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                        <polyline points="6,9 12,15 18,9"/>
+                    </svg>
+                </button>
+                <div class="sort-dropdown-content" id="sortDropdown">
+                    <a href="{{ url_for('jobs_list', view=view, sort='newest', status=status) }}" class="sort-option {{ 'active' if sort == 'newest' else '' }}">
+                        Newest First
+                    </a>
+                    <a href="{{ url_for('jobs_list', view=view, sort='oldest', status=status) }}" class="sort-option {{ 'active' if sort == 'oldest' else '' }}">
+                        Oldest First
+                    </a>
+                </div>
+            </div>
+            
+            <div class="sort-dropdown">
+                <button class="sort-btn" onclick="toggleStatusDropdown()" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6m0 6v6"/>
+                    </svg>
+                    Status
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                        <polyline points="6,9 12,15 18,9"/>
+                    </svg>
+                </button>
+                <div class="sort-dropdown-content" id="statusDropdown">
+                    <a href="{{ url_for('jobs_list', view=view, sort=sort, status='all') }}" class="sort-option {{ 'active' if status == 'all' or not status else '' }}">
+                        All Jobs
+                    </a>
+                    <a href="{{ url_for('jobs_list', view=view, sort=sort, status='active') }}" class="sort-option {{ 'active' if status == 'active' else '' }}">
+                        Active Only
+                    </a>
+                    <a href="{{ url_for('jobs_list', view=view, sort=sort, status='closed') }}" class="sort-option {{ 'active' if status == 'closed' else '' }}">
+                        Closed Only
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="view-buttons">            
+            <a href="{{ url_for('jobs_list', view='table', sort=sort, status=status) }}" 
+               class="{{ 'active' if view == 'table' else '' }}" 
+               title="Table View" aria-pressed="{{ 'true' if view == 'table' else 'false' }}">
+                <!-- Table icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                Table View
+            </a>
 
-        <a href="{{ url_for('jobs_list', view='card') }}" 
-           class="{{ 'active' if view == 'card' else '' }}" 
-           title="Card View" aria-pressed="{{ 'true' if view == 'card' else 'false' }}">
-            <!-- Card icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-            Card View
-        </a>
+            <a href="{{ url_for('jobs_list', view='card', sort=sort, status=status) }}" 
+               class="{{ 'active' if view == 'card' else '' }}" 
+               title="Card View" aria-pressed="{{ 'true' if view == 'card' else 'false' }}">
+                <!-- Card icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                Card View
+            </a>
+        </div>
     </div>
 
     <!-- Table view HTML -->
     <table>
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Location</th>
-                <th>Type</th>
-                <th>Requirements</th>
+                <th>Job Name</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -215,35 +467,31 @@
             <tr>
                 <td>{{ job['job_title'] }}</td>
                 <td>
-                  {% set desc = job['job_description'] %}
-                  {% if desc and desc|length > 120 %}
-                    {{ desc[:120] }}... <a href="{{ url_for('job_details', job_id=job['job_id']) }}" style="color:#007bff; text-decoration:underline;">See more</a>
-                  {% else %}
-                    {{ desc }}
-                  {% endif %}
+                    <span class="status-badge {{ 'open' if job.get('status', 'active').lower() in ['open', 'active'] else 'closed' }}">
+                        {{ job.get('status', 'Open').title() }}
+                    </span>
                 </td>
-                <td>{{ job['job_location'] }}</td>
-                <td>{{ job['job_type'] }}</td>
-                <td>{{ job['job_requirements'] }}</td>
                 <td>
                     {% if job['job_id'] %}
                         <div class="action-wrapper">
-                            <a href="{{ url_for('job_details', job_id=job['job_id']) }}" class="btn-white" title="View">
-                                <img src="{{ url_for('static', filename='images/view.png') }}" alt="View" style="width: 20px; height: 20px;">
+                            <a href="{{ url_for('job_details', job_id=job['job_id']) }}" class="icon-btn" title="View">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                  <circle cx="12" cy="12" r="3"/>
+                                </svg>
                             </a>
-                            <a href="{{ url_for('edit_job', job_id=job['job_id']) }}" title="Edit" class="icon-btn" style="margin-right:8px; opacity: 0.8;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <a href="{{ url_for('edit_job', job_id=job['job_id']) }}" title="Edit" class="icon-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                   <path d="M12 20h9" />
                                   <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
                                 </svg>
                             </a>
-                            <a href="{{ url_for('delete_job', job_id=job['job_id']) }}" title="Delete" class="icon-btn" style="color:#dc3545; opacity: 0.6;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <a href="{{ url_for('delete_job', job_id=job['job_id']) }}" title="Delete" class="icon-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                   <polyline points="3 6 5 6 21 6" />
                                   <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
                                   <path d="M10 11v6" />
                                   <path d="M14 11v6" />
-                                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                                 </svg>
                             </a>
                         </div>
@@ -261,10 +509,24 @@
         {% for job in jobs %}
             <div class="job-card">
                 <h3>{{ job['job_title'] }}</h3>
-                <p><strong>Description:</strong> {{ job['job_description'] }}</p>
+                <p><strong>Description:</strong> 
+                  {% set desc = job['job_description'] %}
+                  {% if desc and desc|length > 80 %}
+                    {{ desc[:80] }}...
+                  {% else %}
+                    {{ desc }}
+                  {% endif %}
+                </p>
                 <p><strong>Location:</strong> {{ job['job_location'] }}</p>
                 <p><strong>Type:</strong> {{ job['job_type'] }}</p>
-                <p><strong>Requirements:</strong> {{ job['job_requirements'] }}</p>
+                <p><strong>Requirements:</strong> 
+                  {% set req = job['job_requirements'] %}
+                  {% if req and req|length > 60 %}
+                    {{ req[:60] }}...
+                  {% else %}
+                    {{ req }}
+                  {% endif %}
+                </p>
                 <div class="job-card-actions">
                     {% if job['job_id'] %}
                         <a href="{{ url_for('job_details', job_id=job['job_id']) }}" class="btn-white" title="View">
@@ -285,5 +547,30 @@
     </div>
 
 </div>
+
+<script>
+function toggleSortDropdown() {
+    const dropdown = document.getElementById('sortDropdown');
+    dropdown.classList.toggle('show');
+}
+
+function toggleStatusDropdown() {
+    const dropdown = document.getElementById('statusDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// Close dropdown when clicking outside
+window.onclick = function(event) {
+    if (!event.target.matches('.sort-btn') && !event.target.closest('.sort-btn')) {
+        const dropdowns = document.getElementsByClassName('sort-dropdown-content');
+        for (let i = 0; i < dropdowns.length; i++) {
+            const openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}
+</script>
 
 {% endblock %}

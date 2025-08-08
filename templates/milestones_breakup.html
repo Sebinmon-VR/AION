@@ -1,7 +1,42 @@
 {% block content %}
 <div style="max-width:900px;margin:40px auto;padding:32px 24px;background:#fff;border-radius:10px;box-shadow:0 2px 12px #0001;">
   <h2 style="color:#1976d2;">Milestone: {{ label|capitalize }}</h2>
-  {% if label|lower == 'hired' %}
+  
+  Quick Navigation for Hired Candidates
+  {% if label|lower == 'hiring_success_rate' %}
+  <!-- <div style="background:#e8f5e8;padding:16px;border-radius:8px;margin-bottom:20px;text-align:center;">
+    <h3 style="color:#2e7d32;margin-bottom:12px;">📊 Hiring Success Rate Analytics</h3>
+    <div style="display:flex;gap:20px;justify-content:center;margin-bottom:12px;">
+      <div style="background:white;padding:10px;border-radius:5px;border:2px solid #43a047;">
+        <strong>Total Hired: {{ total_hired|default(0) }}</strong>
+      </div>
+      <div style="background:white;padding:10px;border-radius:5px;border:2px solid #1976d2;">
+        <strong>Success Rate: {{ success_rate|default(0) }}%</strong>
+      </div>
+    </div>
+    <a href="/milestones_breakup/hired" style="background:#43a047;color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block;">
+      📋 View Detailed Hired Candidates Page
+    </a>
+  </div> -->
+  
+  <!-- Hiring Success Rate Chart Section -->
+  <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start;margin-top:24px;">
+    <div style="flex:1;min-width:320px;max-width:420px;text-align:center;">
+      <h3 style="color:#1976d2;font-size:1.05rem;margin-bottom:8px;">Hiring Success Rate Breakdown</h3>
+      <canvas id="successRateChart" width="320" height="320"></canvas>
+      <div style="margin-top:12px;">
+        <span style="font-size:1.1rem;">Total Applicants: <b id="totalApplicantsDisplay">{{ total_applicants|default(0) }}</b></span><br>
+        <span style="font-size:1.1rem;">Total Hired: <b id="totalHiredDisplay">{{ total_hired|default(0) }}</b></span><br>
+        <span style="font-size:1.1rem;">Success Rate: <b id="successRateDisplay">{{ success_rate|default(0) }}%</b></span>
+      </div>
+    </div>
+    <div style="flex:1;min-width:320px;max-width:420px;text-align:center;">
+      <h3 style="color:#1976d2;font-size:1.05rem;margin-bottom:8px;">Hired Candidates by Department</h3>
+      <canvas id="deptSuccessChart" width="340" height="320"></canvas>
+      <div id="deptSuccessHint" style="color:#888;font-size:0.98rem;margin-top:8px;">Click a department label to view hired candidates</div>
+    </div>
+  </div>
+  {% elif label|lower == 'hired' %}
   <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start;">
     <div style="flex:1;min-width:320px;max-width:420px;text-align:center;">
       <h3 style="color:#1976d2;font-size:1.05rem;margin-bottom:8px;">Hiring Milestone Analytics</h3>
@@ -119,10 +154,13 @@
     {% endif %}
   </div>
   {% else %}
+  <!-- Only show general department radar chart for pages that don't have specific chart sections -->
+  {% if label|lower not in ['hiring_success_rate'] %}
   <div style="margin:32px auto 0 auto; max-width:500px; text-align:center;">
     <canvas id="deptRadarChart" width="340" height="320"></canvas>
     <div id="deptClickHint" style="color:#888;font-size:0.98rem;margin-top:8px;">Click a department label to view applicants</div>
   </div>
+  {% endif %}
   {% endif %}
   <div id="deptApplicantsTableWrapper" style="margin:28px auto 0 auto; max-width:700px; display:none;">
     <h4 id="deptApplicantsTitle" style="color:#1976d2;margin-bottom:10px;"></h4>
@@ -149,6 +187,9 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    // Global variables for all chart types
+    let allCandidates = [];
+    
     // Polar area chart for Hiring Milestone Analytics (only for hired)
     {% if label|lower == 'hired' %}
     window.addEventListener('DOMContentLoaded', function() {
@@ -215,6 +256,129 @@
     });
     {% endif %}
     
+    // Charts for Hiring Success Rate Analytics (only for hiring_success_rate)
+    {% if label|lower == 'hiring_success_rate' %}
+    window.addEventListener('DOMContentLoaded', function() {
+      // Set global allCandidates for this page
+      allCandidates = {{ candidates_json|safe }};
+      
+      // Success Rate Breakdown Chart (Doughnut)
+      const successRateData = [
+        Number({{ total_hired|default(0) }}),
+        Number({{ total_applicants|default(0) }}) - Number({{ total_hired|default(0) }})
+      ];
+      const successRateLabels = ['Hired', 'Not Hired'];
+      const successRateColors = [
+        'rgba(67, 160, 71, 0.8)',
+        'rgba(244, 67, 54, 0.8)'
+      ];
+      const successRateBorderColors = [
+        '#43a047',
+        '#f44336'
+      ];
+      const successRateCanvas = document.getElementById('successRateChart');
+      if (successRateCanvas) {
+        const successRateCtx = successRateCanvas.getContext('2d');
+        new Chart(successRateCtx, {
+          type: 'doughnut',
+          data: {
+            labels: successRateLabels,
+            datasets: [{
+              data: successRateData,
+              backgroundColor: successRateColors,
+              borderColor: successRateBorderColors,
+              borderWidth: 3
+            }]
+          },
+          options: {
+            responsive: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                  color: '#222',
+                  font: { size: 14, weight: 'bold' }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const percentage = (context.parsed / successRateData.reduce((a, b) => a + b, 0) * 100).toFixed(1);
+                    return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+      
+      // Department-wise Success Rate Chart (Radar)
+      const deptLabels = {{ dept_labels_json|safe }};
+      const deptCounts = {{ dept_counts_json|safe }};
+      
+      // Assign the candidates data to the global variable
+      allCandidates = {{ candidates_json|safe }};
+      
+      console.log('Hiring Success Rate Chart Data:');
+      console.log('deptLabels:', deptLabels);
+      console.log('deptCounts:', deptCounts);
+      console.log('allCandidates length:', allCandidates.length);
+      console.log('Sample candidates:', allCandidates.slice(0, 3));
+      
+      const deptSuccessCanvas = document.getElementById('deptSuccessChart');
+      let deptSuccessChart = null;
+      if (deptSuccessCanvas && deptLabels.length && deptCounts.length) {
+        const deptSuccessCtx = deptSuccessCanvas.getContext('2d');
+        deptSuccessChart = new Chart(deptSuccessCtx, {
+          type: 'radar',
+          data: {
+            labels: deptLabels,
+            datasets: [{
+              label: 'Success Rate by Department',
+              data: deptCounts,
+              fill: true,
+              backgroundColor: 'rgba(156, 39, 176, 0.15)',
+              borderColor: '#9c27b0',
+              pointBackgroundColor: '#9c27b0',
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: '#9c27b0'
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false }, title: { display: false } },
+            scales: {
+              r: {
+                angleLines: { display: true },
+                suggestedMin: 0,
+                suggestedMax: Math.max(...deptCounts, 5),
+                pointLabels: { font: { size: 13, weight: '600' } }
+              }
+            },
+            onClick: (e) => {
+              console.log('Chart clicked!');
+              const points = deptSuccessChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+              console.log('Points found:', points.length);
+              if (points.length) {
+                const idx = points[0].index;
+                console.log('Clicked index:', idx, 'Department:', deptLabels[idx]);
+                showDeptApplicants(deptLabels[idx]);
+              }
+            }
+          }
+        });
+        console.log('Chart created successfully');
+      } else {
+        console.log('Chart not created - missing data or canvas');
+        console.log('Canvas exists:', !!deptSuccessCanvas);
+        console.log('Labels length:', deptLabels.length);
+        console.log('Counts length:', deptCounts.length);
+      }
+    });
+    {% endif %}
+    
     // Doughnut chart for Vacancy Status Breakdown (only for total_vacancies)
     {% if label|lower == 'total_vacancies' %}
     window.addEventListener('DOMContentLoaded', function() {
@@ -269,20 +433,21 @@
       }
     });
     {% endif %}
-    // Department Radar Chart
-    const deptLabels = {{ dept_labels_json|safe }};
-    const deptCounts = {{ dept_counts_json|safe }};
+    // Department Radar Chart (for pages other than hiring_success_rate)
+    {% if label|lower not in ['hiring_success_rate'] %}
+    const generalDeptLabels = {{ dept_labels_json|safe }};
+    const generalDeptCounts = {{ dept_counts_json|safe }};
     const allCandidates = {{ candidates_json|safe }};
     const radarCanvas = document.getElementById('deptRadarChart');
     let radarChart = null;
-    if (radarCanvas && deptLabels.length && deptCounts.length) {
+    if (radarCanvas && generalDeptLabels.length && generalDeptCounts.length) {
       radarChart = new Chart(radarCanvas.getContext('2d'), {
         type: 'radar',
         data: {
-          labels: deptLabels,
+          labels: generalDeptLabels,
           datasets: [{
             label: 'Applicants',
-            data: deptCounts,
+            data: generalDeptCounts,
             fill: true,
             backgroundColor: 'rgba(25, 118, 210, 0.15)',
             borderColor: '#1976d2',
@@ -298,7 +463,7 @@
             r: {
               angleLines: { display: true },
               suggestedMin: 0,
-              suggestedMax: Math.max(...deptCounts, 5),
+              suggestedMax: Math.max(...generalDeptCounts, 5),
               pointLabels: { font: { size: 13, weight: '600' } }
             }
           },
@@ -306,24 +471,33 @@
             const points = radarChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
             if (points.length) {
               const idx = points[0].index;
-              showDeptApplicants(deptLabels[idx]);
+              showDeptApplicants(generalDeptLabels[idx]);
             }
           }
         }
       });
     }
+    {% endif %}
     function showDeptApplicants(dept) {
+      console.log('showDeptApplicants called with dept:', dept);
+      console.log('allCandidates available:', typeof allCandidates !== 'undefined');
+      console.log('allCandidates length:', typeof allCandidates !== 'undefined' ? allCandidates.length : 'undefined');
+      
       const wrapper = document.getElementById('deptApplicantsTableWrapper');
       const title = document.getElementById('deptApplicantsTitle');
       const tbody = document.getElementById('deptApplicantsTable').querySelector('tbody');
       
       // Check if this is total_vacancies page
       const isVacancies = '{{ label|lower }}' === 'total_vacancies';
+      const isHiringSuccess = '{{ label|lower }}' === 'hiring_success_rate';
+      
+      console.log('Page type - isVacancies:', isVacancies, 'isHiringSuccess:', isHiringSuccess);
       
       if (isVacancies) {
         title.textContent = `Jobs in "${dept}"`;
         tbody.innerHTML = '';
         const filtered = allCandidates.filter(c => (c.department || 'Unknown') === dept);
+        console.log('Vacancies filtered:', filtered.length);
         if (filtered.length === 0) {
           tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No jobs in this department.</td></tr>';
         } else {
@@ -334,16 +508,38 @@
           }
         }
       } else {
-        title.textContent = `Applicants in "${dept}"`;
-        tbody.innerHTML = '';
-        const filtered = allCandidates.filter(c => (c.department || 'Unknown') === dept);
-        if (filtered.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No applicants in this department.</td></tr>';
+        if (isHiringSuccess) {
+          title.textContent = `Hired Candidates in "${dept}"`;
+          tbody.innerHTML = '';
+          // For hiring success rate, filter for hired candidates only in the selected department
+          const filtered = allCandidates.filter(c => 
+            (c.department || 'Unknown') === dept && 
+            (c.status || '').toLowerCase() === 'hired'
+          );
+          console.log('Hiring success filtered for dept:', dept, 'count:', filtered.length);
+          console.log('Sample filtered candidates:', filtered.slice(0, 3));
+          if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No hired candidates in this department.</td></tr>';
+          } else {
+            for (const cand of filtered) {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td style='padding:6px 4px;'>${cand.name}</td><td style='padding:6px 4px;'>${cand.job_title}</td><td style='padding:6px 4px;'>${cand.status}</td><td style='padding:6px 4px;'>${cand.applied_date}</td><td style='padding:6px 4px;'><a class='btn btn-primary' style='padding:4px 12px;' href='/candidate/${cand.id}'>View Profile</a></td>`;
+              tbody.appendChild(tr);
+            }
+          }
         } else {
-          for (const cand of filtered) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td style='padding:6px 4px;'>${cand.name}</td><td style='padding:6px 4px;'>${cand.job_title}</td><td style='padding:6px 4px;'>${cand.status}</td><td style='padding:6px 4px;'>${cand.applied_date}</td><td style='padding:6px 4px;'><a class='btn btn-primary' style='padding:4px 12px;' href='/candidate/${cand.id}'>View Profile</a></td>`;
-            tbody.appendChild(tr);
+          title.textContent = `Applicants in "${dept}"`;
+          tbody.innerHTML = '';
+          const filtered = allCandidates.filter(c => (c.department || 'Unknown') === dept);
+          console.log('General applicants filtered:', filtered.length);
+          if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No applicants in this department.</td></tr>';
+          } else {
+            for (const cand of filtered) {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td style='padding:6px 4px;'>${cand.name}</td><td style='padding:6px 4px;'>${cand.job_title}</td><td style='padding:6px 4px;'>${cand.status}</td><td style='padding:6px 4px;'>${cand.applied_date}</td><td style='padding:6px 4px;'><a class='btn btn-primary' style='padding:4px 12px;' href='/candidate/${cand.id}'>View Profile</a></td>`;
+              tbody.appendChild(tr);
+            }
           }
         }
       }

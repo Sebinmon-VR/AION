@@ -1,3 +1,4 @@
+{% extends 'base.html' %}
 
 {% block title %}Candidate Profile{% endblock %}
 {% block content %}
@@ -1289,7 +1290,7 @@
   }
 </style>
 
-<div class="main-container">
+<div class="main-container" style="margin-top: 5%;">
   <!-- Profile Header -->
   <div class="profile-header">
     <h1>{{ candidate.name }}</h1>
@@ -1363,7 +1364,11 @@
                 <div class="step-title">Shortlisted <span class="expand-icon">▼</span></div>
                 <div class="step-subtitle">Resume reviewed</div>
                 <div class="step-date {% if candidate.status in ['Shortlisted', 'Interview Scheduled', 'Interviewed', 'Pending Approval', 'Approved', 'Selected', 'Hired', 'Onboarding'] %}completed{% endif %}">
-                  {{ candidate.shortlisted_date or '2025-01-02' }}
+                  {% if candidate.status in ['Shortlisted', 'Interview Scheduled', 'Interviewed', 'Pending Approval', 'Approved', 'Selected', 'Hired', 'Onboarding'] %}
+                    {{ candidate.shortlisted_date or 'Date not set' }}
+                  {% else %}
+                    Pending
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -1384,7 +1389,13 @@
                   {% else %}Pending{% endif %}
                 </div>
                 <div class="step-date {% if candidate.status == 'Interview Scheduled' %}in-progress{% elif candidate.status in ['Interviewed', 'Pending Approval', 'Approved', 'Selected', 'Hired', 'Onboarding'] %}completed{% endif %}">
-                  {{ candidate.interview_date or '2025-01-03' }}
+                  {% if candidate.status in ['Interviewed', 'Pending Approval', 'Approved', 'Selected', 'Hired', 'Onboarding'] %}
+                    {{ candidate.interview_date or 'Date not set' }}
+                  {% elif candidate.status == 'Interview Scheduled' %}
+                    {{ candidate.interview_date or 'Scheduled' }}
+                  {% else %}
+                    Pending
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -1405,7 +1416,13 @@
                   {% else %}Pending{% endif %}
                 </div>
                 <div class="step-date {% if candidate.status == 'Pending Approval' %}in-progress{% elif candidate.status in ['Approved', 'Selected', 'Hired', 'Onboarding'] %}completed{% endif %}">
-                  {{ candidate.approved_date or '2025-01-04' }}
+                  {% if candidate.status in ['Approved', 'Selected', 'Hired', 'Onboarding'] %}
+                    {{ candidate.approved_date or 'Date not set' }}
+                  {% elif candidate.status == 'Pending Approval' %}
+                    In Review
+                  {% else %}
+                    Pending
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -1435,7 +1452,15 @@
                   {% else %}Pending{% endif %}
                 </div>
                 <div class="step-date {% if candidate.status == 'Hired' and candidate.contract_signed %}completed{% elif candidate.status == 'Hired' and not candidate.contract_signed and not candidate.offer_accepted %}pending-response{% elif candidate.status == 'Hired' %}in-progress{% elif candidate.status == 'Selected' %}in-progress{% endif %}">
-                  {{ candidate.hired_date or '2025-01-05' }}
+                  {% if candidate.status == 'Hired' and candidate.contract_signed %}
+                    {{ candidate.hired_date or 'Date not set' }}
+                  {% elif candidate.status == 'Hired' and not candidate.contract_signed and not candidate.offer_accepted %}
+                    Pending Response
+                  {% elif candidate.status in ['Hired', 'Selected'] %}
+                    {{ candidate.hired_date or 'In Progress' }}
+                  {% else %}
+                    Pending
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -1461,7 +1486,17 @@
                   {% else %}Employee process{% endif %}
                 </div>
                 <div class="step-date {% if candidate.status == 'Onboarding' %}in-progress{% elif candidate.status == 'Hired' and candidate.contract_signed %}completed{% elif candidate.status == 'Hired' and not candidate.contract_signed and not candidate.offer_accepted %}pending{% elif candidate.status == 'Hired' %}in-progress{% endif %}">
-                  {{ candidate.onboarding_date or '2025-01-06' }}
+                  {% if candidate.status == 'Onboarding' %}
+                    {{ candidate.onboarding_date or 'In Progress' }}
+                  {% elif candidate.status == 'Hired' and candidate.contract_signed %}
+                    {{ candidate.onboarding_date or 'Ready to Start' }}
+                  {% elif candidate.status == 'Hired' and not candidate.contract_signed and not candidate.offer_accepted %}
+                    Pending Contract
+                  {% elif candidate.status == 'Hired' %}
+                    {{ candidate.onboarding_date or 'Preparing' }}
+                  {% else %}
+                    Pending
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -1729,7 +1764,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        {% set main_steps = ['Joining Formalities', 'HR Introduction', 'Document Verification', 'System Allocation'] %}
+                        {% set main_steps = ['Joining Formalities', 'HR Introduction', 'Document Verification', 'User IDs and ICT Allocation'] %}
                         {% for step in main_steps %}
                         <tr style="border-bottom: 1px solid #e2e8f0;">
                           <td style="padding: 8px; color: #2d3748;">{{ step }}</td>

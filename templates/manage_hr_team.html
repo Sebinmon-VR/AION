@@ -1000,6 +1000,56 @@
     100% { transform: scale(1); opacity: 0.7; }
   }
 
+  /* Filter Toggle Styles */
+  .filter-container {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+
+  .filter-toggle {
+    display: inline-flex;
+    background: #f8f9fa;
+    border-radius: 18px;
+    padding: 3px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 15px;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    border-radius: 15px;
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .filter-btn:hover {
+    color: #333;
+    text-decoration: none;
+  }
+
+  .filter-btn.active {
+    background: #ffffff;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-weight: 600;
+  }
+
+  .filter-description {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    font-style: italic;
+  }
+
   @media (max-width: 768px) {
     .flow-steps {
       flex-direction: column;
@@ -1023,6 +1073,27 @@
 <div class="page-header">
   <h1>Approval Cycle</h1>
   <div class="user-role">Logged in as: <strong>{{ current_user_role }}</strong></div>
+</div>
+
+<!-- Filter Toggle -->
+<div class="filter-container" style="text-align: right; margin-bottom: 30px;">
+  <div class="filter-toggle" style="display: inline-flex; width: auto;">
+    <a href="{{ url_for('manage_hr_team', filter='overall') }}" 
+       class="filter-btn {% if view_filter == 'overall' %}active{% endif %}">
+      Overall
+    </a>
+    <a href="{{ url_for('manage_hr_team', filter='active') }}" 
+       class="filter-btn {% if view_filter == 'active' %}active{% endif %}">
+      Active
+    </a>
+  </div>
+  <p class="filter-description" style="text-align: right; font-size: 12px; margin-top: 8px;">
+    {% if view_filter == 'active' %}
+      <strong>Active View:</strong> Showing only candidates currently in the approval process (excludes hired, rejected, withdrawn)
+    {% else %}
+      <strong>Overall View:</strong> Showing all candidates regardless of status
+    {% endif %}
+  </p>
 </div>
 
 
@@ -1418,12 +1489,12 @@ function showStatusTab(tabElement, status) {
 
 // View candidate profile
 function viewCandidate(candidateId) {
-  window.open(`/candidate_profile/${candidateId}`, '_blank');
+  window.open(`/candidate/${candidateId}`, '_blank');
 }
 
 // View candidate profile (new function name for consistency)
 function viewCandidateProfile(candidateId) {
-  window.open(`/candidate_profile/${candidateId}`, '_blank');
+  window.open(`/candidate/${candidateId}`, '_blank');
 }
 
 // Add click event for approve/reject buttons (if any existing ones)

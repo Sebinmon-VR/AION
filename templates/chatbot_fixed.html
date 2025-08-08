@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #fafbfc;
+      color: #222;
+    }
+
+    .chat-container {
+      height: 100vh;
+      max-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #f9f9f9;
+      border-radius: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 18px;
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+      min-height: 0;
+    }
+
+    .message {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.3s forwards;
+    }
+
+    .message.user {
+      align-items: flex-end;
+    }
+
+    .message.bot {
+      align-items: flex-start;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .bubble {
+      padding: 12px 18px;
+      border-radius: 18px;
+      max-width: 80%;
+      font-size: 1em;
+      background: #f5f5f5;
+      color: #222;
+      white-space: pre-wrap;
+    }
+
+    .message.user .bubble {
+      background: #e0e7ff;
+    }
+
+    .chat_a {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      background: #fafafa;
+      border-top: 1px solid #eee;
+      flex-shrink: 0;
+      min-height: 60px;
+      position: relative;
+    }
+
+    .chat-input-area {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    .send-btn {
+      margin-left: 10px;
+      margin-right: 70px;
+      padding: 0 22px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      color: #222;
+      transition: background 0.2s;
+    }
+
+    .send-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .dot-loader {
+      display: inline-block;
+      width: 32px;
+      text-align: left;
+    }
+
+    .dot-loader span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      margin: 0 2px;
+      background: #888;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: dotBounce 1.2s infinite;
+    }
+
+    .dot-loader span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot-loader span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes dotBounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.6; }
+      40% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    .analytics-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid #e0e0e0;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transform: translateY(0);
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .analytics-panel.hidden {
+      transform: translateY(100%);
+    }
+
+    .analytics-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .analytics-panel-title {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .analytics-toggle-btn {
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: #666;
+      transition: all 0.2s;
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .analytics-toggle-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: #333;
+    }
+
+    .analytics-panel-content {
+      padding: 20px;
+    }
+
+    .analytics-floating-toggle {
+      position: absolute;
+      right: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1em;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3);
+      transition: all 0.3s;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .analytics-floating-toggle.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .analytics-floating-toggle:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+    }
+
+    .chat-messages.has-content ~ .chat-bg-center {
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .chat-messages:not(.has-content) ~ .chat-bg-center {
+      opacity: 1;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chat-container">
+    <div class="chat-messages" id="chat-messages"></div>
+    
+    <!-- Analytics Panel -->
+    <div id="analytics-panel" class="analytics-panel">
+      <div class="analytics-panel-header">
+        <div class="analytics-panel-title">
+          📈 HR Analytics Insights
+        </div>
+        <button class="analytics-toggle-btn" onclick="toggleAnalyticsPanel()">
+          ⬆️
+        </button>
+      </div>
+      
+      <div class="analytics-panel-content">
+        <!-- Quick Actions -->
+        <div style="margin-bottom:20px;">
+          <div style="text-align:center;color:#666;font-size:0.9em;font-weight:600;margin-bottom:10px;">📊 Quick Actions</div>
+          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+            <button id="recent-activities-btn" style="backdrop-filter: blur(8px); background: rgba(255,255,255,0.7); border: 1px solid #e0e7ff; color: #1976d2; border-radius: 8px; padding: 10px 20px; font-size: 0.9em; font-weight: 500; box-shadow: 0 2px 8px #e0e7ff33; cursor: pointer; transition: all 0.2s;">🕑 Recent Activities</button>
+            <button id="upcoming-events-btn" style="backdrop-filter: blur(8px); background: rgba(255,255,255,0.7); border: 1px solid #e0e7ff; color: #1976d2; border-radius: 8px; padding: 10px 20px; font-size: 0.9em; font-weight: 500; box-shadow: 0 2px 8px #e0e7ff33; cursor: pointer; transition: all 0.2s;">📅 Upcoming Events</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chat_a">
+      <!-- Analytics Toggle Button -->
+      <button id="analytics-floating-toggle" class="analytics-floating-toggle" onclick="toggleAnalyticsPanel()">
+        📈
+      </button>
+      <form class="chat-input-area" id="chat-form" autocomplete="off">
+        <input type="text" class="chat-input" id="chat-input" placeholder="Type your message..." required />
+        <button type="submit" class="send-btn">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Quick Action: Recent Activities
+    document.getElementById('recent-activities-btn').addEventListener('click', async function() {
+      const loaderDiv = document.createElement('div');
+      loaderDiv.className = 'message bot';
+      const loaderBubble = document.createElement('div');
+      loaderBubble.className = 'bubble';
+      const loader = document.createElement('div');
+      loader.className = 'dot-loader';
+      loader.innerHTML = '<span></span><span></span><span></span>';
+      loaderBubble.appendChild(loader);
+      loaderDiv.appendChild(loaderBubble);
+      chatMessages.appendChild(loaderDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      updateBgVisibility();
+      
+      try {
+        const res = await fetch('http://127.0.0.1:5001/recent_activities?format=json');
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        if (res.ok) {
+          const data = await res.json();
+          let msg = '<b>📋 Recent Activities:</b><br><br>';
+          
+          if (data.recent_activities && data.recent_activities.length > 0) {
+            msg += '<div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 8px 0;">';
+            
+            // Show today's activities first if any
+            if (data.todays_activities && data.todays_activities.length > 0) {
+              msg += '<h4 style="margin: 0 0 8px 0; color: #1976d2;">📅 Today\'s Activities (' + data.todays_activities.length + ')</h4>';
+              for (let i = 0; i < Math.min(data.todays_activities.length, 5); i++) {
+                const act = data.todays_activities[i];
+                let time = act.timestamp || act.time || act.date || '';
+                if (time.includes(' ')) time = time.split(' ')[1]; // Get just time part
+                msg += '<div style="margin: 4px 0; padding: 6px; background: #e3f2fd; border-radius: 4px;">';
+                msg += '<span style="color: #1565c0; font-weight: 500;">' + (act.description || 'Activity') + '</span>';
+                if (act.user && act.user !== 'Unknown') {
+                  msg += '<br><small style="color: #666;">by ' + act.user + (time ? ' at ' + time : '') + '</small>';
+                }
+                msg += '</div>';
+              }
+              msg += '<br>';
+            }
+            
+            // Show recent activities
+            msg += '<h4 style="margin: 0 0 8px 0; color: #388e3c;">🕒 Recent Activities</h4>';
+            for (let i = 0; i < Math.min(data.recent_activities.length, 8); i++) {
+              const act = data.recent_activities[i];
+              let time = act.timestamp || act.time || act.date || '';
+              if (time.includes(' ')) {
+                const parts = time.split(' ');
+                time = parts[0] + ' ' + (parts[1] || '').substring(0, 5); // Date + time HH:MM
+              }
+              msg += '<div style="margin: 4px 0; padding: 6px; background: #f1f8e9; border-radius: 4px;">';
+              msg += '<span style="color: #2e7d32; font-weight: 500;">' + (act.description || 'Activity') + '</span>';
+              if (act.user && act.user !== 'Unknown') {
+                msg += '<br><small style="color: #666;">by ' + act.user + (time ? ' - ' + time : '') + '</small>';
+              }
+              msg += '</div>';
+            }
+            
+            msg += '</div>';
+            
+            // Add activity stats if available
+            if (data.activity_stats) {
+              msg += '<br><div style="background: #fff3e0; padding: 10px; border-radius: 6px; border-left: 4px solid #ff9800;">';
+              msg += '<b>📊 Activity Summary:</b><br>';
+              msg += '• Total Recent: ' + (data.activity_stats.total_recent || 0) + '<br>';
+              msg += '• Today: ' + (data.activity_stats.total_today || 0) + '<br>';
+              msg += '• Candidate Activities: ' + (data.activity_stats.candidate_activities || 0) + '<br>';
+              msg += '• Job Activities: ' + (data.activity_stats.job_activities || 0);
+              msg += '</div>';
+            }
+          } else {
+            msg += '<div style="padding: 20px; text-align: center; color: #666;">No recent activities found.</div>';
+          }
+          
+          appendMessage(msg, 'bot');
+        } else {
+          appendMessage('❌ Error: Unable to fetch recent activities. Server responded with status ' + res.status, 'bot');
+        }
+      } catch (err) {
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        appendMessage('❌ Error: Unable to connect to server. ' + (err.message || err), 'bot');
+      }
+    });
+
+    // Quick Action: Upcoming Events
+    document.getElementById('upcoming-events-btn').addEventListener('click', async function() {
+      const loaderDiv = document.createElement('div');
+      loaderDiv.className = 'message bot';
+      const loaderBubble = document.createElement('div');
+      loaderBubble.className = 'bubble';
+      const loader = document.createElement('div');
+      loader.className = 'dot-loader';
+      loader.innerHTML = '<span></span><span></span><span></span>';
+      loaderBubble.appendChild(loader);
+      loaderDiv.appendChild(loaderBubble);
+      chatMessages.appendChild(loaderDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      updateBgVisibility();
+      
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'Show me the upcoming events.' })
+        });
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        if (response.ok) {
+          const data = await response.json();
+          appendMessage(data.reply, 'bot');
+        } else {
+          appendMessage('Error: Unable to get upcoming events.', 'bot');
+        }
+      } catch (err) {
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        appendMessage('Error: Unable to connect to server. ' + (err.message || err), 'bot');
+      }
+    });
+
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+
+    function updateBgVisibility() {
+      const hasContent = chatMessages.children.length > 0;
+      if (hasContent) {
+        chatMessages.classList.add('has-content');
+      } else {
+        chatMessages.classList.remove('has-content');
+      }
+    }
+    updateBgVisibility();
+
+    function appendMessage(text, sender, isTyping = false) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message ' + sender;
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      msgDiv.appendChild(bubble);
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      updateBgVisibility();
+
+      if (sender === 'bot' && !isTyping) {
+        typeHTML(bubble, text, 10);
+      } else {
+        bubble.innerHTML = text;
+      }
+    }
+
+    function typeHTML(el, html, speed = 10) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      const nodes = Array.from(tempDiv.childNodes);
+
+      let i = 0;
+      function typeNextNode() {
+        if (i >= nodes.length) {
+          return;
+        }
+        const node = nodes[i++];
+        const clone = node.cloneNode(true);
+        el.appendChild(clone);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        if (clone.nodeType === Node.TEXT_NODE) {
+          const text = clone.textContent;
+          clone.textContent = '';
+          let j = 0;
+          const interval = setInterval(() => {
+            clone.textContent += text[j++];
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            if (j >= text.length) {
+              clearInterval(interval);
+              typeNextNode();
+            }
+          }, speed);
+        } else {
+          typeNextNode();
+        }
+      }
+
+      typeNextNode();
+    }
+
+    chatForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const userMsg = chatInput.value.trim();
+      if (!userMsg) return;
+      appendMessage(userMsg, 'user');
+      chatInput.value = '';
+      updateBgVisibility();
+
+      const loaderDiv = document.createElement('div');
+      loaderDiv.className = 'message bot';
+      const loaderBubble = document.createElement('div');
+      loaderBubble.className = 'bubble';
+      const loader = document.createElement('div');
+      loader.className = 'dot-loader';
+      loader.innerHTML = '<span></span><span></span><span></span>';
+      loaderBubble.appendChild(loader);
+      loaderDiv.appendChild(loaderBubble);
+      chatMessages.appendChild(loaderDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      updateBgVisibility();
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMsg })
+        });
+
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+
+        if (response.ok) {
+          const data = await response.json();
+          appendMessage(data.reply, 'bot');
+        } else {
+          appendMessage('Error: Unable to get response.', 'bot');
+        }
+      } catch (err) {
+        chatMessages.removeChild(loaderDiv);
+        updateBgVisibility();
+        appendMessage('Error: Unable to connect to server.', 'bot');
+      }
+    });
+
+    // Analytics Panel Toggle Functionality
+    let isAnalyticsPanelOpen = true;
+
+    function toggleAnalyticsPanel() {
+      const panel = document.getElementById('analytics-panel');
+      const floatingBtn = document.getElementById('analytics-floating-toggle');
+      const toggleBtn = panel.querySelector('.analytics-toggle-btn');
+      
+      isAnalyticsPanelOpen = !isAnalyticsPanelOpen;
+      
+      if (isAnalyticsPanelOpen) {
+        panel.classList.remove('hidden');
+        floatingBtn.classList.remove('show');
+        toggleBtn.innerHTML = '⬆️';
+      } else {
+        panel.classList.add('hidden');
+        floatingBtn.classList.add('show');
+        toggleBtn.innerHTML = '⬇️';
+      }
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', function() {
+      // Start with panel open
+      const panel = document.getElementById('analytics-panel');
+      const floatingBtn = document.getElementById('analytics-floating-toggle');
+      panel.classList.remove('hidden');
+      floatingBtn.classList.remove('show');
+    });
+  </script>
+</body>
+</html>

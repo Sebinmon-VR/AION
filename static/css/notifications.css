@@ -1,0 +1,221 @@
+/* Notification System Styles */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    max-width: 400px;
+}
+
+.notification-popup {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-left: 5px solid #ffd700;
+    animation: slideInFromRight 0.5s ease-out;
+    position: relative;
+    backdrop-filter: blur(10px);
+    max-width: 380px;
+    word-wrap: break-word;
+}
+
+.notification-popup.high-priority {
+    border-left-color: #ff4757;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+}
+
+.notification-popup.success {
+    border-left-color: #2ed573;
+    background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.notification-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+.notification-message {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 15px;
+    opacity: 0.95;
+}
+
+.notification-meta {
+    font-size: 12px;
+    opacity: 0.8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.notification-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.notification-action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.notification-action-btn.primary {
+    background: rgba(255, 215, 0, 0.8);
+    color: #333;
+    font-weight: bold;
+}
+
+.notification-action-btn.primary:hover {
+    background: rgba(255, 215, 0, 1);
+}
+
+/* Notification Badge */
+.notification-badge {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: #ff4757;
+    color: white;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 9999;
+    cursor: pointer;
+    animation: pulse 2s infinite;
+    box-shadow: 0 2px 10px rgba(255, 71, 87, 0.5);
+}
+
+.notification-badge:hover {
+    transform: scale(1.1);
+}
+
+/* Animations */
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutToRight {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 71, 87, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0);
+    }
+}
+
+.notification-popup.fade-out {
+    animation: slideOutToRight 0.5s ease-in forwards;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .notification-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .notification-popup {
+        max-width: none;
+    }
+}
+
+/* Sound notification indicator */
+.notification-popup::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+        rgba(255, 215, 0, 0.3) 0%, 
+        transparent 25%, 
+        transparent 75%, 
+        rgba(255, 215, 0, 0.3) 100%);
+    border-radius: 12px;
+    z-index: -1;
+    animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
